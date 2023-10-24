@@ -1,13 +1,7 @@
 {
-    "cmake.sourceDirectory": "D:/W7500P",
-    "files.associations": {
-        "stdio.h": "c",
-        "stat.h": "c",
-        "w7500x_dualtimer.h": "c",
-        "mmc_sd.h": "c",
-        "w7500x_it.h": "c",
-        "w7500x_uart.h": "c",
-        "w7500x_wztoe.h": "c",
-        "loopback.h": "c"
-    }
+    "cmake.configureArgs": [
+        "-DCMAKE_MAKE_PROGRAM=C:/Program Files (x86)/xpack-windows-build-tools-4.4.0-1/bin/make.exe",
+        "-DARM_TOOLCHAIN_DIR=C:/Program Files (x86)/GNU Arm Embedded Toolchain/10 2021.10/bin"
+    ],
+    "cmake.generator": "Unix Makefiles"
 }

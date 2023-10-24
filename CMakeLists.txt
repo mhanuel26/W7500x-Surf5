@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-set(PROJECT_NAME W7500x_pwm)
+set(PROJECT_NAME W7500x-surf5)
 
 include(${CMAKE_SOURCE_DIR}/tools/arm-none-eabi-gcc.cmake)
 project(${PROJECT_NAME} 
