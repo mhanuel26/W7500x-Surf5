@@ -94,11 +94,11 @@ void GPIO_Setting(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
     
-     /* GPIO Configuration for red LED */
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0; ///< Connecting GPIO_Pin_0(LED(R))
+     /* GPIO Configuration for USER LED */
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15; ///< Connecting GPIO_Pin_15(USER LED)
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT; ///< Set to GPIO Mode to Output Port
     GPIO_Init(GPIOC, &GPIO_InitStructure);
-    PAD_AFConfig(PAD_PC, GPIO_Pin_0, PAD_AF1); ///< PAD Config - LED used 2nd Function
+    PAD_AFConfig(PAD_PC, GPIO_Pin_15, PAD_AF1); ///< PAD Config - LED used 2nd Function
 }
 
 /**

@@ -1,12 +1,12 @@
 /*******************************************************************************************************************************************************
- * Copyright ¨Ï 2016 <WIZnet Co.,Ltd.> 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ¡°Software¡±), 
+ * Copyright ï¿½ï¿½ 2016 <WIZnet Co.,Ltd.> 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ï¿½ï¿½Softwareï¿½ï¿½), 
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
  * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
  *
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
- * THE SOFTWARE IS PROVIDED ¡°AS IS¡±, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * THE SOFTWARE IS PROVIDED ï¿½ï¿½AS ISï¿½ï¿½, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
  * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
@@ -235,10 +235,10 @@ void PWM0_Handler(void)
         /* Clear match interrupt */
         PWM_CH0_ClearMatchInt(); 
         /* LED red is toggled */
-        if(GPIO_ReadOutputDataBit(GPIOC,GPIO_Pin_8) != (uint32_t)Bit_RESET)
-            GPIO_ResetBits(GPIOC, GPIO_Pin_8);
+        if(GPIO_ReadOutputDataBit(GPIOC,GPIO_Pin_15) != (uint32_t)Bit_RESET)
+            GPIO_ResetBits(GPIOC, GPIO_Pin_15);
         else
-            GPIO_SetBits(GPIOC, GPIO_Pin_8);
+            GPIO_SetBits(GPIOC, GPIO_Pin_15);
     }
     /* If overflow interrupt is occurred */
     if( (IntFlag & PWM_CHn_IER_OI_Msk) != 0 )
@@ -246,10 +246,10 @@ void PWM0_Handler(void)
         /* Clear overflow interrupt */
         PWM_CH0_ClearOverflowInt();
         /* LED green is toggled */
-        if(GPIO_ReadOutputDataBit(GPIOC,GPIO_Pin_9) != (uint32_t)Bit_RESET)
-            GPIO_ResetBits(GPIOC, GPIO_Pin_9);
+        if(GPIO_ReadOutputDataBit(GPIOC,GPIO_Pin_15) != (uint32_t)Bit_RESET)
+            GPIO_ResetBits(GPIOC, GPIO_Pin_15);
         else
-            GPIO_SetBits(GPIOC, GPIO_Pin_9);
+            GPIO_SetBits(GPIOC, GPIO_Pin_15);
     }
 
     /* If capture interrupt is occurred */
@@ -259,7 +259,7 @@ void PWM0_Handler(void)
 }
 
 /**
-  * @brief  This function handles PWM1 Handler.
+  * @brief  This function handles PWM1 Handler.\
   * @param  None
   * @retval None
   */

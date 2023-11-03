@@ -1,12 +1,12 @@
 /*******************************************************************************************************************************************************
- * Copyright ¨Ï 2016 <WIZnet Co.,Ltd.> 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ¡°Software¡±), 
+ * Copyright ï¿½ï¿½ 2016 <WIZnet Co.,Ltd.> 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ï¿½ï¿½Softwareï¿½ï¿½), 
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
  * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
  *
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
- * THE SOFTWARE IS PROVIDED ¡°AS IS¡±, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * THE SOFTWARE IS PROVIDED ï¿½ï¿½AS ISï¿½ï¿½, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
  * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
@@ -70,12 +70,12 @@ int main()
 	    SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk; //deep sleep mode
 	    __WFI(); //Wait For Interrupt!!
 	    
-        delay_ms(1000);
-	    GPIO_SetBits(GPIOC, GPIO_Pin_5); //LED(B) off
+      delay_ms(1000);
+	    GPIO_SetBits(GPIOC, GPIO_Pin_15); //USER LED off
 	    delay_ms(1000);
-	    GPIO_ResetBits(GPIOC, GPIO_Pin_5); //LED(B) ON
+	    GPIO_ResetBits(GPIOC, GPIO_Pin_15); //USER LED ON
 	    delay_ms(1000);
-	    GPIO_SetBits(GPIOC, GPIO_Pin_5); //LED(B) off
+	    GPIO_SetBits(GPIOC, GPIO_Pin_15); //USER LED off
     }
 }
 
@@ -92,11 +92,11 @@ void GPIO_Setting(void)
     GPIO_InitDef.GPIO_Mode = GPIO_Mode_IN;
     GPIO_Init(GPIOA, &GPIO_InitDef);
 
-    /* GPIO LED(B) Setting */
-    GPIO_InitDef.GPIO_Pin = GPIO_Pin_5; // Connecting GPIO_Pin_5(LED(B))
+    /* GPIO USER LED Setting */
+    GPIO_InitDef.GPIO_Pin = GPIO_Pin_15; // Connecting GPIO_Pin_15(USER LED)
     GPIO_InitDef.GPIO_Mode = GPIO_Mode_OUT; // Set to GPIO Mode to Output Port
     GPIO_Init(GPIOC, &GPIO_InitDef);
-	PAD_AFConfig(PAD_PC,GPIO_Pin_5 , PAD_AF1); // PAD Config - LED used 2nd Function
+	PAD_AFConfig(PAD_PC,GPIO_Pin_15 , PAD_AF1); // PAD Config - LED used 2nd Function
 
     /* Set to GPIO_Pin_0 to External Interrupt Port */
     EXTI_InitDef.EXTI_Line = GPIO_Pin_0;

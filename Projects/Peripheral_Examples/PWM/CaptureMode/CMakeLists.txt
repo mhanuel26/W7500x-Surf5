@@ -2,6 +2,7 @@
 set(TARGET_NAME CaptureMode)
 add_executable(${TARGET_NAME}
   ${CMAKE_SOURCE_DIR}/Projects/Peripheral_Examples/PWM/CaptureMode/main.c
+  ${CMAKE_SOURCE_DIR}/Projects/Peripheral_Examples/PWM/CaptureMode/W7500x_it.c
   ${CMAKE_SOURCE_DIR}/Libraries/Startup/startup_W7500.s
   )
   

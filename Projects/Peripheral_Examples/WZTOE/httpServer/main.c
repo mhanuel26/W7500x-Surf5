@@ -1,12 +1,12 @@
 /*******************************************************************************************************************************************************
- * Copyright ¨Ï 2016 <WIZnet Co.,Ltd.> 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ¡°Software¡±), 
+ * Copyright ï¿½ï¿½ 2016 <WIZnet Co.,Ltd.> 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ï¿½ï¿½Softwareï¿½ï¿½), 
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
  * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
  *
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
- * THE SOFTWARE IS PROVIDED ¡°AS IS¡±, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * THE SOFTWARE IS PROVIDED ï¿½ï¿½AS ISï¿½ï¿½, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
  * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
@@ -43,12 +43,11 @@
 #include "webpage.h"
 
 /* Private typedef -----------------------------------------------------------*/
-
+UART_InitTypeDef UART_InitStructure;
 
 /* Private define ------------------------------------------------------------*/
 #define __DEF_USED_MDIO__ 
-#define __W7500P__ // for W7500
-
+//#define __W7500P__ // for W7500
 
 #ifndef __W7500P__ // for W7500
 	#define __DEF_USED_IC101AG__ //for W7500 Test main Board V001
@@ -92,8 +91,8 @@ int main()
     //uint8_t tx_size[8] = { 2, 2, 2, 2, 2, 2, 2, 2 };
     //uint8_t rx_size[8] = { 2, 2, 2, 2, 2, 2, 2, 2 };
     uint8_t mac_addr[6] = {0x00, 0x08, 0xDC, 0x71, 0x72, 0x77}; 
-    uint8_t src_addr[4] = {192, 168,  1,  98};
-    uint8_t gw_addr[4]  = {192, 168,  1,  1};
+    uint8_t src_addr[4] = {192, 168,  0,  11};
+    uint8_t gw_addr[4]  = {192, 168,  0,  1};
     uint8_t sub_addr[4] = {255, 255, 255,  0};	
 		
     uint8_t tmp[8];
@@ -107,11 +106,12 @@ int main()
     /* Set Systme init */
     SystemInit();
 
-    /* UART0 and UART1 configuration*/
-    //UART_StructInit(&UART_InitStructure);
-    /* Configure UART1 */
-    //UART_Init(UART1,&UART_InitStructure);
-		S_UART_Init(115200);
+     /* Configure UART1 for W7500*/
+    UART_StructInit(&UART_InitStructure);
+    UART_Init(UART1,&UART_InitStructure);
+
+     /* Configure UART2 for W7500P*/
+	  // S_UART_Init(115200);
 
     /* SysTick_Config */
     SysTick_Config((GetSystemClock()/1000));
@@ -244,16 +244,12 @@ void GPIO_Setting(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
 
-    /*GPIO Configuration for red,green,blue LED */
-    PAD_AFConfig(PAD_PC,GPIO_Pin_0,PAD_AF1); ///< PAD Config - RED LED used 2nd Function
-    PAD_AFConfig(PAD_PC,GPIO_Pin_5,PAD_AF1); ///< PAD Config - GREEN LED used 2nd Function	 
-    PAD_AFConfig(PAD_PC,GPIO_Pin_4,PAD_AF1); ///< PAD Config - BLUE LED used 2nd Function
+    /*GPIO Configuration for USER LED */
+    PAD_AFConfig(PAD_PC,GPIO_Pin_15,PAD_AF1); ///< PAD Config - USER LED used 2nd Function
     
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_4 | GPIO_Pin_5; ///< Connecting GPIO_Pin_0(R),5(G),4(B)
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15; ///< Connecting GPIO_Pin_15(USER LED)
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT; ///< Set to GPIO Mode to Output Port
     GPIO_Init(GPIOC, &GPIO_InitStructure);
 	
-	  GPIO_SetBits(GPIOC, GPIO_Pin_0);// Red - High(off)
-	  GPIO_SetBits(GPIOC, GPIO_Pin_5);// Green - High(off)
-	  GPIO_SetBits(GPIOC, GPIO_Pin_4);// Blue - High(off)
+	  GPIO_SetBits(GPIOC, GPIO_Pin_15);// USER LED - High(off)
 }

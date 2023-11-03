@@ -1,12 +1,12 @@
 /*******************************************************************************************************************************************************
- * Copyright ¨Ï 2016 <WIZnet Co.,Ltd.> 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ¡°Software¡±), 
+ * Copyright ï¿½ï¿½ 2016 <WIZnet Co.,Ltd.> 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ï¿½ï¿½Softwareï¿½ï¿½), 
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
  * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
  *
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
- * THE SOFTWARE IS PROVIDED ¡°AS IS¡±, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * THE SOFTWARE IS PROVIDED ï¿½ï¿½AS ISï¿½ï¿½, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
  * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
@@ -88,7 +88,7 @@ int main()
     //uint8_t tx_size[8] = { 2, 2, 2, 2, 2, 2, 2, 2 };
     //uint8_t rx_size[8] = { 2, 2, 2, 2, 2, 2, 2, 2 };
     uint8_t mac_addr[6] = {0x00, 0x08, 0xDC, 0x01, 0x02, 0x03}; 
-    uint8_t src_addr[4] = {192, 168,  0,  9};
+    uint8_t src_addr[4] = {192, 168,  0,  11};
     uint8_t gw_addr[4]  = {192, 168,  0,  1};
     uint8_t sub_addr[4] = {255, 255, 255,  0};		
     //uint8_t dns_server[4] = {8, 8, 8, 8};           // for Example domain name server
@@ -111,13 +111,12 @@ int main()
 		SSP1_Initialize();
 		GPIO_Initialize();	
 
-		GPIO_SetBits(GPIOC, GPIO_Pin_8); // LED red off
-		GPIO_SetBits(GPIOC, GPIO_Pin_9); // LED green off
-		GPIO_ResetBits(GPIOC, GPIO_Pin_6); // Test off
-
-    /* UART Init */
+     /* Configure UART1 for W7500*/
     UART_StructInit(&UART_InitStructure);
     UART_Init(UART1,&UART_InitStructure);
+
+     /* Configure UART2 for W7500P*/
+	  // S_UART_Init(115200);
 
     /* SysTick_Config */
     SysTick_Config((GetSystemClock()/1000));
@@ -315,15 +314,9 @@ void SSP1_Initialize(void)	//Slave
 }
 void GPIO_Initialize(void)
 {
-	/* GPIO LED(R) Setting */
-	GPIO_InitDef.GPIO_Pin = GPIO_Pin_8; 								// Connecting GPIO_Pin_8(LED(R))
+	/* GPIO LED(USER) Setting */
+	GPIO_InitDef.GPIO_Pin = GPIO_Pin_15; 								// Connecting GPIO_Pin_15(LED(USER))
 	GPIO_InitDef.GPIO_Mode = GPIO_Mode_OUT; 		// Set to GPIO Mode to Output Port
 	GPIO_Init(GPIOC, &GPIO_InitDef); 											// Set to GPIOC
-	PAD_AFConfig(PAD_PC,GPIO_Pin_8, PAD_AF1); // PAD Config - LED used 2nd Function
-
-	/* GPIO LED(G) Setting */
-	GPIO_InitDef.GPIO_Pin = GPIO_Pin_9; 								// Connecting GPIO_Pin_9(LED(G))
-	GPIO_InitDef.GPIO_Mode = GPIO_Mode_OUT; 		// Set to GPIO Mode to Output Port
-	GPIO_Init(GPIOC, &GPIO_InitDef); 											// Set to GPIOC
-	PAD_AFConfig(PAD_PC,GPIO_Pin_9, PAD_AF1); // PAD Config - LED used 2nd Function
+	PAD_AFConfig(PAD_PC,GPIO_Pin_15, PAD_AF1); // PAD Config - LED used 2nd Function
 }

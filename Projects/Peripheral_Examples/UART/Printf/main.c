@@ -54,14 +54,16 @@ UART_InitTypeDef UART_InitStructure;
 int main()
 {
     /*System clock configuration*/
-	SystemInit();    
+	  SystemInit();    
     /* UART0 and UART1 configuration*/
     UART_StructInit(&UART_InitStructure);
-    /* Configure UART0 */
+    /* Configure UART1 */
     UART_Init(UART1,&UART_InitStructure);
-  	S_UART_Init(115200);
+    /* Configure UART2 */
+  	// S_UART_Init(115200);
+
     /* Retarget functions for GNU Tools for ARM Embedded Processors*/
     UartPuts(UART1,"UART 1 Test(#1)\r\n");
-    printf("UART 2 Test(#2)\r\n"); 
+    printf("UART 1 Test(#2)\r\n"); 
 }
 

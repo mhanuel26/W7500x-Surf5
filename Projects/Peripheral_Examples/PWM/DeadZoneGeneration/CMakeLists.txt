@@ -2,6 +2,7 @@
 set(TARGET_NAME DeadZoneGeneration)
 add_executable(${TARGET_NAME}
   ${CMAKE_SOURCE_DIR}/Projects/Peripheral_Examples/PWM/DeadZoneGeneration/main.c
+  ${CMAKE_SOURCE_DIR}/Projects/Peripheral_Examples/PWM/DeadZoneGeneration/W7500x_it.c
   ${CMAKE_SOURCE_DIR}/Libraries/Startup/startup_W7500.s
   )
 target_include_directories(${TARGET_NAME} PUBLIC

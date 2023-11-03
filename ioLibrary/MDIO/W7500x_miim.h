@@ -1,12 +1,12 @@
 /*******************************************************************************************************************************************************
- * Copyright ¨Ï 2016 <WIZnet Co.,Ltd.> 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ¡°Software¡±), 
+ * Copyright ï¿½ï¿½ 2016 <WIZnet Co.,Ltd.> 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ï¿½ï¿½Softwareï¿½ï¿½), 
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
  * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
  *
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
- * THE SOFTWARE IS PROVIDED ¡°AS IS¡±, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * THE SOFTWARE IS PROVIDED ï¿½ï¿½AS ISï¿½ï¿½, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
  * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
@@ -15,17 +15,34 @@
 #define __MIIM_H__
 #include "W7500x_gpio.h"
 
+#ifdef __W7500P__ // W7500P only
+
 #define MDIO    GPIO_Pin_15
 #define MDC     GPIO_Pin_14
 
 #define __DEF_USED_MDIO__ 
 #define __W7500P__ // for W7500P
-
+#define __DEF_DBG_LEVEL1__
 
 //#define PHY_ADDR_RLT8201 0x1F //AD[4:0] <= 0x1F (0x1F)
 //#define PHY_ADDR_IP101G (phy_id())
 //#define PHY_ADDR PHY_ADDR_IP101G
+#endif
 
+#ifndef __W7500P__ // For using W7500 + (IC+101AG PHY)
+
+#define MDIO    GPIO_Pin_14
+#define MDC     GPIO_Pin_15
+
+#define __DEF_DBG_LEVEL1__
+#define __DEF_USED_MDIO__ 
+#define __DEF_USED_IC101AG__ //for W7500 Test main Board V001
+
+//#define PHY_ADDR_RLT8201 0x1F //AD[4:0] <= 0x1F (0x1F)
+#define PHY_ADDR_IP101G 0x07 // //AD[3:0] <= 0x0F (0x07)
+#define PHY_ADDR PHY_ADDR_IP101G
+
+#endif
 
 #define SVAL 0x2 //right shift val = 2 
 #define PHYREG_CONTROL  0x0//Control Register address (Contorl basic register)

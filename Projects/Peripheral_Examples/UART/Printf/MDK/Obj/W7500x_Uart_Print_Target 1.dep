@@ -1,0 +1,46 @@
+Dependencies for Project 'W7500x_Uart_Print', Target 'Target 1': (DO NOT MODIFY !)
+CompilerVersion: 5060750::V5.06 update 6 (build 750)::.\ARMCC
+F (..\..\..\..\..\Libraries\CMSIS\Device\WIZnet\W7500\Source\ARM\startup_W7500x.s)(0x6525E78C)(--cpu Cortex-M0 --li -g --apcs=interwork -IC:\Keil_v5\ARM\RV31\INC-IC:\Keil_v5\ARM\CMSIS\Include--pd "__UVISION_VERSION SETA 531"--list .\list\startup_w7500x.lst --xref -o .\obj\startup_w7500x.o --depend .\obj\startup_w7500x.d)
+F (..\..\..\..\..\Libraries\W7500x_stdPeriph_Driver\src\W7500x_uart.c)(0x6525E78E)(-c --cpu Cortex-M0 --li -g -O3 --apcs=interwork -I ..\..\..\..\..\Libraries\CMSIS\Device\WIZnet\W7500\Include -I ..\..\..\..\..\Libraries\W7500x_stdPeriph_Driver\inc -I ..\..\..\..\..\Libraries\CMSIS\Include -I ..\-IC:\Keil_v5\ARM\RV31\INC-IC:\Keil_v5\ARM\CMSIS\Include-D__UVISION_VERSION="531" -DCORTEX_M0 -DUSE_STDPERIPH_DRIVER-o .\obj\w7500x_uart.o --omf_browse .\obj\w7500x_uart.crf --depend .\obj\w7500x_uart.d)
+I (..\..\..\..\..\Libraries\W7500x_stdPeriph_Driver\inc\W7500x_uart.h)(0x6525E78E)
+I (..\..\..\..\..\Libraries\CMSIS\Device\WIZnet\W7500\Include\W7500x.h)(0x6525E78C)
+I (..\..\..\..\..\Libraries\CMSIS\Include\core_cm0.h)(0x6525E78C)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5EC767EC)
+I (..\..\..\..\..\Libraries\CMSIS\Include\core_cmInstr.h)(0x6525E78C)
+I (..\..\..\..\..\Libraries\CMSIS\Include\core_cmFunc.h)(0x6525E78C)
+I (..\..\..\..\..\Libraries\CMSIS\Device\WIZnet\W7500\Include\system_W7500x.h)(0x6525E78C)
+F (..\..\..\..\..\Libraries\CMSIS\Device\WIZnet\W7500\Source\system_W7500x.c)(0x6525E78C)(-c --cpu Cortex-M0 --li -g -O3 --apcs=interwork -I ..\..\..\..\..\Libraries\CMSIS\Device\WIZnet\W7500\Include -I ..\..\..\..\..\Libraries\W7500x_stdPeriph_Driver\inc -I ..\..\..\..\..\Libraries\CMSIS\Include -I ..\-IC:\Keil_v5\ARM\RV31\INC-IC:\Keil_v5\ARM\CMSIS\Include-D__UVISION_VERSION="531" -DCORTEX_M0 -DUSE_STDPERIPH_DRIVER-o .\obj\system_w7500x.o --omf_browse .\obj\system_w7500x.crf --depend .\obj\system_w7500x.d)
+I (..\..\..\..\..\Libraries\CMSIS\Device\WIZnet\W7500\Include\system_W7500x.h)(0x6525E78C)
+I (..\..\..\..\..\Libraries\CMSIS\Device\WIZnet\W7500\Include\W7500x.h)(0x6525E78C)
+I (..\..\..\..\..\Libraries\CMSIS\Include\core_cm0.h)(0x6525E78C)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5EC767EC)
+I (..\..\..\..\..\Libraries\CMSIS\Include\core_cmInstr.h)(0x6525E78C)
+I (..\..\..\..\..\Libraries\CMSIS\Include\core_cmFunc.h)(0x6525E78C)
+F (..\main.c)(0x654328BC)(-c --cpu Cortex-M0 --li -g -O3 --apcs=interwork -I ..\..\..\..\..\Libraries\CMSIS\Device\WIZnet\W7500\Include -I ..\..\..\..\..\Libraries\W7500x_stdPeriph_Driver\inc -I ..\..\..\..\..\Libraries\CMSIS\Include -I ..\-IC:\Keil_v5\ARM\RV31\INC-IC:\Keil_v5\ARM\CMSIS\Include-D__UVISION_VERSION="531" -DCORTEX_M0 -DUSE_STDPERIPH_DRIVER-o .\obj\main.o --omf_browse .\obj\main.crf --depend .\obj\main.d)
+I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x5EC767EC)
+I (..\..\..\..\..\Libraries\W7500x_stdPeriph_Driver\inc\W7500x_uart.h)(0x6525E78E)
+I (..\..\..\..\..\Libraries\CMSIS\Device\WIZnet\W7500\Include\W7500x.h)(0x6525E78C)
+I (..\..\..\..\..\Libraries\CMSIS\Include\core_cm0.h)(0x6525E78C)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5EC767EC)
+I (..\..\..\..\..\Libraries\CMSIS\Include\core_cmInstr.h)(0x6525E78C)
+I (..\..\..\..\..\Libraries\CMSIS\Include\core_cmFunc.h)(0x6525E78C)
+I (..\..\..\..\..\Libraries\CMSIS\Device\WIZnet\W7500\Include\system_W7500x.h)(0x6525E78C)
+F (..\retarget.c)(0x654328B9)(-c --cpu Cortex-M0 --li -g -O3 --apcs=interwork -I ..\..\..\..\..\Libraries\CMSIS\Device\WIZnet\W7500\Include -I ..\..\..\..\..\Libraries\W7500x_stdPeriph_Driver\inc -I ..\..\..\..\..\Libraries\CMSIS\Include -I ..\-IC:\Keil_v5\ARM\RV31\INC-IC:\Keil_v5\ARM\CMSIS\Include-D__UVISION_VERSION="531" -DCORTEX_M0 -DUSE_STDPERIPH_DRIVER-o .\obj\retarget.o --omf_browse .\obj\retarget.crf --depend .\obj\retarget.d)
+I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x5EC767EC)
+I (..\..\..\..\..\Libraries\W7500x_stdPeriph_Driver\inc\W7500x_uart.h)(0x6525E78E)
+I (..\..\..\..\..\Libraries\CMSIS\Device\WIZnet\W7500\Include\W7500x.h)(0x6525E78C)
+I (..\..\..\..\..\Libraries\CMSIS\Include\core_cm0.h)(0x6525E78C)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5EC767EC)
+I (..\..\..\..\..\Libraries\CMSIS\Include\core_cmInstr.h)(0x6525E78C)
+I (..\..\..\..\..\Libraries\CMSIS\Include\core_cmFunc.h)(0x6525E78C)
+I (..\..\..\..\..\Libraries\CMSIS\Device\WIZnet\W7500\Include\system_W7500x.h)(0x6525E78C)
+I (C:\Keil_v5\ARM\ARMCC\include\time.h)(0x5EC767E2)
+I (C:\Keil_v5\ARM\ARMCC\include\rt_misc.h)(0x5EC767E2)
+I (C:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x5EC767EC)
+F (..\W7500x_it.c)(0x6525E78E)(-c --cpu Cortex-M0 --li -g -O3 --apcs=interwork -I ..\..\..\..\..\Libraries\CMSIS\Device\WIZnet\W7500\Include -I ..\..\..\..\..\Libraries\W7500x_stdPeriph_Driver\inc -I ..\..\..\..\..\Libraries\CMSIS\Include -I ..\-IC:\Keil_v5\ARM\RV31\INC-IC:\Keil_v5\ARM\CMSIS\Include-D__UVISION_VERSION="531" -DCORTEX_M0 -DUSE_STDPERIPH_DRIVER-o .\obj\w7500x_it.o --omf_browse .\obj\w7500x_it.crf --depend .\obj\w7500x_it.d)
+I (..\..\..\..\..\Libraries\CMSIS\Device\WIZnet\W7500\Include\W7500x.h)(0x6525E78C)
+I (..\..\..\..\..\Libraries\CMSIS\Include\core_cm0.h)(0x6525E78C)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x5EC767EC)
+I (..\..\..\..\..\Libraries\CMSIS\Include\core_cmInstr.h)(0x6525E78C)
+I (..\..\..\..\..\Libraries\CMSIS\Include\core_cmFunc.h)(0x6525E78C)
+I (..\..\..\..\..\Libraries\CMSIS\Device\WIZnet\W7500\Include\system_W7500x.h)(0x6525E78C)

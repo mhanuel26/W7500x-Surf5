@@ -1,12 +1,12 @@
 /*******************************************************************************************************************************************************
- * Copyright ¨Ï 2016 <WIZnet Co.,Ltd.> 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ¡°Software¡±), 
+ * Copyright ï¿½ï¿½ 2016 <WIZnet Co.,Ltd.> 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ï¿½ï¿½Softwareï¿½ï¿½), 
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
  * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
  *
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
- * THE SOFTWARE IS PROVIDED ¡°AS IS¡±, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * THE SOFTWARE IS PROVIDED ï¿½ï¿½AS ISï¿½ï¿½, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
  * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
@@ -73,7 +73,7 @@ int main()
 //    *(volatile uint32_t *)(0x41001014) = 0x0060100; //clock setting 48MHz
     
     /* CLK OUT Set */
-//    PAD_AFConfig(PAD_PA,GPIO_Pin_2, PAD_AF2); // PAD Config - CLKOUT used 3nd Function
+//    PAD_AFConfig(PAD_PA,GPIO_Pin_2, PAD_AF2); // PAD Config - CLKOUT used 3rd Function
     /* < SSP_StructInit default values
        SSP_InitStructure.SSP_SerialClockRate   = 0x00;
        SSP_InitStructure.SSP_FrameFormat       = SSP_FrameFormat_MO; 
@@ -107,13 +107,13 @@ int main()
 	PAD_AFConfig(PAD_PC,GPIO_Pin_8, PAD_AF1); // PAD Config - LED used 2nd Function
 
     /* GPIO LED(G) Setting */
-    GPIO_InitDef.GPIO_Pin = GPIO_Pin_9; // Connecting GPIO_Pin_9(LED(G))
+    GPIO_InitDef.GPIO_Pin = GPIO_Pin_15; // Connecting GPIO_Pin_9(LED(G))
     GPIO_InitDef.GPIO_Mode = GPIO_Mode_OUT; // Set to GPIO Mode to Output Port
     GPIO_Init(GPIOC, &GPIO_InitDef); // Set to GPIOC
-	PAD_AFConfig(PAD_PC,GPIO_Pin_9, PAD_AF1); // PAD Config - LED used 2nd Function
+	PAD_AFConfig(PAD_PC,GPIO_Pin_15, PAD_AF1); // PAD Config - LED used 2nd Function
             
-    GPIO_SetBits(GPIOC, GPIO_Pin_8); // LED red off
-    GPIO_SetBits(GPIOC, GPIO_Pin_9); // LED green off
+    GPIO_ResetBits(GPIOC, GPIO_Pin_8); // LED red off
+    GPIO_SetBits(GPIOC, GPIO_Pin_15); // LED green off
         
     /* Send only data to SSP1 */ 
     for (TxIdx=0; TxIdx<BufferSize; TxIdx++)
@@ -136,7 +136,7 @@ int main()
     
     if(TransferStatus == PASSED)
     {
-        GPIO_ResetBits(GPIOC, GPIO_Pin_9); //Received are correct == LED green On
+        GPIO_SetBits(GPIOC, GPIO_Pin_15); //Received are correct == LED green On
     }
     else if(TransferStatus == FAILED)
     {

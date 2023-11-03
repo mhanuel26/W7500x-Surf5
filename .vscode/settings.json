@@ -3,5 +3,14 @@
         "-DCMAKE_MAKE_PROGRAM=C:/Program Files (x86)/xpack-windows-build-tools-4.4.0-1/bin/make.exe",
         "-DARM_TOOLCHAIN_DIR=C:/Program Files (x86)/GNU Arm Embedded Toolchain/10 2021.10/bin"
     ],
-    "cmake.generator": "Unix Makefiles"
+    "cmake.generator": "Unix Makefiles",
+    "files.associations": {
+        "w7500x.h": "c",
+        "stdio.h": "c",
+        "w7500x_dma.h": "c",
+        "w7500x_crg.h": "c",
+        "w7500x_gpio.h": "c",
+        "w7500x_wztoe.h": "c",
+        "w7500x_uart.h": "c"
+    }
 }
