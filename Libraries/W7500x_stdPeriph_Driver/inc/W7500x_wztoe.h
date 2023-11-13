@@ -1,136 +1,139 @@
-/*******************************************************************************************************************************************************
- * Copyright ¨Ï 2016 <WIZnet Co.,Ltd.> 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ¡°Software¡±), 
- * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
- * THE SOFTWARE IS PROVIDED ¡°AS IS¡±, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
- * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
- * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*********************************************************************************************************************************************************/
-/*
- *********************************************************************
- * @file    wztoe.h
- * @version 1.0.4
+/**
+ ******************************************************************************
+ * @file    w7500x_wztoe.h
  * @author  WIZnet
- * @data    20-Apr-2017
- * @brief   WZTOE dirver for W7500
- *********************************************************************
+ * @brief   This file contains all the functions prototypes for the Tcp/ip
+ *          core Offload Engine (TOE) firmware library.
+ ******************************************************************************
  * @attention
- * @par Revision history
- *    <2017/04/20> V1.0.4 by Eric Jung
- *      1. Added wiz_recv_macraw_data() function for receiving data at MACRAW mode only
- *    <2017/01/06> V1.0.3 by justinKim
- *      1. DHAR register Read/Write problem bug fix
- *    <2015/05/20> V1.0.2 by justinKim
- *      1. Register & Macro name change WZTOE_xxx
- *    <2015/05/19> V1.0.1 by justinKim
- *      1. getSn_DIPR - IP Address Bug fix
- *      2. getSn_DHAR - SHAR -> DHAR  Bug fix
- *    <2015/05/01> 1st Release
+ *
+ * <h2><center>&copy; COPYRIGHT 2018 WIZnet</center></h2>
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************
  */
- 
 
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef __W7500X_WZTOE_H
+#define __W7500X_WZTOE_H
 
-#ifndef __WZTOE_H
-#define __WZTOE_H
-#include "W7500x.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* Includes ------------------------------------------------------------------*/
+#include "w7500x.h"
 #include <stdio.h>
 #include <stdint.h>
 
+/** @addtogroup W7500x_StdPeriph_Driver
+ * @{
+ */
 
-/* Peripheral base address */
-#define W7500x_WZTOE_BASE   (0x46000000)//(W7500x_AHB_BASE + 0x06000000UL)
+/** @addtogroup WZTOE
+ * @{
+ */
 
-/* WZTOE register and MEMs memory map */
-//-----------------------------------------
-// TX and RX Mermory address  
-//-----------------------------------------
-#define TXMEM_BASE          (W7500x_WZTOE_BASE + 0x00020000)
-#define RXMEM_BASE          (W7500x_WZTOE_BASE + 0x00030000)
-//-----------------------------------------
-// Common Register address
-//-----------------------------------------
-#define WZTOE_VENDOR_INFO         (W7500x_WZTOE_BASE + 0x00000000) 
-#define WZTOE_SYS_BASE            (W7500x_WZTOE_BASE + 0x00002000) 
-#define WZTOE_PHY_BASE            (W7500x_WZTOE_BASE + 0x00004000) 
-#define WZTOE_NETIPV4_BASE        (W7500x_WZTOE_BASE + 0x00006000) 
+/* Exported types ------------------------------------------------------------*/
+/* Exported constants --------------------------------------------------------*/
 
-#define WZTOE_VERSIONR            (WZTOE_VENDOR_INFO) //Reset Value : 0x0000_0005
-#define WZTOE_TIC100US            (WZTOE_SYS_BASE)    //Reset Value : 0x0000_07D0
+/** @defgroup WZTOE_Exported_Constants
+ * @{
+ */
 
-#define WZTOE_IR                  (W7500x_WZTOE_BASE + 0x00002100) //Interrupt Register
-#define WZTOE_IMR                 (W7500x_WZTOE_BASE + 0x00002104) //Interrupt Mask Register
-#define WZTOE_ICR                 (W7500x_WZTOE_BASE + 0x00002108) //Interrupt Clear Register
-#define WZTOE_SIR                 (W7500x_WZTOE_BASE + 0x00002110)
-#define WZTOE_SIMR                (W7500x_WZTOE_BASE + 0x00002114)
-#define WZTOE_INTLEVEL            (W7500x_WZTOE_BASE + 0x00002200)
+/** @defgroup WZTOE_Common_Register_address
+ * @{
+ */
+#define WZTOE_VENDOR_INFO         (WZTOE_BASE + 0x00000000)
+#define WZTOE_SYS_BASE            (WZTOE_BASE + 0x00002000)
+#define WZTOE_PHY_BASE            (WZTOE_BASE + 0x00004000)
+#define WZTOE_NETIPV4_BASE        (WZTOE_BASE + 0x00006000)
 
-#define WZTOE_MR                  (W7500x_WZTOE_BASE + 0x00002300) //Mode Register
-#define WZTOE_MR1                 (W7500x_WZTOE_BASE + 0x00002301) //Mode Register
+#define WZTOE_VERSIONR            (WZTOE_VENDOR_INFO)       //Reset Value : 0x0000_0005
+#define WZTOE_TIC100US            (WZTOE_SYS_BASE)          //Reset Value : 0x0000_07D0
 
-#define WZTOE_PTIMER              (W7500x_WZTOE_BASE + 0x00002400) //PPPoE Timer Register
-#define WZTOE_PMAGIC              (W7500x_WZTOE_BASE + 0x00002404) //PPPoE LCP Magic number in PPPoE
-#define WZTOE_PHAR                (W7500x_WZTOE_BASE + 0x00002408)
-#define WZTOE_PSID                (W7500x_WZTOE_BASE + 0x00002410)
-#define WZTOE_PMRU                (W7500x_WZTOE_BASE + 0x00002414)
+#define WZTOE_IR                  (WZTOE_BASE + 0x00002100) //Interrupt Register
+#define WZTOE_IMR                 (WZTOE_BASE + 0x00002104) //Interrupt Mask Register
+#define WZTOE_ICR                 (WZTOE_BASE + 0x00002108) //Interrupt Clear Register
+#define WZTOE_SIR                 (WZTOE_BASE + 0x00002110)
+#define WZTOE_SIMR                (WZTOE_BASE + 0x00002114)
+#define WZTOE_INTLEVEL            (WZTOE_BASE + 0x00002200)
 
-#define WZTOE_SHAR                (W7500x_WZTOE_BASE + 0x00006000) //Network IPv4
-#define WZTOE_GAR                 (W7500x_WZTOE_BASE + 0x00006008)
-#define WZTOE_SUBR                (W7500x_WZTOE_BASE + 0x0000600C)
-#define WZTOE_SIPR                (W7500x_WZTOE_BASE + 0x00006010)
-#define WZTOE_NETCFGLOCK          (W7500x_WZTOE_BASE + 0x00006020) 
-#define WZTOE_RTR                 (W7500x_WZTOE_BASE + 0x00006040) //Conf IPvr
-#define WZTOE_RCR                 (W7500x_WZTOE_BASE + 0x00006044)
-#define WZTOE_UIPR                (W7500x_WZTOE_BASE + 0x00006050) //Port unreachable
-#define WZTOE_UPORTR              (W7500x_WZTOE_BASE + 0x00006054) 
+#define WZTOE_MR                  (WZTOE_BASE + 0x00002300) //Mode Register
+#define WZTOE_MR1                 (WZTOE_BASE + 0x00002301) //Mode Register
 
-//-----------------------------------------
-// Socket Register address
-//-----------------------------------------
-#define WZTOE_Sn_MR(ch)          (W7500x_WZTOE_BASE + (0x00010000 + ((ch)<<18))) 
-#define WZTOE_Sn_CR(ch)           (W7500x_WZTOE_BASE + (0x00010010 + ((ch)<<18))) 
-#define WZTOE_Sn_ISR(ch)          (W7500x_WZTOE_BASE + (0x00010020 + ((ch)<<18))) 
-#define WZTOE_Sn_IMR(ch)          (W7500x_WZTOE_BASE + (0x00010024 + ((ch)<<18))) 
-#define WZTOE_Sn_ICR(ch)          (W7500x_WZTOE_BASE + (0x00010028 + ((ch)<<18))) 
-#define WZTOE_Sn_SR(ch)           (W7500x_WZTOE_BASE + (0x00010030 + ((ch)<<18))) 
+#define WZTOE_PTIMER              (WZTOE_BASE + 0x00002400) //PPPoE Timer Register
+#define WZTOE_PMAGIC              (WZTOE_BASE + 0x00002404) //PPPoE LCP Magic number in PPPoE
+#define WZTOE_PHAR                (WZTOE_BASE + 0x00002408)
+#define WZTOE_PSID                (WZTOE_BASE + 0x00002410)
+#define WZTOE_PMRU                (WZTOE_BASE + 0x00002414)
 
-#define WZTOE_Sn_PROTO(ch)        (W7500x_WZTOE_BASE + (0x00010100 + ((ch)<<18))) 
-#define WZTOE_Sn_TOS(ch)          (W7500x_WZTOE_BASE + (0x00010104 + ((ch)<<18))) 
-#define WZTOE_Sn_TTL(ch)          (W7500x_WZTOE_BASE + (0x00010108 + ((ch)<<18)))
-#define WZTOE_Sn_FRG(ch)          (W7500x_WZTOE_BASE + (0x0001010C + ((ch)<<18)))
-#define WZTOE_Sn_MSSR(ch)         (W7500x_WZTOE_BASE + (0x00010110 + ((ch)<<18))) 
-#define WZTOE_Sn_PORT(ch)         (W7500x_WZTOE_BASE + (0x00010114 + ((ch)<<18))) 
-#define WZTOE_Sn_DHAR(ch)         (W7500x_WZTOE_BASE + (0x00010118 + ((ch)<<18))) 
+#define WZTOE_SHAR                (WZTOE_BASE + 0x00006000) //Network IPv4
+#define WZTOE_GAR                 (WZTOE_BASE + 0x00006008)
+#define WZTOE_SUBR                (WZTOE_BASE + 0x0000600C)
+#define WZTOE_SIPR                (WZTOE_BASE + 0x00006010)
+#define WZTOE_NETCFGLOCK          (WZTOE_BASE + 0x00006020)
+#define WZTOE_RTR                 (WZTOE_BASE + 0x00006040) //Conf IPvr
+#define WZTOE_RCR                 (WZTOE_BASE + 0x00006044)
+#define WZTOE_UIPR                (WZTOE_BASE + 0x00006050) //Port unreachable
+#define WZTOE_UPORTR              (WZTOE_BASE + 0x00006054)
+/**
+ * @}
+ */
 
-#define WZTOE_Sn_DPORT(ch)        (W7500x_WZTOE_BASE + (0x00010120 + ((ch)<<18))) 
-#define WZTOE_Sn_DIPR(ch)         (W7500x_WZTOE_BASE + (0x00010124 + ((ch)<<18)))
-#define WZTOE_Sn_DIPR1(ch)         (W7500x_WZTOE_BASE + (0x00010125 + ((ch)<<18)))
-#define WZTOE_Sn_DIPR2(ch)         (W7500x_WZTOE_BASE + (0x00010126 + ((ch)<<18)))
-#define WZTOE_Sn_DIPR3(ch)         (W7500x_WZTOE_BASE + (0x00010127 + ((ch)<<18)))
+/** @defgroup WZTOE_Socket_Register_address
+ * @{
+ */
+#define WZTOE_Sn_MR(ch)          (WZTOE_BASE + (0x00010000 + ((ch)<<18)))
+#define WZTOE_Sn_CR(ch)           (WZTOE_BASE + (0x00010010 + ((ch)<<18)))
+#define WZTOE_Sn_ISR(ch)          (WZTOE_BASE + (0x00010020 + ((ch)<<18)))
+#define WZTOE_Sn_IMR(ch)          (WZTOE_BASE + (0x00010024 + ((ch)<<18)))
+#define WZTOE_Sn_ICR(ch)          (WZTOE_BASE + (0x00010028 + ((ch)<<18)))
+#define WZTOE_Sn_SR(ch)           (WZTOE_BASE + (0x00010030 + ((ch)<<18)))
 
-#define WZTOE_Sn_KPALVTR(ch)      (W7500x_WZTOE_BASE + (0x00010180 + ((ch)<<18))) 
-#define WZTOE_Sn_RTR(ch)          (W7500x_WZTOE_BASE + (0x00010184 + ((ch)<<18))) 
-#define WZTOE_Sn_RCR(ch)          (W7500x_WZTOE_BASE + (0x00010188 + ((ch)<<18))) 
-#define WZTOE_Sn_TXBUF_SIZE(ch)   (W7500x_WZTOE_BASE + (0x00010200 + ((ch)<<18))) 
-#define WZTOE_Sn_TX_FSR(ch)       (W7500x_WZTOE_BASE + (0x00010204 + ((ch)<<18))) 
-#define WZTOE_Sn_TX_RD(ch)        (W7500x_WZTOE_BASE + (0x00010208 + ((ch)<<18))) 
-#define WZTOE_Sn_TX_WR(ch)        (W7500x_WZTOE_BASE + (0x0001020C + ((ch)<<18))) 
-#define WZTOE_Sn_RXBUF_SIZE(ch)   (W7500x_WZTOE_BASE + (0x00010220 + ((ch)<<18))) 
-#define WZTOE_Sn_RX_RSR(ch)       (W7500x_WZTOE_BASE + (0x00010224 + ((ch)<<18))) 
-#define WZTOE_Sn_RX_RD(ch)        (W7500x_WZTOE_BASE + (0x00010228 + ((ch)<<18))) 
-#define WZTOE_Sn_RX_WR(ch)        (W7500x_WZTOE_BASE + (0x0001022C + ((ch)<<18))) 
-//#define WZTOE_Sn_TSR(ch)        (W7500x_WZTOE_BASE + (0x00010400 + ((ch)<<18))) 
-//-----------------------------------------
+#define WZTOE_Sn_PROTO(ch)        (WZTOE_BASE + (0x00010100 + ((ch)<<18)))
+#define WZTOE_Sn_TOS(ch)          (WZTOE_BASE + (0x00010104 + ((ch)<<18)))
+#define WZTOE_Sn_TTL(ch)          (WZTOE_BASE + (0x00010108 + ((ch)<<18)))
+#define WZTOE_Sn_FRG(ch)          (WZTOE_BASE + (0x0001010C + ((ch)<<18)))
+#define WZTOE_Sn_MSSR(ch)         (WZTOE_BASE + (0x00010110 + ((ch)<<18)))
+#define WZTOE_Sn_PORT(ch)         (WZTOE_BASE + (0x00010114 + ((ch)<<18)))
+#define WZTOE_Sn_DHAR(ch)         (WZTOE_BASE + (0x00010118 + ((ch)<<18)))
 
-/* Variable Values */
-//-----------------------------------------
-// Register Values 
-//-----------------------------------------
-// MODE register values
+#define WZTOE_Sn_DPORT(ch)        (WZTOE_BASE + (0x00010120 + ((ch)<<18)))
+#define WZTOE_Sn_DIPR(ch)         (WZTOE_BASE + (0x00010124 + ((ch)<<18)))
+#define WZTOE_Sn_DIPR1(ch)         (WZTOE_BASE + (0x00010125 + ((ch)<<18)))
+#define WZTOE_Sn_DIPR2(ch)         (WZTOE_BASE + (0x00010126 + ((ch)<<18)))
+#define WZTOE_Sn_DIPR3(ch)         (WZTOE_BASE + (0x00010127 + ((ch)<<18)))
+
+#define WZTOE_Sn_KPALVTR(ch)      (WZTOE_BASE + (0x00010180 + ((ch)<<18)))
+#define WZTOE_Sn_RTR(ch)          (WZTOE_BASE + (0x00010184 + ((ch)<<18)))
+#define WZTOE_Sn_RCR(ch)          (WZTOE_BASE + (0x00010188 + ((ch)<<18)))
+#define WZTOE_Sn_TXBUF_SIZE(ch)   (WZTOE_BASE + (0x00010200 + ((ch)<<18)))
+#define WZTOE_Sn_TX_FSR(ch)       (WZTOE_BASE + (0x00010204 + ((ch)<<18)))
+#define WZTOE_Sn_TX_RD(ch)        (WZTOE_BASE + (0x00010208 + ((ch)<<18)))
+#define WZTOE_Sn_TX_WR(ch)        (WZTOE_BASE + (0x0001020C + ((ch)<<18)))
+#define WZTOE_Sn_RXBUF_SIZE(ch)   (WZTOE_BASE + (0x00010220 + ((ch)<<18)))
+#define WZTOE_Sn_RX_RSR(ch)       (WZTOE_BASE + (0x00010224 + ((ch)<<18)))
+#define WZTOE_Sn_RX_RD(ch)        (WZTOE_BASE + (0x00010228 + ((ch)<<18)))
+#define WZTOE_Sn_RX_WR(ch)        (WZTOE_BASE + (0x0001022C + ((ch)<<18)))
+/**
+ * @}
+ */
+
+/** @defgroup WZTOE_MODE_Register_values
+ * @{
+ */
 #define MR_NOTCPRSTPKT      (0x0200) /**< No Send TCP RESET PACKET */
 #define MR_SKIPSRCMAC       (0x0100) /**< SKIP Source MAC Check for test */
 #define MR_RST              (0x0080) /**< reset */
@@ -138,8 +141,13 @@
 #define MR_PB               (0x0010) /**< ping block */
 #define MR_PPPOE            (0x0008) /**< enable pppoe */
 #define MR_FARP             (0x0002) /**< enbale FORCE ARP */
+/**
+ * @}
+ */
 
-// IR register values 
+/** @defgroup WZTOE_IR_Register_values
+ * @{
+ */
 #define IR_CONFLICT         (0x80) /**< check ip confict */
 #define IR_UNREACH          (0x40) /**< get the destination unreachable message in UDP sending */
 #define IR_PPPoE            (0x20) /**< get the PPPoE close message */
@@ -148,8 +156,13 @@
 #define IM_IR6              IR_UNREACH
 #define IM_IR5              IR_PPPoE
 #define IM_IR4              IR_MP
+/**
+ * @}
+ */
 
-// Sn_MR values 
+/** @defgroup WZTOE_Sn_MR_Register_values
+ * @{
+ */
 #define Sn_MR_MULTI         (0x80)     /**< support UDP Multicating */
 #define Sn_MR_BCASTB        (0x40)     /**< support UDP Broadcasting */
 #define Sn_MR_FPSHCLR       (0x40)     /**< IPv4 clear PSH flag in TCP */
@@ -162,11 +175,19 @@
 #define Sn_MR_UDP           (0x02)     /**< UDP */
 #define Sn_MR_TCP           (0x01)     /**< TCP */
 #define Sn_MR_CLOSE         (0x00)     /**< unused socket */
+/**
+ * @}
+ */
 
-// Sn_MR values in MACRAW MODE 
+/** @defgroup WZTOE_Sn_MR_Register_values_in_MACRAW MODE
+ * @{
+ */
 #define Sn_MR_MFEN          (Sn_MR_MULTI)     /**< support MAC filter enable */
 #define Sn_MR_MMB           (Sn_MR_ND)     /**< IPv4 Multicasting Block */
 #define Sn_MR_MIP6B         (Sn_MR_UCASTB)     /**< IPv6 packet Block */
+/**
+ * @}
+ */
 
 /**
  * @brief For Berkeley Socket API
@@ -174,8 +195,9 @@
 #define SOCK_STREAM         Sn_MR_TCP
 #define SOCK_DGRAM          Sn_MR_UDP
 
-
-// Sn_CR values 
+/** @defgroup WZTOE_Sn_CR_Register_values
+ * @{
+ */
 #define Sn_CR_OPEN          (0x01)     /**< initialize or open socket */
 #define Sn_CR_LISTEN        (0x02)     /**< wait connection request in tcp mode(Server mode) */
 #define Sn_CR_CONNECT       (0x04)     /**< send connection request in tcp mode(Client mode) */
@@ -185,28 +207,25 @@
 #define Sn_CR_SEND_MAC      (0x21)     /**< send data with MAC address, so without ARP process */
 #define Sn_CR_SEND_KEEP     (0x22)     /**<  send keep alive message */
 #define Sn_CR_RECV          (0x40)     /**< update rxbuf pointer, recv data */
-#ifdef __DEF_IINCHIP_PPP__
-#define Sn_CR_PCON          (0x23)      
-#define Sn_CR_PDISCON       (0x24)      
-#define Sn_CR_PCR           (0x25)      
-#define Sn_CR_PCN           (0x26)     
-#define Sn_CR_PCJ           (0x27)     
-#endif
+/**
+ * @}
+ */
 
-
-// Sn_IR values 
+/** @defgroup WZTOE_Sn_IR_Register_values
+ * @{
+ */
 #define Sn_IR_SENDOK        (0x10)     /**< complete sending */
 #define Sn_IR_TIMEOUT       (0x08)     /**< assert timeout */
 #define Sn_IR_RECV          (0x04)     /**< receiving data */
 #define Sn_IR_DISCON        (0x02)     /**< closed socket */
 #define Sn_IR_CON           (0x01)     /**< established connection */
-#ifdef __DEF_IINCHIP_PPP__
-#define Sn_IR_PNEXT         (0x20)     
-#define Sn_IR_PFAIL         (0x40)     
-#define Sn_IR_PRECV         (0x80)     
-#endif
+/**
+ * @}
+ */
 
-// Sn_SR values 
+/** @defgroup WZTOE_Sn_SR_Register_values
+ * @{
+ */
 #define SOCK_CLOSED         (0x00)     /**< closed */
 #define SOCK_INIT           (0x13)     /**< init state */
 #define SOCK_LISTEN         (0x14)     /**< listen state */
@@ -222,8 +241,13 @@
 #define SOCK_IPRAW          (0x32)     /**< ip raw mode socket */
 #define SOCK_MACRAW         (0x42)     /**< mac raw mode socket */
 #define SOCK_PPPOE          (0x5F)     /**< pppoe socket */
+/**
+ * @}
+ */
 
-// IP PROTOCOL 
+/** @defgroup WZTOE_IP PROTOCOL
+ * @{
+ */
 #define IPPROTO_IP          (0  )      /**< Dummy for IP */
 #define IPPROTO_ICMP        (1  )      /**< Control message protocol */
 #define IPPROTO_IGMP        (2  )      /**< Internet group management protocol */
@@ -235,30 +259,21 @@
 #define IPPROTO_ND          (77 )      /**< UNOFFICIAL net disk protocol */
 #define IPPROTO_RAW         (255)      /**< Raw IP packet */
 /**
+ * @}
+ */
+
+/**
  * @brief Enter a critical section
  * @brief Exit a critical section
  */
 #define WIZCHIP_CRITICAL_ENTER()     //WIZCHIP.CRIS._enter()
 #define WIZCHIP_CRITICAL_EXIT()     //WIZCHIP.CRIS._exit()
-////////////////////////
-// Basic I/O Function //
-////////////////////////
+
 uint8_t WIZCHIP_READ(uint32_t Addr);
 void WIZCHIP_WRITE(uint32_t Addr, uint8_t Data);
-void WIZCHIP_READ_BUF (uint32_t BaseAddr, uint32_t ptr, uint8_t* pBuf, uint16_t len);
+void WIZCHIP_READ_BUF(uint32_t BaseAddr, uint32_t ptr, uint8_t* pBuf, uint16_t len);
 void WIZCHIP_WRITE_BUF(uint32_t BaseAddr, uint32_t ptr, uint8_t* pBuf, uint16_t len);
-//-----------------------------------------
-// wztoe utils 
-//-----------------------------------------
-//#define htole32(x) \
-//	(((((uint32_t)x) & 0xff000000) >> 24) | \
-//	 ((((uint32_t)x) & 0x00ff0000) >> 8) | \
-//	 ((((uint32_t)x) & 0x0000ff00) << 8) | \
-//	 ((((uint32_t)x) & 0x000000ff) << 24))
-//
-//#define htole16(x) \
-//	(((((uint16_t)x) & 0xff00) >> 8) | \
-//	 ((((uint16_t)x) & 0x00ff) << 8)) 
+
 /////////////////////////////////
 // Common Register I/O function //
 /////////////////////////////////
@@ -287,16 +302,6 @@ void WIZCHIP_WRITE_BUF(uint32_t BaseAddr, uint32_t ptr, uint8_t* pBuf, uint16_t 
  */
 #define setTIC100US(tic)  (*(volatile uint32_t *)(WZTOE_TIC100US) = tic)
 
-
-/**
- * @ingroup Common_register_access_function
- * @brief Set @ref IR register
- * @param (uint8_t)ir Value to set @ref IR register.
- * @sa getIR()
- */
-//#define setIR(ir) \
-//		WIZCHIP_WRITE(WZTOE_IR, (ir & 0xF0))
-
 /**
  * @ingroup Common_register_access_function
  * @brief Get @ref IR register
@@ -305,6 +310,7 @@ void WIZCHIP_WRITE_BUF(uint32_t BaseAddr, uint32_t ptr, uint8_t* pBuf, uint16_t 
  */
 #define getIR() \
     WIZCHIP_READ(WZTOE_IR)
+
 /**
  * @ingroup Common_register_access_function
  * @brief Set @ref IMR register
@@ -323,7 +329,6 @@ void WIZCHIP_WRITE_BUF(uint32_t BaseAddr, uint32_t ptr, uint8_t* pBuf, uint16_t 
 #define getIMR() \
     WIZCHIP_READ(WZTOE_IMR)
 
-
 /**
  * @ingroup Common_register_access_function
  * @brief Set @ref ICR register
@@ -335,14 +340,6 @@ void WIZCHIP_WRITE_BUF(uint32_t BaseAddr, uint32_t ptr, uint8_t* pBuf, uint16_t 
 
 #define setIR(ir) \
     setICR(ir)
-/**
- * @ingroup Common_register_access_function
- * @brief Get @ref ICR register
- * @return uint8_t. Value of @ref ICR register.
- * @sa setICR()
- */
-//#define getICR() \
-//		WIZCHIP_READ(WZTOE_ICR)
 
 /**
  * @ingroup Common_register_access_function
@@ -361,6 +358,7 @@ void WIZCHIP_WRITE_BUF(uint32_t BaseAddr, uint32_t ptr, uint8_t* pBuf, uint16_t 
  */
 #define getSIR() \
     WIZCHIP_READ(WZTOE_SIR)
+
 /**
  * @ingroup Common_register_access_function
  * @brief Set @ref SIMR register
@@ -394,7 +392,6 @@ void WIZCHIP_WRITE_BUF(uint32_t BaseAddr, uint32_t ptr, uint8_t* pBuf, uint16_t 
  * @sa setINTLEVEL()
  */
 #define getINTLEVEL() ((uint16_t)(*(volatile uint32_t *)(WZTOE_INTLEVEL)))
-
 
 /**
  * @ingroup Common_register_access_function
@@ -431,6 +428,7 @@ void WIZCHIP_WRITE_BUF(uint32_t BaseAddr, uint32_t ptr, uint8_t* pBuf, uint16_t 
  */
 #define setMR1(mr) \
     WIZCHIP_WRITE(WZTOE_MR,mr&0x2)
+
 /**
  * @ingroup Common_register_access_function
  * @brief Get Mode Register
@@ -582,7 +580,6 @@ WIZCHIP_WRITE((WZTOE_GAR+2), gar[1]); \
 WIZCHIP_WRITE((WZTOE_GAR+1), gar[2]); \
 WIZCHIP_WRITE((WZTOE_GAR  ), gar[3]); 
 
-
 /**
  * @ingroup Common_register_access_function
  * @brief Get gateway IP address
@@ -608,8 +605,6 @@ gar[3] = WIZCHIP_READ((WZTOE_GAR+0));
 WIZCHIP_WRITE((WZTOE_SUBR+2), subr[1]); \
 WIZCHIP_WRITE((WZTOE_SUBR+1), subr[2]); \
 WIZCHIP_WRITE((WZTOE_SUBR  ), subr[3]); 
-
-
 
 /**
  * @ingroup Common_register_access_function
@@ -770,7 +765,6 @@ uipr[3] = WIZCHIP_READ((WZTOE_UIPR));
  */
 //#define setSn_IR(sn, ir) \
 //		WIZCHIP_WRITE(WZTOE_Sn_IR(sn), (ir & 0x1F))
-
 /**
  * @ingroup Socket_register_access_function
  * @brief Get @ref Sn_IR register
@@ -960,8 +954,8 @@ uipr[3] = WIZCHIP_READ((WZTOE_UIPR));
     WIZCHIP_WRITE((WZTOE_Sn_DHAR(sn)+0), dhar[3]); \
     WIZCHIP_WRITE((WZTOE_Sn_DHAR(sn)+5), dhar[4]); \
     WIZCHIP_WRITE((WZTOE_Sn_DHAR(sn)+4), dhar[5]); 
-    //17.01.06 by justinkim
-    //WIZCHIP_WRITE((WZTOE_Sn_DHAR(sn)+7), dhar[4]); \
+//17.01.06 by justinkim
+//WIZCHIP_WRITE((WZTOE_Sn_DHAR(sn)+7), dhar[4]); \
     //WIZCHIP_WRITE((WZTOE_Sn_DHAR(sn)+6), dhar[5]); 
 
 /**
@@ -971,7 +965,7 @@ uipr[3] = WIZCHIP_READ((WZTOE_UIPR));
  * @param (uint8_t*)dhar Pointer variable to get socket n destination hardware address. It should be allocated 6 bytes.
  * @sa getSn_DHAR()
  */
- //15.05.19 by justinKim
+//15.05.19 by justinKim
 #define getSn_DHAR(sn, dhar) \
     dhar[0] = WIZCHIP_READ((WZTOE_Sn_DHAR(sn)+3)); \
     dhar[1] = WIZCHIP_READ((WZTOE_Sn_DHAR(sn)+2)); \
@@ -1012,8 +1006,7 @@ uipr[3] = WIZCHIP_READ((WZTOE_UIPR));
     WIZCHIP_WRITE((WZTOE_Sn_DIPR1(sn)), dipr[2]); \
     WIZCHIP_WRITE((WZTOE_Sn_DIPR(sn)),   dipr[3]); \
 }
-//#define setSn_DIPR(sn, dipr) \
-
+//#define setSn_DIPR(sn, dipr)
 /**
  * @ingroup Socket_register_access_function
  * @brief Get @ref Sn_DIPR register
@@ -1085,7 +1078,7 @@ uipr[3] = WIZCHIP_READ((WZTOE_UIPR));
  * @sa getSn_RCR()
  */
 #define setSn_RCR(sn, sn_rcr) \
-    WIZCHIP_WRITE(WZTOE_SN_RCR(sn), sn_rcr)
+    WIZCHIP_WRITE(WZTOE_Sn_RCR(sn), sn_rcr)
 
 /**
  * @ingroup Socket_register_access_function
@@ -1095,7 +1088,7 @@ uipr[3] = WIZCHIP_READ((WZTOE_UIPR));
  * @sa setSn_RCR()
  */
 #define getSn_RCR(sn) \
-    WIZCHIP_READ(WZTOE_SN_RCR(sn))
+    WIZCHIP_READ(WZTOE_Sn_RCR(sn))
 
 /**
  * @ingroup Socket_register_access_function

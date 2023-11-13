@@ -1,77 +1,40 @@
-/*******************************************************************************************************************************************************
- * Copyright �� 2016 <WIZnet Co.,Ltd.> 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ��Software��), 
- * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
- * THE SOFTWARE IS PROVIDED ��AS IS��, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
- * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
- * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*********************************************************************************************************************************************************/
 /**
-  ******************************************************************************
-  * @file    W7500x_stdPeriph_Driver/src/W7500x_gpio.c    
-  * @author  IOP Team
-  * @version V1.0.5
-  * @date    05-June-2015
-  * @brief   This file contains all the functions prototypes for the gpio 
-  *          firmware library.
-	*					- Initialization and Configuration
-	*					- GPIO Read and Write
-	*					- GPIO Interrupts and flags management
-	*					- GPIO Alternate functions configuration
-	*
-  ******************************************************************************
-  * @par Revision history
-  *    <2015/06/03> Update about Interrupt (add Interrupt Function)
-  *                         - Add GPIO_INT_Enable_Bits Function
-  *                         - Add GPIO_INT_Enable Function
-  *                         - Add GPIO_INT_Polarity_Bits Function
-  *                         - Add GPIO_INT_Polarity Function
-  *                         - Add GPIO_INT_Clear Function
-  *                         - Add GPIO_Read_INTstatus Function
-  *                         - Add GPIO_INT_Configuration Function
-  *                         Add GPIO_Configuration Function
-  *    <2015/05/01> 1st Release
-  *
-  *              
-  *  @verbatim
-  *  
-  *          ===================================================================
-  *                                 How to use this driver
-  *          ===================================================================
-  *
-  *          1. Select the GPIO(A..D), GPIO_Pin(case GPIOA..C : 0..15, case GPIOD : 0..4) 
-  *             and mode(GPIO_Mode_OUT, GPIO_Mode_IN) using GPIO_Init()
-  *                 
-  *          2. Configure Alternative function(PAD_AF0..3) using PAD_AFConfig() 
-  *             Check the datasheet 39 page(version106, 12.3 Functional description )
-  *                   
-  *          3. Read or Write the data
-  *   
-  *  @endverbatim        
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    w7500x_gpio.c
+ * @author  WIZnet
+ * @brief   This file provides firmware functions to manage of the
+ *          General-purpose I/Os(GPIO) peripheral.
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; COPYRIGHT 2018 WIZnet</center></h2>
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************
+ */
 
 /*includes -------------------------------------------*/
-#include "W7500x_gpio.h"
+#include "w7500x_gpio.h"
 
-
-
-
-/** @addtogroup W7500x_Periph_Driver
-  * @{
-  */
-	
+/** @addtogroup W7500x_StdPeriph_Driver
+ * @{
+ */
 
 /** @defgroup GPIO
-  * @brief GPIO driver modules
-  * @{
-  */
+ * @brief GPIO driver modules
+ * @{
+ */
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -81,392 +44,302 @@
 /* Private functions ---------------------------------------------------------*/
 
 /** @defgroup GPIO_Private_Functions
-  * @{
-  */ 
-
-
-
-/** @defgroup GPIO_Group1 Initialization and Configuration
- *  @brief   Initialization and Configuration
- *
-@verbatim   
- ===============================================================================
-                        Initialization and Configuration
- ===============================================================================  
-
-@endverbatim
-  * @{
-  */
-
+ * @{
+ */
 
 /**
-  * @brief  Deinitializes the GPIOx peripheral registers to their default reset values.
-  * @note   By default, The GPIO pins are configured in input floating mode (except JTAG pins).
-  * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
-  * @retval None
-  */
+ * @brief  Deinitializes the GPIOx peripheral registers to their default reset values.
+ * @note   By default, The GPIO pins are configured in input floating mode (except JTAG pins).
+ * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
+ * @retval None
+ */
 void GPIO_DeInit(GPIO_TypeDef* GPIOx)
 {
-    uint32_t i, loop =16;
-    P_Port_Def *px_pcr;
-    P_Port_Def *px_afsr;
+    uint32_t i, loop = 16;
 
     /* Check the parameters */
     assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
 
     /* DeInit GPIOx Registers */
-    GPIOx->DATA = 0x0000;        
-    GPIOx->DATAOUT = 0x0000;     
-    //GPIOx->OUTENSET = 0x0000;    
-    GPIOx->OUTENCLR = 0xFFFF;    
-    //GPIOx->INTENSET = 0x0000;    
-    GPIOx->INTENCLR = 0xFFFF;    
-    GPIOx->INTTYPESET = 0x0000;  
-    //GPIOx->INTTYPECLR = 0xFFFF;  
-    //GPIOx->intpolset = 0x0000;   
-    GPIOx->INTPOLCLR = 0xFFFF;   
+    GPIOx->OUTENCLR = 0xFFFF;
+    GPIOx->INTENCLR = 0xFFFF;
+    GPIOx->INTTYPECLR = 0xFFFF;
+    GPIOx->INTPOLCLR = 0xFFFF;
 
+    if (GPIOx == GPIOD) loop = 5;
 
-    /* DeInit GPIOx 
-     *      Pad Control Register
-     *      Pad Extern interrupt Enable Register
-     *      Pad Alternate Function Select Register
-     */
-		/* Select the specified port register to deinit */
-    if (GPIOx == GPIOA)
-    {
-        px_pcr = (P_Port_Def*)PA_PCR;
-        px_afsr = (P_Port_Def*)PA_AFSR;
-    }
-    else if (GPIOx == GPIOB)
-    {
-        px_pcr = (P_Port_Def*)PB_PCR;
-        px_afsr = (P_Port_Def*)PB_AFSR;
-    }
-    else // if  (GPIOx == GPIOC)
-    {
-        px_pcr = PC_PCR;
-        px_afsr = PC_AFSR;
-    }  
-
-		
-    for(i=0; i<loop; i++)
-    {
-	/* DeInit Pad Control Register */
-        px_pcr->Port[i] = 0x60;
-		/* DeInit Alternate Function Select Register */
-        px_afsr->Port[i] = PAD_AF0;
-
+    for (i = 0; i < loop; i++) {
+        GPIO_PinAFConfig(GPIOx, i, PAD_AF0);
+        GPIO_PinPadConfig(GPIOx, i, GPIO_Pad_Default);
     }
 }
 
-
 /**
-  * @brief  Initializes the GPIOx peripheral according to the specified parameters in the GPIO_InitStruct.
-  * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
-  * @param  GPIO_InitStruct: pointer to a GPIO_InitTypeDef structure that contains
-  *         the configuration information for the specified GPIO peripheral.
-  * @retval None
-  */
+ * @brief  Initializes the GPIOx peripheral according to the specified parameters in the GPIO_InitStruct.
+ * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
+ * @param  GPIO_InitStruct: pointer to a GPIO_InitTypeDef structure that contains
+ *         the configuration information for the specified GPIO peripheral.
+ * @retval None
+ */
 void GPIO_Init(GPIO_TypeDef* GPIOx, GPIO_InitTypeDef* GPIO_InitStruct)
 {
     uint32_t pinpos = 0x00, pos = 0x00, currentpin = 0x00, loop = 16;
-    P_Port_Def *px_pcr;
+    uint8_t pad_value = 0;
 
-		/* Check the parameters */
+    /* Check the parameters */
     assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
     assert_param(IS_GPIO_PIN(GPIO_InitStruct->GPIO_Pin));
-	//A170223 becky
-    assert_param(IS_GPIO_PIN(GPIO_InitStruct->GPIO_Mode));
-	////////////////////////////////////////////////////////////
-	  assert_param(IS_GPIO_PUPD(GPIO_InitStruct->GPIO_PuPd));
+    assert_param(IS_GPIO_DIRECTION(GPIO_InitStruct->GPIO_Direction));
+    assert_param(IS_GPIO_PAD(GPIO_InitStruct->GPIO_Pad));
+    assert_param(IS_GPIO_AF(GPIO_InitStruct->GPIO_AF));
 
-    if      (GPIOx == GPIOA)       
-    {
-        px_pcr  =(P_Port_Def*)PA_PCR;
-    }
-    else if (GPIOx == GPIOB)        
-    {
-        px_pcr  = (P_Port_Def*)PB_PCR;
-    }
-    else 
-    {
-        px_pcr  = PC_PCR;
-    }
+    if (GPIOx == GPIOD) loop = 5;
 
-    for(pinpos = 0x00; pinpos < loop; pinpos++)
-    {
-        pos = ((uint32_t)0x01) << pinpos;
+    for (pinpos = 0x00; pinpos < loop; pinpos++) {
+        pos = ((uint32_t) 0x01) << pinpos;
 
         currentpin = (GPIO_InitStruct->GPIO_Pin) & pos;
 
-        if(currentpin == pos)
-        {
-            if(GPIO_InitStruct->GPIO_Mode == GPIO_Mode_OUT)
-            {
-                GPIOx->OUTENSET |= pos;   /* Output Enable Set Register */ 
-            }
-            else        // GPIO_Mode_In
-            {
-                GPIOx->OUTENCLR = pos; 	/* Output Enable Clear Register  */ 
+        if (currentpin == pos) {
+            if (GPIO_InitStruct->GPIO_Direction == GPIO_Direction_OUT) {
+                GPIOx->OUTENSET = pos; /* Output Enable Set Register */
+            } else {
+                GPIOx->OUTENCLR = pos; /* Output Enable Clear Register */
             }
 
-            // Configure pull-up pull-down bits 
-            if(GPIO_InitStruct->GPIO_Pad & Px_PCR_PUPD_UP)
-            {
-                px_pcr->Port[pinpos] &= ~(Px_PCR_PUPD_UP | Px_PCR_PUPD_DOWN);
-                px_pcr->Port[pinpos] |= Px_PCR_PUPD_UP;
-            }
-            else
-            {
-                px_pcr->Port[pinpos] &= ~(Px_PCR_PUPD_UP | Px_PCR_PUPD_DOWN);
-                px_pcr->Port[pinpos] |= Px_PCR_PUPD_DOWN;
+            pad_value = GPIO_Read_PinPad(GPIOx, pinpos);
+
+            /* Configure pull-up pull-down bits */
+            if ((GPIO_InitStruct->GPIO_Pad & GPIO_PuPd_NOPULL) == GPIO_PuPd_NOPULL) {
+                pad_value &= ~GPIO_PuPd_NOPULL;
+            } else if (GPIO_InitStruct->GPIO_Pad & GPIO_PuPd_DOWN) {
+                pad_value &= ~GPIO_PuPd_NOPULL;
+                pad_value |= GPIO_PuPd_DOWN;
+            } else if (GPIO_InitStruct->GPIO_Pad & GPIO_PuPd_UP) {
+                pad_value &= ~GPIO_PuPd_NOPULL;
+                pad_value |= GPIO_PuPd_UP;
+            } else {
+                pad_value &= ~GPIO_PuPd_NOPULL;
             }
 
-            // Configure Driving stregnth selections bit 
-            if(GPIO_InitStruct->GPIO_Pad & Px_PCR_DS_HIGH)
-            {
-                px_pcr->Port[pinpos] |= Px_PCR_DS_HIGH;
-            }
-            else
-            {
-                px_pcr->Port[pinpos] &= ~(Px_PCR_DS_HIGH);
+            /* Configure Driving strength selections bit */
+            if (GPIO_InitStruct->GPIO_Pad & GPIO_LowDrivingStrength) {
+                pad_value |= GPIO_LowDrivingStrength;
+            } else {
+                pad_value &= ~GPIO_LowDrivingStrength;
             }
 
-            // Configure Input buffer enable selection bit 
-            if(GPIO_InitStruct->GPIO_Pad & Px_PCR_IE)
-            {
-                px_pcr->Port[pinpos] |= Px_PCR_IE;
-            }
-            else
-            {
-                px_pcr->Port[pinpos] &= ~(Px_PCR_IE);
+            /* Configure Open Drain output mode selections bit */
+            if (GPIO_InitStruct->GPIO_Pad & GPIO_OpenDrainEnable) {
+                pad_value |= GPIO_OpenDrainEnable;
+            } else {
+                pad_value &= ~GPIO_OpenDrainEnable;
             }
 
-            // Configure input type (CMOS input or Summit trigger input) select bit 
-            if(GPIO_InitStruct->GPIO_Pad & Px_PCR_CS_SUMMIT)
-            {
-                px_pcr->Port[pinpos] |= Px_PCR_CS_SUMMIT;
+            /* Configure Input buffer enable selection bit */
+            if (GPIO_InitStruct->GPIO_Pad & GPIO_InputBufferEnable) {
+                pad_value |= GPIO_InputBufferEnable;
+            } else {
+                pad_value &= ~GPIO_InputBufferEnable;
             }
-            else
-            {
-                px_pcr->Port[pinpos] &= ~(Px_PCR_CS_SUMMIT);
+
+            /* Configure input type (CMOS input or Summit trigger input) select bit */
+            if (GPIO_InitStruct->GPIO_Pad & GPIO_CMOS) {
+                pad_value |= GPIO_CMOS;
+            } else {
+                pad_value &= ~GPIO_CMOS;
             }
+
+            GPIO_PinAFConfig(GPIOx, pinpos, GPIO_InitStruct->GPIO_AF);
+            GPIO_PinPadConfig(GPIOx, pinpos, pad_value);
         }
     }
 }
 
-
 /**
-  * @brief  Fills each GPIO_InitStruct member with its default value.
-  * @param  GPIO_InitStruct : pointer to a GPIO_InitTypeDef structure which will be initialized.
-  * @retval None
-  */
+ * @brief  Fills each GPIO_InitStruct member with its default value.
+ * @param  GPIO_InitStruct : pointer to a GPIO_InitTypeDef structure which will be initialized.
+ * @retval None
+ */
 void GPIO_StructInit(GPIO_InitTypeDef* GPIO_InitStruct)
 {
-    GPIO_InitStruct->GPIO_Pin  = GPIO_Pin_All;
-    GPIO_InitStruct->GPIO_Mode = GPIO_Mode_IN;
-    GPIO_InitStruct->GPIO_Pad = (GPIOPad_TypeDef)(GPIO_SUMMIT|GPIO_IE|GPIO_PuPd_UP);
+    GPIO_InitStruct->GPIO_Pin = GPIO_Pin_All;
+    GPIO_InitStruct->GPIO_Direction = (GPIODirection_TypeDef) GPIO_Direction_IN;
+    GPIO_InitStruct->GPIO_Pad = GPIO_Pad_Default;
+    GPIO_InitStruct->GPIO_AF = (GPIOAf_TypeDef) (PAD_AF0);
 }
 
-
 /**
-  * @}
-  */
-
-
-
-
-/** @defgroup GPIO_Group2  GPIO Read and Write
- *  @brief    GPIO Read and Write
- *
-@verbatim   
- ===============================================================================
-                        GPIO Read and Write
- ===============================================================================  
-
-@endverbatim
-  * @{
-  */
-
-
-
-
-/**
-  * @brief  Reads the specified input port pin.
-  * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
-  * @param  GPIO_Pin: specifies the port bit to read.
-  *         This parameter can be one of  GPIO_Pin_x where x can be (0..15), except for GPIOD that can be one of (0..5). 
-  * @retval The input port pin value.
-  */
-uint8_t GPIO_ReadInputDataBit(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
+ * @brief  Reads the specified input port pin.
+ * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
+ * @param  GPIO_Pin: specifies the port bit to read.
+ *          This parameter can be one of  GPIO_Pin_x where x can be (0..15), except for GPIOD that can be one of (0..5).
+ * @retval The input port pin value.
+ */
+BitAction GPIO_ReadInputDataBit(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
 {
-    uint8_t bitstatus = 0x00;
+    BitAction bitstatus = Bit_RESET;
 
-		/* Check the parameters */
+    /* Check the parameters */
     assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
     assert_param(IS_GET_GPIO_PIN(GPIO_Pin));
 
-	
-		/* Check the pin's value*/
-    if((GPIOx->DATA & GPIO_Pin) != (uint32_t)Bit_RESET)
-    {
-        bitstatus = (uint8_t)Bit_SET;
-    }
-    else
-    {
-        bitstatus = (uint8_t)Bit_RESET;
+    /* Check the pin's value*/
+    if ((GPIOx->DATA & GPIO_Pin) != (uint32_t) Bit_RESET) {
+        bitstatus = Bit_SET;
+    } else {
+        bitstatus = Bit_RESET;
     }
 
-		/* Return the input port pin value */
+    /* Return the input port pin value */
     return bitstatus;
 }
 
-
 /**
-  * @brief  Reads the specified GPIO input data port.
-  * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
-  * @retval GPIO input data port value.
-  */
+ * @brief  Reads the specified GPIO input data port.
+ * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
+ * @retval The input port pin value.
+ */
 uint16_t GPIO_ReadInputData(GPIO_TypeDef* GPIOx)
 {
-		/* Check the parameters */
+    /* Check the parameters */
     assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
-	
-	/*Return the input port value */
-    return ((uint16_t)GPIOx->DATA);
+
+    /*Return the input port value */
+    return (uint16_t) GPIOx->DATA;
 }
 
-
 /** 
-  * @brief  Reads the specified output data port bit.
-  * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
-  * @param  GPIO_Pin: specifies the port bit to read.
-	*          This parameter can be one of  GPIO_Pin_x where x can be (0..15), except for GPIOD that can be one of (0..5). 
-  * @retval The output port pin value.
-  */
-
-
-uint8_t GPIO_ReadOutputDataBit(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
+ * @brief  Reads the specified output data port bit.
+ * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
+ * @param  GPIO_Pin: specifies the port bit to read.
+ *          This parameter can be one of  GPIO_Pin_x where x can be (0..15), except for GPIOD that can be one of (0..5).
+ * @retval The output port pin value.
+ */
+BitAction GPIO_ReadOutputDataBit(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
 {
-    uint8_t bitstatus = 0x00;
-		
-		/* Check the parameters */
+    BitAction bitstatus = Bit_RESET;
+
+    /* Check the parameters */
     assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
     assert_param(IS_GET_GPIO_PIN(GPIO_Pin));
 
-    if((GPIOx->DATAOUT & GPIO_Pin) != (uint32_t)Bit_RESET)
-    {
-        bitstatus = (uint8_t)Bit_SET;
-    }
-    else
-    {
-        bitstatus = (uint8_t)Bit_RESET;
+    if ((GPIOx->DATAOUT & GPIO_Pin) != (uint32_t) Bit_RESET) {
+        bitstatus = Bit_SET;
+    } else {
+        bitstatus = Bit_RESET;
     }
 
     return bitstatus;
 }
 
 /**
-  * @brief  Reads the specified GPIO output data port.
-  * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
-  * @retval GPIO output data port value.
-  */
+ * @brief  Reads the specified GPIO output data port.
+ * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
+ * @retval GPIO output data port value.
+ */
 uint16_t GPIO_ReadOutputData(GPIO_TypeDef* GPIOx)
 {
     /* Check the parameters */
-    assert_param(IS_GPIO_ALLPERIPH(GPIOx));
-    return ((uint16_t)GPIOx->DATAOUT);
+    assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
+
+    return (uint16_t) GPIOx->DATAOUT;
 }
 
-
 /**
-  * @brief  Sets the selected data port bits.
-  * @note   This functions uses GPIOx_LB_MASKED and GPIOx_UB_MASKED register to allow atomic read/modify 
-  *         accesses. In this way, there is no risk of an IRQ occurring between
-  *         the read and the modify access.
-  * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
-  * @param  GPIO_Pin: specifies the port bits to be written.
-  *          This parameter can be one of  GPIO_Pin_x where x can be (0..15), except for GPIOD that can be one of (0..5). 
-  * @retval None
-  */
+ * @brief  Sets the selected data port bits.
+ * @note   This functions uses GPIOx_LB_MASKED and GPIOx_UB_MASKED register to allow atomic read/modify
+ *         accesses. In this way, there is no risk of an IRQ occurring between
+ *         the read and the modify access.
+ * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
+ * @param  GPIO_Pin: specifies the port bits to be written.
+ *          This parameter can be one of  GPIO_Pin_x where x can be (0..15), except for GPIOD that can be one of (0..5).
+ * @retval None
+ */
 void GPIO_SetBits(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
 {
     /* Check the parameters */
     assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
-    assert_param(IS_GPIO_PIN(GPIO_Pin)); 
+    assert_param(IS_GPIO_PIN(GPIO_Pin));
 
-    (GPIOx->LB_MASKED[(uint8_t)(GPIO_Pin)]) = GPIO_Pin;
-    (GPIOx->UB_MASKED[(uint8_t)((GPIO_Pin)>>8)]) = GPIO_Pin;
+    /* fix bug 2019.05.03 */
+    //(GPIOx->LB_MASKED[(uint8_t) (GPIO_Pin)]) = GPIO_Pin;
+    //(GPIOx->UB_MASKED[(uint8_t) ((GPIO_Pin) >> 8)]) = GPIO_Pin;
+    if (GPIO_Pin < 256)
+        (GPIOx->LB_MASKED[(uint8_t) (GPIO_Pin)]) = 0xFFFF;
+    else
+        (GPIOx->UB_MASKED[(uint8_t) ((GPIO_Pin) >> 8)]) = 0xFFFF;
 }
 
-
 /**
-  * @brief  Clears the selected data port bits.
-  * @note   This functions uses GPIOx_LB_MASKED and GPIOx_UB_MASKED register to allow atomic read/modify 
-  *         accesses. In this way, there is no risk of an IRQ occurring between
-  *         the read and the modify access.
-  * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
-  * @param  GPIO_Pin: specifies the port bits to be written.
-  *          This parameter can be one of  GPIO_Pin_x where x can be (0..15), except for GPIOD that can be one of (0..5). 
-  * @retval None
-  */
+ * @brief  Clears the selected data port bits.
+ * @note   This functions uses GPIOx_LB_MASKED and GPIOx_UB_MASKED register to allow atomic read/modify
+ *         accesses. In this way, there is no risk of an IRQ occurring between
+ *         the read and the modify access.
+ * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
+ * @param  GPIO_Pin: specifies the port bits to be written.
+ *          This parameter can be one of  GPIO_Pin_x where x can be (0..15), except for GPIOD that can be one of (0..5).
+ * @retval None
+ */
 void GPIO_ResetBits(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
 {
     /* Check the parameters */
     assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
     assert_param(IS_GPIO_PIN(GPIO_Pin));
 
-    (GPIOx->LB_MASKED[(uint8_t)(GPIO_Pin)]) = ~(GPIO_Pin);
-    (GPIOx->UB_MASKED[(uint8_t)(GPIO_Pin>>8)]) = ~(GPIO_Pin);
+    /* fix bug 2019.05.03 */
+    //(GPIOx->LB_MASKED[(uint8_t) (GPIO_Pin)]) = ~(GPIO_Pin);
+    //(GPIOx->UB_MASKED[(uint8_t) (GPIO_Pin >> 8)]) = ~(GPIO_Pin);
+    if (GPIO_Pin < 256)
+        (GPIOx->LB_MASKED[(uint8_t) (GPIO_Pin)]) = 0x0;
+    else
+        (GPIOx->UB_MASKED[(uint8_t) (GPIO_Pin >> 8)]) = 0x0;
 }
 
-
 /**
-  * @brief  Sets or clears the selected data port bit.
-  * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
-  * @param  GPIO_Pin: specifies the port bit to be written.
-  *          This parameter can be one of  GPIO_Pin_x where x can be (0..15), except for GPIOD that can be one of (0..5). 
-  * @param  BitVal: specifies the value to be written to the selected bit.
-  *          This parameter can be one of the BitAction enum values:
-  *            @arg Bit_RESET: to clear the port pin
-  *            @arg Bit_SET: to set the port pin
-  * @retval None
-  */
+ * @brief  Sets or clears the selected data port bit.
+ * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
+ * @param  GPIO_Pin: specifies the port bit to be written.
+ *          This parameter can be one of  GPIO_Pin_x where x can be (0..15), except for GPIOD that can be one of (0..5).
+ * @param  BitVal: specifies the value to be written to the selected bit.
+ *          This parameter can be one of the BitAction enum values:
+ *            @arg Bit_RESET: to clear the port pin
+ *            @arg Bit_SET: to set the port pin
+ * @retval None
+ */
 void GPIO_WriteBit(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, BitAction BitVal)
 {
     uint32_t temp_gpio_lb;
     uint32_t temp_gpio_ub;
-    
+
     /* Check the parameters */
     assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
     assert_param(IS_GET_GPIO_PIN(GPIO_Pin));
-    assert_param(IS_GPIO_BIT_ACTION(BitVal)); 
-    
-    temp_gpio_lb = (GPIOx->LB_MASKED[(uint8_t)(GPIO_Pin)]);
-    temp_gpio_ub = (GPIOx->UB_MASKED[(uint8_t)((GPIO_Pin)>>8)]);
+    assert_param(IS_GPIO_BIT_ACTION(BitVal));
 
-    if( BitVal == Bit_SET)
+    if (GPIO_Pin < 256)
     {
-        (GPIOx->LB_MASKED[(uint8_t)(GPIO_Pin)]) = (temp_gpio_lb | GPIO_Pin);
-        (GPIOx->UB_MASKED[(uint8_t)((GPIO_Pin)>>8)]) = (temp_gpio_ub | GPIO_Pin);
+        if(BitVal)
+            (GPIOx->LB_MASKED[(uint8_t) (GPIO_Pin)]) = 0xFFFF;
+        else
+            (GPIOx->LB_MASKED[(uint8_t) (GPIO_Pin)]) = 0x0;
     }
     else
     {
-        (GPIOx->LB_MASKED[(uint8_t)(GPIO_Pin)]) = (temp_gpio_lb & ~(GPIO_Pin));
-        (GPIOx->UB_MASKED[(uint8_t)((GPIO_Pin)>>8)]) = (temp_gpio_ub & ~(GPIO_Pin));
+        if(BitVal)
+            (GPIOx->UB_MASKED[(uint8_t) (GPIO_Pin)]) = 0xFFFF;
+        else
+            (GPIOx->UB_MASKED[(uint8_t) (GPIO_Pin)]) = 0x0;
     }
+
 }
 
-
-
-
 /**
-  * @brief  Writes data to the specified GPIO data port.
-  * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
-  * @param  PortVal: specifies the value to be written to the port output data register.
-  * @retval None
-  */
+ * @brief  Writes data to the specified GPIO data port.
+ * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
+ * @param  PortVal: specifies the value to be written to the port output data register.
+ * @retval None
+ */
 void GPIO_Write(GPIO_TypeDef* GPIOx, uint16_t PortVal)
 {
     /* Check the parameters */
@@ -475,386 +348,228 @@ void GPIO_Write(GPIO_TypeDef* GPIOx, uint16_t PortVal)
     GPIOx->DATAOUT = PortVal;
 }
 
-
-
-
 /**
-  * @brief  Toggles the specified GPIO pins..
-  * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
-  * @param  GPIO_Pin: Specifies the pins to be toggled.
-  * @retval None
-  */
+ * @brief  Toggles the specified GPIO pins..
+ * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
+ * @param  GPIO_Pin: Specifies the pins to be toggled.
+ * @retval None
+ */
 void GPIO_ToggleBits(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
 {
-  /* Check the parameters */
-  assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
-
-  GPIOx->DATAOUT ^= GPIO_Pin;
-}
-
-
-/**
-  * @}
-  */
-
-
-
-
-/** @defgroup GPIO_Group3 GPIO Interrupts and flags management
- *  @brief   GPIO Interrupts and flags management
- *
-@verbatim   
- ===============================================================================
-                              GPIO Interrupts and flags management
- ===============================================================================  
-
-@endverbatim
-  * @{
-  */
-
-
-
-
-
-/**
-  * @brief  Set or Clear interrupt enable for the selected data port bits.
-  * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
-  * @param  GPIO_Pin: specifies the port bits to be written.
-  *          This parameter can be one of  GPIO_Pin_x where x can be (0..15), except for GPIOD that can be one of (0..5). 
-  * @param  SetValue: specifies the value to be set to the selected bit.
-  *          This parameter can be one of the GPIOSet_TypeDef enum values:
-  *            @arg RESET: to clear tinterrupt enable
-  *            @arg SET: to set interrupt enable
-  * @retval None
-  */
-
-void GPIO_INT_Enable_Bits(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIOSet_TypeDef SetValue)
-{
     /* Check the parameters */
     assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
-    assert_param(IS_GET_GPIO_PIN(GPIO_Pin));
-    
-	
-	 /* Interrupt Type Set */
-    GPIOx->INTTYPESET |= GPIO_Pin;
+    assert_param(IS_GPIO_PIN(GPIO_Pin));
 
-    if(SetValue == Set)
-				/* Interrupt Enable Set */
-        GPIOx->INTENSET  |= GPIO_Pin;  
-		
-    else // SetValue == Reset 
-         /* Interrupt Enable Clear */
-				GPIOx->INTENCLR |= GPIO_Pin; 
+    GPIOx->DATAOUT ^= GPIO_Pin;
+
 }
 
-
 /**
-  * @brief  Set or Clear interrupt enable for the selected data port.
-  * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
-  * @param  SetValue: specifies the value to be set to the selected port.
-  *          This parameter can be one of the GPIOSet_TypeDef enum values:
-  *            @arg RESET: to clear interrupt enable
-  *            @arg SET: to set interrupt enable
-  * @retval None
-  */
-void GPIO_INT_Enable(GPIO_TypeDef* GPIOx, GPIOSet_TypeDef SetValue)
+ * @brief  Initializes the GPIOx peripheral according to the specified parameters in the GPIO_ITInitStruct.
+ * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
+ * @param  GPIO_ITInitStruct: pointer to a GPIO_ITInitTypeDef structure that contains
+ *         the configuration information for the specified GPIO peripheral.
+ * @retval None
+ */
+void GPIO_IT_Init(GPIO_TypeDef* GPIOx, GPIO_ITInitTypeDef* GPIO_ITInitStruct)
 {
+    uint32_t pinpos = 0x00, pos = 0x00, currentpin = 0x00, loop = 16;
+
     /* Check the parameters */
     assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
-    
-		/* Interrupt Type Set */
-    GPIOx->INTTYPESET = 0xffff;
+    assert_param(IS_GPIO_PIN(GPIO_ITInitStruct->GPIO_IT_Pin));
+    assert_param(IS_GPIO_IT_POL(GPIO_ITInitStruct->GPIO_IT_Polarity));
+    assert_param(IS_GPIO_IT_TYPE(GPIO_ITInitStruct->GPIO_IT_Type));
 
-    if(SetValue == Set)
-				/* Set Interrupt Enable */
-        GPIOx->INTENSET = 0xffff;
-    else //SetValue == Reset
-				/* Clear Interrupt Enable */
-        GPIOx->INTENCLR = 0xffff;
-}
+    if (GPIOx == GPIOD) loop = 5;
 
+    for (pinpos = 0x00; pinpos < loop; pinpos++) {
+        pos = ((uint32_t) 0x01) << pinpos;
 
-/**
-  * @brief  Sets or Clears Intterupt Porarity for the selected data port bit.
-  * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
-  * @param  GPIO_Pin: specifies the port bits to be written.
-  *          This parameter can be one of  GPIO_Pin_x where x can be (0..15), except for GPIOD that can be one of (0..5). 
-  * @param  Polarity: specifies the value to be set to the selected bits.
-  *          This parameter can be one of the GPIOPol_TypeDef enum values:
-  *            @arg Falling: Clear Intterupt Poraity (indicates for LOW level or falling edge)
-  *            @arg Rising: Set Intterupt Porarity (indicates HIGH level or rising edge)
-  * @retval None
-  */
-void GPIO_INT_Polarity_Bits(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIOPol_TypeDef Polarity)
-{
-    /* Check the parameters */
-    assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
-    assert_param(IS_GET_GPIO_PIN(GPIO_Pin));
+        currentpin = (GPIO_ITInitStruct->GPIO_IT_Pin) & pos;
 
-    if(Polarity == Rising)
-        GPIOx->INTPOLSET  |= GPIO_Pin; /* Set Interrupt Polarity  */ 
-    else //Polarity == Falling
-        GPIOx->INTPOLCLR |= GPIO_Pin;    /* Clear Interrupt Polarity  */
-}
+        if (currentpin == pos) {
 
-
-/**
-  * @brief  Sets or Clears Intterupt Porarity for the selected data port.
-  * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
-  * @param  Polarity: pecifies the value to be set to the selected port.
-  *          This parameter can be one of the GPIOPol_TypeDef enum values:
-  *            @arg Falling: Clear Intterupt Poraity (indicates for LOW level or falling edge)
-  *            @arg Rising: Set Intterupt Porarity (indicates HIGH level or rising edge)
-  * @retval None
-  */
-void GPIO_INT_Polarity(GPIO_TypeDef* GPIOx, GPIOPol_TypeDef Polarity)
-{
-    /* Check the parameters */
-    assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
-
-    if(Polarity == Rising)
-        GPIOx->INTPOLSET = 0xffff;  /* Set Interrupt Polarity  */ 
-    else //Polarity == Falling
-        GPIOx->INTPOLCLR = 0xffff;  /* Clear Interrupt Polarity  */
-}
-
-
-/**
-  * @brief  Clear the interrupt.
-  * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
-  * @retval None
-  */
-void GPIO_INT_Clear(GPIO_TypeDef* GPIOx)
-{
-    /* Check the parameters */
-    assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
-		
-		/* Intterupt Clear */
-    GPIOx->Interrupt.INTCLEAR = 0xffff;
-}
-
-
-
-/**
-  * @brief  Read Intterupt status of selected data port pin.
-  * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
-  * @param  GPIO_Pin: specifies the port bit to read.
-  *          This parameter can be one of  GPIO_Pin_x where x can be (0..15), except for GPIOD that can be one of (0..5). 
-  * @retval The intterupt status value of selected data port pin.
-  */
-uint8_t GPIO_Read_INTstatus(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
-{
-    uint8_t status = 0x0000;
-		
-	
-		/* Check the parameters */
-    assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
-    assert_param(IS_GET_GPIO_PIN(GPIO_Pin));
-
-    if((GPIOx->Interrupt.INTSTATUS & GPIO_Pin) != (uint32_t)Bit_RESET)
-    {
-        status = (uint8_t)Bit_SET;
-    }
-    else
-    {
-        status = (uint8_t)Bit_RESET;
-    }
-
-    return status;
-}
-
-
-/**
-  * @}
-  */
-
-
-/** @defgroup GPIO_Group4 GPIO Alternate functions configuration
- *  @brief   GPIO Alternate functions configuration
- *
-@verbatim   
- ===============================================================================
-               GPIO Alternate functions configuration
- ===============================================================================  
-
-@endverbatim
-  * @{
-  */
-
-
-
-
-
-
-
-/**
-  * @brief   Changes the mapping of the specified pin.
-  * @param  PAD_Px: where x can be (A..D) to select the PAD peripheral.
-  * @param  GPIO_Pin: specifies the pin for the Alternate function.
-  *          This parameter can be one of GPIO_Pin_x where x can be (0..15), except for PAD_PD that can be one of (0..5).
-  * @param  P_AF: selects the pin to used as Alternate function.
-  *          This parameter can be one of the PAD_AF_TypeDef enum values:
-  *            @arg PAD_AF0, PAD_AF1, PAD_AF2, PAD_AF3
-  * @retval None
-  */
-
-void PAD_AFConfig(PAD_Type Px, uint16_t GPIO_Pin, PAD_AF_TypeDef P_AF)
-{
-    int i;
-    uint16_t idx =0x1;
-	
-		/* Check the parameters */
-    assert_param(IS_PAD_Type(Px));
-	//A170223 becky 
-		assert_param(IS_GET_GPIO_PIN(GPIO_Pin));
-	
-	
-    for(i=0;i<16;i++)
-    {	
-        if(GPIO_Pin & (idx<<i))
-        {
-            if(Px == PAD_PA)
-            {
-                assert_param(IS_PA_NUM(i)); 
-                PA_AFSR->Port[i] &= ~(0x03ul);
-                PA_AFSR->Port[i] |= P_AF;
+            if (GPIO_ITInitStruct->GPIO_IT_Polarity & GPIO_IT_HighRising) {
+                GPIOx->INTTYPESET = currentpin;
+            } else {
+                GPIOx->INTTYPECLR = currentpin;
             }
-            else if(Px == PAD_PB)
-            {
-                assert_param(IS_PB_NUM(i));
-                PB_AFSR->Port[i] &= ~(0x03ul);
-                PB_AFSR->Port[i] |= P_AF;
+
+            if (GPIO_ITInitStruct->GPIO_IT_Type & GPIO_IT_Edge) {
+                GPIOx->INTPOLSET = currentpin;
+            } else {
+                GPIOx->INTPOLCLR = currentpin;
             }
-            else 
-            {
-                assert_param(IS_PC_NUM(i));
-                PC_AFSR->Port[i] &= ~(0x03ul);
-                PC_AFSR->Port[i] |= P_AF;
-            }				
         }
     }
 }
 
 /**
-  * @brief GPIO Configuration Function
-  * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
-  * @param  GPIO_Pin: specifies the port bits to be written.
-  *          This parameter can be one of  GPIO_Pin_x where x can be (0..15), except for GPIOD that can be one of (0..5). 
-  * @param  GPIO_Mode: specifies the GPIO Mode
-  *          This parameter can be one of the GPIOMode_TypeDef enum values:
-	*            @arg GPIO_Mode_IN: GPIO Input Mode     
-	*            @arg GPIO_Mode_OUT: GPIO Output Mode     
-	*            @arg GPIO_Mode_AF: GPIO Alternate function Mode  
-  * @param  P_AF: specifies the PAD alternate function type
-  *          This parameter can be one of the PAD_AF_TypeDef enum values:
-  *            @arg PAD_AF0, PAD_AF1, PAD_AF2, PAD_AF3
-  * @retval None
-  */
-void GPIO_Configuration(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIOMode_TypeDef GPIO_Mode, PAD_AF_TypeDef P_AF)
+ * @brief  Fills each GPIO_ITInitStruct member with its default value.
+ * @param  GPIO_ITInitStruct : pointer to a GPIO_IT_InitTypeDef structure which will be initialized.
+ * @retval None
+ */
+void GPIO_ITStructInit(GPIO_ITInitTypeDef* GPIO_ITInitStruct)
 {
-    GPIO_InitTypeDef GPIO_InitStructure;
-    PAD_Type PADx;
-    GPIO_StructInit(&GPIO_InitStructure);
-    
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode;
-    GPIO_Init(GPIOx, &GPIO_InitStructure);
-	
-    if(GPIOx == GPIOA)
-    {       
-        PADx = PAD_PA;
-        PAD_AFConfig(PADx,GPIO_Pin, P_AF);
-    }
-    else if(GPIOx == GPIOB)
-    {
-        PADx = PAD_PB;
-        PAD_AFConfig(PADx,GPIO_Pin, P_AF);
-    }
-    else 
-    {
-        PADx = PAD_PC;
-        PAD_AFConfig(PADx,GPIO_Pin, P_AF);
-    }
+    GPIO_ITInitStruct->GPIO_IT_Pin = GPIO_Pin_All;
+    GPIO_ITInitStruct->GPIO_IT_Polarity = (GPIOITPol_TypeDef) (GPIO_IT_HighRising);
+    GPIO_ITInitStruct->GPIO_IT_Type = (GPIOITType_TypeDef) (GPIO_IT_Edge);
 }
 
-
-
-
-
-
-
-
-
-
 /**
-  * @brief  Interrupt Configuration Function
-  * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
-  * @param  GPIO_Pin: specifies the port bits to be written.
-  *          This parameter can be one of  GPIO_Pin_x where x can be (0..15), except for GPIOD that can be one of (0..5). 
-  * @param  Polarity: specifies the value to be set to the selected bits.
-  *          This parameter can be one of the GPIOPol_TypeDef enum values:
-  *            @arg Falling: Clear Intterupt Poraity (indicates for LOW level or falling edge)
-  *            @arg Rising: Set Intterupt Porarity (indicates HIGH level or rising edge)
-  * @retval None
-  */
-void GPIO_INT_Configuration(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIOPol_TypeDef Polarity)
+ * @brief  Enables or disables the specified GPIOx's pin interrupts.
+ * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
+ * @param  GPIO_Pin: specifies the GPIO interrupt sources to be enabled or disabled.
+ *          This parameter can be one of GPIO_Pin_x where x can be (0..15), except for GPIOD that can be one of (0..5).
+ * @param  NewState: new state of the specified GPIOx's pin interrupts.
+ *          This parameter can be: ENABLE or DISABLE.
+ * @retval None
+ */
+void GPIO_ITConfig(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, FunctionalState NewState)
 {
-    GPIO_InitTypeDef GPIO_InitStructure;
-    PAD_Type PADx;
-    GPIO_StructInit(&GPIO_InitStructure);
-    
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin;  
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;  //Set input mode
-    GPIO_Init(GPIOx, &GPIO_InitStructure);
-
-		/* Check the parameters */
+    /* Check the parameters */
     assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
-    assert_param(IS_GPIO_PIN(GPIO_InitStruct->GPIO_Pin));
+    assert_param(IS_GPIO_PIN(GPIO_Pin));
+    assert_param(IS_FUNCTIONAL_STATE(NewState));
 
-    GPIOx->INTENSET  |= GPIO_Pin; // Interrupt Enable Set 
-    GPIOx->INTTYPESET |= GPIO_Pin;  //Interrupt Type Set 
-    
-	
-		
-    GPIO_INT_Polarity_Bits(GPIOx, GPIO_Pin, Polarity);
-	
-    if(GPIOx == GPIOA)
-    {       
-        PADx = PAD_PA;
-			
-				/* Configure Alternative function type that is the GPIO */
-        PAD_AFConfig(PADx,GPIO_Pin, PAD_AF1);
-			
-			/* Enable External Interrupt*/
-        NVIC_EnableIRQ(PORT0_IRQn);
-    }
-    else if(GPIOx == GPIOB)
-    {
-        PADx = PAD_PB;
-        PAD_AFConfig(PADx,GPIO_Pin, PAD_AF1);
-        NVIC_EnableIRQ(PORT1_IRQn);
-    }
-    else
-    {
-        PADx = PAD_PC;
-        PAD_AFConfig(PADx,GPIO_Pin, PAD_AF1);
-        NVIC_EnableIRQ(PORT2_IRQn);
+    if (NewState != DISABLE) {
+        GPIOx->INTENSET = GPIO_Pin;
+    } else {
+        GPIOx->INTENCLR = GPIO_Pin;
     }
 }
 
+/**
+ * @brief  Checks whether the specified GPIOx's pin interrupt has occurred or not.
+ * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
+ * @param  GPIO_Pin: specifies the GPIO interrupt source to check.
+ *          This parameter can be one of GPIO_Pin_x where x can be (0..15), except for GPIOD that can be one of (0..5).
+ * @retval The new state of selected data port pin (SET or RESET).
+ */
+ITStatus GPIO_GetITStatus(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
+{
+    ITStatus bitstatus = RESET;
+
+    /* Check the parameters */
+    assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
+    assert_param(IS_GET_GPIO_PIN(GPIO_Pin));
+
+    if ((GPIOx->Interrupt.INTSTATUS & GPIO_Pin) != ((uint16_t) Bit_RESET)) {
+        bitstatus = SET;
+    } else {
+        bitstatus = RESET;
+    }
+
+    return bitstatus;
+}
 
 /**
-  * @}
-  */
+ * @brief  Clears the GPIOx's interrupt pending pin.
+ * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
+ * @param  GPIO_Pin: specifies the interrupt pending pin to clear.
+ *          This parameter can be one of GPIO_Pin_x where x can be (0..15), except for GPIOD that can be one of (0..5).
+ * @retval None
+ */
+void GPIO_ClearITPendingPin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
+{
+    /* Check the parameters */
+    assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
+    assert_param(IS_GPIO_PIN(GPIO_Pin));
+
+    GPIOx->Interrupt.INTCLEAR = GPIO_Pin;
+}
 
 /**
-  * @}
-  */
+ * @brief  Writes data to the specified AFC data port.
+ * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
+ * @param  GPIO_PinSource: specifies the pin for the Alternate function.
+ *          This parameter can be one of GPIO_PinSourcex where x can be (0..15), except for PAD_PD that can be one of (0..5).
+ * @param  GPIO_AF: selects the pin to used as Alternate function.
+ *          This parameter can be one of the GPIOAf_TypeDef enum values:
+ *            @arg PAD_AF0, PAD_AF1, PAD_AF2, PAD_AF3
+ * @retval None
+ */
+void GPIO_PinAFConfig(GPIO_TypeDef* GPIOx, uint16_t GPIO_PinSource, GPIOAf_TypeDef GPIO_AF)
+{
+    assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
+    assert_param(IS_GPIO_PIN_SOURCE(GPIO_PinSource));
+    assert_param(IS_GPIO_AF(GPIO_AF));
+
+    if (GPIOx == GPIOA) AFC_PA->REGISTER[GPIO_PinSource] = GPIO_AF;
+    else if (GPIOx == GPIOB) AFC_PB->REGISTER[GPIO_PinSource] = GPIO_AF;
+    else if (GPIOx == GPIOC) AFC_PC->REGISTER[GPIO_PinSource] = GPIO_AF;
+    else AFC_PD->REGISTER[GPIO_PinSource] = GPIO_AF;
+}
 
 /**
-  * @}
-  */
+ * @brief  Read data to the specified AFC data port.
+ * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
+ * @param  GPIO_PinSource: specifies the pin for the Alternate function.
+ *          This parameter can be one of GPIO_PinSourcex where x can be (0..15), except for PAD_PD that can be one of (0..5).
+ * @retval The Alternate function value.
+ */
+uint8_t GPIO_Read_PinAF(GPIO_TypeDef* GPIOx, uint16_t GPIO_PinSource)
+{
+    assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
+    assert_param(IS_GPIO_PIN_SOURCE(GPIO_PinSource));
+
+    if (GPIOx == GPIOA) return (uint8_t) AFC_PA->REGISTER[GPIO_PinSource];
+    else if (GPIOx == GPIOB) return (uint8_t) AFC_PB->REGISTER[GPIO_PinSource];
+    else if (GPIOx == GPIOC) return (uint8_t) AFC_PC->REGISTER[GPIO_PinSource];
+    else return (uint8_t) AFC_PD->REGISTER[GPIO_PinSource];
+
+}
 
 /**
-  * @}
-  */
+ * @brief  Writes data to the specified PAD data port.
+ * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
+ * @param  GPIO_PinSource: specifies the pin for the Pad function.
+ *          This parameter can be one of GPIO_PinSourcex where x can be (0..15), except for PAD_PD that can be one of (0..5).
+ * @param  GPIO_Pad: selects the pin to used as Pad function.
+ *          This parameter can be one of the GPIOPad_TypeDef enum values:
+ * @retval None
+ */
+void GPIO_PinPadConfig(GPIO_TypeDef* GPIOx, uint16_t GPIO_PinSource, uint32_t GPIO_Pad)
+{
+    assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
+    assert_param(IS_GPIO_PIN_SOURCE(GPIO_PinSource));
+    assert_param(IS_GPIO_PAD(GPIO_Pad));
+
+    if (GPIOx == GPIOA) PADCON_PA->REGISTER[GPIO_PinSource] = GPIO_Pad;
+    else if (GPIOx == GPIOB) PADCON_PB->REGISTER[GPIO_PinSource] = GPIO_Pad;
+    else if (GPIOx == GPIOC) PADCON_PC->REGISTER[GPIO_PinSource] = GPIO_Pad;
+    else PADCON_PD->REGISTER[GPIO_PinSource] = GPIO_Pad;
+}
+
+/**
+ * @brief  Read data to the specified PAD data port.
+ * @param  GPIOx: where x can be (A..D) to select the GPIO peripheral.
+ * @param  GPIO_PinSource: specifies the pin for the Alternate function.
+ *          This parameter can be one of GPIO_PinSourcex where x can be (0..15), except for PAD_PD that can be one of (0..5).
+ * @retval The Pad function value.
+ */
+uint8_t GPIO_Read_PinPad(GPIO_TypeDef* GPIOx, uint16_t GPIO_PinSource)
+{
+    assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
+    assert_param(IS_GPIO_PIN_SOURCE(GPIO_PinSource));
+
+    if (GPIOx == GPIOA) return (uint8_t) PADCON_PA->REGISTER[GPIO_PinSource];
+    else if (GPIOx == GPIOB) return (uint8_t) PADCON_PB->REGISTER[GPIO_PinSource];
+    else if (GPIOx == GPIOC) return (uint8_t) PADCON_PC->REGISTER[GPIO_PinSource];
+    else return (uint8_t) PADCON_PD->REGISTER[GPIO_PinSource];
+}
+
+/**
+ * @}
+ */
+
+/**
+ * @}
+ */
+
+/**
+ * @}
+ */
+
+/******************** (C) COPYRIGHT WIZnet *****END OF FILE********************/

@@ -1,11 +1,9 @@
 cmake_minimum_required(VERSION 3.5)
 
-set(PROJECT_NAME W7500x-surf5)
+set(PROJECT_NAME W7500-surf5)
 
 include(${CMAKE_SOURCE_DIR}/tools/arm-none-eabi-gcc.cmake)
-project(${PROJECT_NAME} 
- ASM C CXX
-)
+project(${PROJECT_NAME} ASM C CXX)
 
     # Compiler options
 function(complie_link_option name)
@@ -15,13 +13,13 @@ function(complie_link_option name)
     -fdata-sections
     -ffunction-sections  
     -Wall
-    -O0
+    -O2
     -g3
     )
     
     # Linker options
     target_link_options(${name} PRIVATE
-    -T${CMAKE_SOURCE_DIR}/Libraries/gcc_W7500.ld
+    -T${CMAKE_SOURCE_DIR}/Libraries/CMSIS/Device/WIZnet/W7500/Source/GCC/gcc_w7500x.ld
     -mcpu=cortex-m0
     -mthumb
     -specs=nano.specs
@@ -37,10 +35,9 @@ function(create_binary_file PROJECT_NAME)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${PROJECT_NAME}> $<IF:$<BOOL:$<TARGET_PROPERTY:${PROJECT_NAME},OUTPUT_NAME>>,$<TARGET_PROPERTY:${PROJECT_NAME},OUTPUT_NAME>,$<TARGET_PROPERTY:${PROJECT_NAME},NAME>>.bin)
     endfunction()
 
-
-
-set(EXAMPLES_DIR ${CMAKE_SOURCE_DIR}/Projects/Peripheral_Examples)
-    
+set(EXAMPLES_DIR ${CMAKE_SOURCE_DIR}/Projects/W7500x_StdPeriph_Examples)
 add_subdirectory(${EXAMPLES_DIR})
 add_subdirectory(Libraries)
-add_subdirectory(ioLibrary)
+add_subdirectory(src)
+    
+

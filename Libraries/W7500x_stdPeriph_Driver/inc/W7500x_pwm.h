@@ -1,336 +1,234 @@
-/*******************************************************************************************************************************************************
- * Copyright ¨Ï 2016 <WIZnet Co.,Ltd.> 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ¡°Software¡±), 
- * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
- * THE SOFTWARE IS PROVIDED ¡°AS IS¡±, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
- * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
- * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*********************************************************************************************************************************************************/
 /**
-  ******************************************************************************
-  * @file    W7500x_stdPeriph_Driver/inc/W7500x_pwm.h
-  * @author  IOP Team
-  * @version V1.0.0
-  * @date    01-May-2015
-  * @brief   This file contains all the functions prototypes for the pwm 
-  *          firmware library.
-  ******************************************************************************
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    w7500x_pwm.h
+ * @author  WIZnet
+ * @brief   This file contains all the functions prototypes for the Pulse-Width
+ *          Modulation(PWM) firmware library.
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; COPYRIGHT 2018 WIZnet</center></h2>
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************
+ */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __W7500X_PWM_H
 #define __W7500X_PWM_H
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "W7500x.h"
+#include "w7500x.h"
 
-
-/** @addtogroup W7500x_Periph_Driver
-  * @{
-  */
+/** @addtogroup W7500x_StdPeriph_Driver
+ * @{
+ */
 
 /** @addtogroup PWM
-  * @{
-  */        
-  
-  
+ * @{
+ */
+
+/* Exported types ------------------------------------------------------------*/
+
+/**
+ * @brief  PWM Init structure definition
+ */
 typedef struct
 {
-    uint32_t    PWM_CHn_PR;   //Prescale register
-                              //   <0..5>   PR : prescale register <R/W>
-    uint32_t    PWM_CHn_MR;   //Match register
-                              //   <0..31>   MR : Match register <R/W>
-    uint32_t    PWM_CHn_LR;   //Limit register
-                              //   <0..31>   LR : Limit register <R/W>
-    uint32_t    PWM_CHn_UDMR; //Up-Down mode register
-                              //   <0>   UDM : Up-down mode <R/W>
-    uint32_t    PWM_CHn_PDMR; //Periodic mode register
-                                   //   <0>   PDM : Periodic mode <R/W>
-}PWM_TimerModeInitTypeDef;
+    uint32_t PWM_Mode;
+    uint32_t PWM_Output;
+    uint32_t PWM_Capture;
+    uint32_t PWM_Prescale_Counter;
+    uint32_t PWM_Duty;
+    uint32_t PWM_Period;
+    uint32_t PWM_UpDown;
+    uint32_t PWM_Repetiton;
+    uint32_t PWM_DeadZone;
+    uint32_t PWM_DeadZone_Counter;
+} PWM_InitTypeDef;
 
-typedef struct
-{
-    uint32_t    PWM_CHn_PR;   //Prescale register 
-                              //   <0..5>   PR : prescale register <R/W>
-    uint32_t    PWM_CHn_MR;   //Match register
-                              //   <0..31>   MR : Match register <R/W>
-    uint32_t    PWM_CHn_LR;   //Limit register
-                              //   <0..31>   LR : Limit register <R/W>
-    uint32_t    PWM_CHn_UDMR; //Up-Down mode register
-                              //   <0>   UDM : Up-down mode <R/W>
-    uint32_t    PWM_CHn_PDMR; //Periodic mode register
-                              //   <0>   PDM : Peiodic mode <R/W>
-    uint32_t    PWM_CHn_CMR;  //Capture mode register
-                                   //   <0>   CM : Capture mode <R/W>
-}PWM_CaptureModeInitTypeDef;
+/* Exported constants --------------------------------------------------------*/
 
-typedef struct
-{
-    uint32_t    PWM_CHn_MR;
-    uint32_t    PWM_CHn_LR;
-    uint32_t    PWM_CHn_UDMR;
-    uint32_t    PWM_CHn_PDMR;
-    uint32_t    PWM_CHn_TCMR;
-}PWM_CounterModeInitTypeDef;
+/** @defgroup PWM_Exported_Constants
+ * @{
+ */
 
-typedef struct
-{
-    uint32_t    PWM_CHn_PEEER;
-}PWM_CtrlPWMOutputTypeDef;
+/** @defgroup PWM_Selection
+ * @{
+ */
+#define IS_PWM_ALL_PERIPH(PERIPH)   (((PERIPH) == PWM0) || \
+                                     ((PERIPH) == PWM1) || \
+									 ((PERIPH) == PWM2) || \
+									 ((PERIPH) == PWM3) || \
+									 ((PERIPH) == PWM4) || \
+									 ((PERIPH) == PWM5) || \
+									 ((PERIPH) == PWM6) || \
+									 ((PERIPH) == PWM7))
+/**
+ * @}
+ */
 
-typedef struct
-{
-    uint32_t    PWM_CHn_PR;
-    uint32_t    PWM_CHn_MR;
-    uint32_t    PWM_CHn_LR;
-    uint32_t    PWM_CHn_UDMR;
-    uint32_t    PWM_CHn_PDMR;
-    uint32_t    PWM_CHn_DZCR;
-}PWM_DeadzoneModeInitTypDef;
+/** @defgroup PWM_Mode
+ * @{
+ */
+#define PWM_Mode_Timer              0x00UL
+#define PWM_Mode_CounterRising      PWM_CHn_TCMR_TCM_0
+#define PWM_Mode_CounterFalling     PWM_CHn_TCMR_TCM_1
+#define PWM_Mode_CounterBoth        PWM_CHn_TCMR_TCM
 
+#define IS_PWM_MODE(MODE)           (((MODE) == PWM_Mode_Timer) || \
+                                     ((MODE) == PWM_Mode_CounterRising) || \
+									 ((MODE) == PWM_Mode_CounterFalling) || \
+									 ((MODE) == PWM_Mode_CounterBoth))
+/**
+ * @}
+ */
 
-#define IS_PWM_ALL_CH(CHn)             ((CHn == PWM_CH0) || \
-                                        (CHn == PWM_CH1) || \
-                                        (CHn == PWM_CH2) || \
-                                        (CHn == PWM_CH3) || \
-                                        (CHn == PWM_CH4) || \
-                                        (CHn == PWM_CH5) || \
-                                        (CHn == PWM_CH6) || \
-                                        (CHn == PWM_CH7))
+/** @defgroup PWM_Output
+ * @{
+ */
+#define PWM_Output_OutDisable_InDisable     0x00UL
+#define PWM_Output_OutDisable_InEnable      PWM_CHn_PEEER_PEEE_0
+#define PWM_Output_OutEnable_InDisable      PWM_CHn_PEEER_PEEE_1
 
+#define IS_PWM_OUTPUT(OUTPUT)               (((OUTPUT) == PWM_Output_OutDisable_InDisable) || \
+                                             ((OUTPUT) == PWM_Output_OutDisable_InEnable) || \
+                                             ((OUTPUT) == PWM_Output_OutEnable_InDisable))
+/**
+ * @}
+ */
 
-#define PWM_IER_IE0_Enable              (0x1ul << 0) 
-#define PWM_IER_IE1_Enable              (0x1ul << 1)
-#define PWM_IER_IE2_Enable              (0x1ul << 2)
-#define PWM_IER_IE3_Enable              (0x1ul << 3)
-#define PWM_IER_IE4_Enable              (0x1ul << 4)
-#define PWM_IER_IE5_Enable              (0x1ul << 5)
-#define PWM_IER_IE6_Enable              (0x1ul << 6)
-#define PWM_IER_IE7_Enable              (0x1ul << 7)
+/** @defgroup PWM_Capture
+ * @{
+ */
+#define PWM_Capture_Rising          0x00UL
+#define PWM_Capture_Falling         PWM_CHn_CMR_CM
 
-#define PWM_IER_IE0_Disable             ~PWM_IER_IE0_Enable
-#define PWM_IER_IE1_Disable             ~PWM_IER_IE1_Enable
-#define PWM_IER_IE2_Disable             ~PWM_IER_IE2_Enable
-#define PWM_IER_IE3_Disable             ~PWM_IER_IE3_Enable
-#define PWM_IER_IE4_Disable             ~PWM_IER_IE4_Enable
-#define PWM_IER_IE5_Disable             ~PWM_IER_IE5_Enable
-#define PWM_IER_IE6_Disable             ~PWM_IER_IE6_Enable
-#define PWM_IER_IE7_Disable             ~PWM_IER_IE7_Enable
+#define IS_PWM_CAPTURE(CAPTURE)     (((CAPTURE) == PWM_Capture_Rising) || \
+                                     ((CAPTURE) == PWM_Capture_Falling))
+/**
+ * @}
+ */
 
-#define PWM_SSR_SS0_Start               (0x1ul << 0)
-#define PWM_SSR_SS1_Start               (0x1ul << 1)
-#define PWM_SSR_SS2_Start               (0x1ul << 2)
-#define PWM_SSR_SS3_Start               (0x1ul << 3)
-#define PWM_SSR_SS4_Start               (0x1ul << 4)
-#define PWM_SSR_SS5_Start               (0x1ul << 5)
-#define PWM_SSR_SS6_Start               (0x1ul << 6)
-#define PWM_SSR_SS7_Start               (0x1ul << 7)
+/** @defgroup PWM_UpDown
+ * @{
+ */
+#define PWM_UpDown_Up               0x00UL
+#define PWM_UpDown_Down             PWM_CHn_UDMR_UDM
 
-#define PWM_SSR_SS0_Stop                ~PWM_SSR_SS0_Start
-#define PWM_SSR_SS1_Stop                ~PWM_SSR_SS1_Start
-#define PWM_SSR_SS2_Stop                ~PWM_SSR_SS2_Start
-#define PWM_SSR_SS3_Stop                ~PWM_SSR_SS3_Start
-#define PWM_SSR_SS4_Stop                ~PWM_SSR_SS4_Start
-#define PWM_SSR_SS5_Stop                ~PWM_SSR_SS5_Start
-#define PWM_SSR_SS6_Stop                ~PWM_SSR_SS6_Start
-#define PWM_SSR_SS7_Stop                ~PWM_SSR_SS7_Start
+#define IS_PWM_UPDOWN(UPDOWN)       (((UPDOWN) == PWM_UpDown_Up) || \
+                                     ((UPDOWN) == PWM_UpDown_Down))
+/**
+ * @}
+ */
 
-#define IS_SSR_BIT_FLAG(FLAG)           (FLAG <= 0xFF)
+/** @defgroup PWM_Repetiton
+ * @{
+ */
+#define PWM_Repetition_Periodic         PWM_CHn_PDMR_PDM
+#define PWM_Repetition_Oneshot          0x00UL
 
-#define PWM_PSR_PS0_Pause               (0x1ul << 0)
-#define PWM_PSR_PS1_Pause               (0x1ul << 1)
-#define PWM_PSR_PS2_Pause               (0x1ul << 2)
-#define PWM_PSR_PS3_Pause               (0x1ul << 3)
-#define PWM_PSR_PS4_Pause               (0x1ul << 4)
-#define PWM_PSR_PS5_Pause               (0x1ul << 5)
-#define PWM_PSR_PS6_Pause               (0x1ul << 6)
-#define PWM_PSR_PS7_Pause               (0x1ul << 7)
+#define IS_PWM_REPETITION(REPETITION)   (((REPETITION) == PWM_Repetition_Periodic) || \
+                                         ((REPETITION) == PWM_Repetition_Oneshot))
+/**
+ * @}
+ */
 
-#define PWM_PSR_PS0_Restart             ~PWM_PSR_PS0_Pause
-#define PWM_PSR_PS1_Restart             ~PWM_PSR_PS1_Pause
-#define PWM_PSR_PS2_Restart             ~PWM_PSR_PS2_Pause
-#define PWM_PSR_PS3_Restart             ~PWM_PSR_PS3_Pause
-#define PWM_PSR_PS4_Restart             ~PWM_PSR_PS4_Pause
-#define PWM_PSR_PS5_Restart             ~PWM_PSR_PS5_Pause
-#define PWM_PSR_PS6_Restart             ~PWM_PSR_PS6_Pause
-#define PWM_PSR_PS7_Restart             ~PWM_PSR_PS7_Pause
+/** @defgroup PWM_DeadZone
+ * @{
+ */
+#define PWM_DeadZone_Enable             PWM_CHn_DZER_DZE
+#define PWM_DeadZone_Disable            0x00UL
 
-#define IS_PWM_PSR_BIT_FLAG(FLAG)       (FLAG <= 0xFF)
+#define IS_PWM_DEADZONE(DEADZONE)       (((DEADZONE) == PWM_DeadZone_Enable) || \
+                                         ((DEADZONE) == PWM_DeadZone_Disable))
+/**
+ * @}
+ */
 
+/** @defgroup PWM_Interrupt_definition
+ * @{
+ */
+#define PWM_IT_MI         PWM_CHn_IR_MI
+#define PWM_IT_OI         PWM_CHn_IR_OI
+#define PWM_IT_CI         PWM_CHn_IR_CI
+#define PWM_IT_ALL        PWM_IT_MI|PWM_IT_OI|PWM_IT_CI
 
+#define IS_PWM_CONFIG_IT(IT)    (((IT) == PWM_IT_MI) || \
+                                 ((IT) == PWM_IT_OI) || \
+                                 ((IT) == PWM_IT_CI) || \
+								 ((IT) == PWM_IT_ALL))
 
-#define PWM_CHn_IER_MIE                 (0x1ul << 0) ///< Match Interrupt Enable
-#define PWM_CHn_IER_OIE                 (0x1ul << 1) ///< Overflow Interrupt Enable
-#define PWM_CHn_IER_CIE                 (0x1ul << 2) ///< Capture Interrupt Enable
-#define IS_PWM_CHn_IER(FLAG)            (FLAG <= 0x7)
+#define IS_PWM_GET_IT(IT)       (((IT) == PWM_IT_MI) || \
+                                 ((IT) == PWM_IT_OI) || \
+                                 ((IT) == PWM_IT_CI))
 
-#define PWM_CHn_IER_MI_Msk              (0x1ul << 0) ///< Match Interrupt Enable Mask
-#define PWM_CHn_IER_OI_Msk              (0x1ul << 1) ///< Overflow Interrupt Enable Mask
-#define PWM_CHn_IER_CI_Msk              (0x1ul << 2) ///< Capture Interrupt Enable Mask
+#define IS_PWM_CLEAR_IT(IT)     (((IT) == PWM_IT_MI) || \
+                                 ((IT) == PWM_IT_OI) || \
+                                 ((IT) == PWM_IT_CI))
+/**
+ * @}
+ */
 
-#define PWM_CHn_ICR_MatchInterruptClear     (0x1ul << 0)
-#define PWM_CHn_ICR_OverflowInterruptClear  (0x1ul << 1)
-#define PWM_CHn_ICR_CaptureInterruptClear   (0x1ul << 2)
-#define IS_PWM_CHn_IntClearFlag(FLAG)       FLAG <= 0x7
+/** @defgroup PWM_Global_definition
+ * @{
+ */
+#define IS_PWM_PRESCALE_COUNTER(COUNTER)     (((COUNTER) >= 0x00UL) && ((COUNTER) <= 0x3FUL))
+#define IS_PWM_DEADZONE_COUNTER(COUNTER)     (((COUNTER) >= 0x00UL) && ((COUNTER) <= 0x3FFUL))
+/**
+ * @}
+ */
 
+/**
+ * @}
+ */
 
+/* Exported macro ------------------------------------------------------------*/
+/* Exported functions ------------------------------------------------------- */
 
-//M20170223 becky 1F -> 3F  (PR uses [5:0]bits) 
-#define IS_PWM_PR_FILTER(MAXVAL)        (MAXVAL <= 0x3F)
-                                     
+/* Initialization and Configuration functions *********************************/
+void PWM_DeInit(PWM_TypeDef* PWMx);
+void PWM_Init(PWM_TypeDef* PWMx, PWM_InitTypeDef* PWM_InitStruct);
+void PWM_StructInit(PWM_InitTypeDef* PWM_InitStruct);
+void PWM_Cmd(PWM_TypeDef* PWMx, FunctionalState NewState);
+void PWM_Pause(PWM_TypeDef* PWMx, FunctionalState NewState);
 
-#define PWM_CHn_UDMR_UpCount            (0x0ul)
-#define PWM_CHn_UDMR_DownCount          (0x1ul)
-#define IS_PWM_CHn_UDMR(MODE)          ((MODE == PWM_CHn_UDMR_UpCount) || \
-                                        (MODE == PWM_CHn_UDMR_DownCount))
+/* Input Capture management ***************************************************/
+uint32_t PWM_GetCapture(PWM_TypeDef* PWMx);
+uint32_t PWM_GetCounter(PWM_TypeDef* PWMx);
 
-#define PWM_CHn_TCMR_TimerMode          (0x0ul)
-#define PWM_CHn_TCMR_RisingCounterMode  (0x1ul)
-#define PWM_CHn_TCMR_FallingCounterMode (0x2ul)
-#define PWM_CHn_TCMR_BothCounterMode    (0x3ul)
-
-//A20170223 becky  add "MODE == PWM_CHn_TCMR_TimerMode"  
-#define IS_PWM_CHn_TCMR(MODE)          ((MODE == PWM_CHn_TCMR_TimerMode) || \
-										(MODE == PWM_CHn_TCMR_RisingCounterMode)  || \
-                                        (MODE == PWM_CHn_TCMR_FallingCounterMode) || \
-                                        (MODE == PWM_CHn_TCMR_BothCounterMode))
-
-#define PWM_CHn_PEEER_Disable           (0x0ul)
-#define PWM_CHn_PEEER_ExtEnable         (0x1ul)
-#define PWM_CHn_PEEER_PWMEnable         (0x2ul)
-#define IS_PWM_CHn_PEEER(ENABLE)       ((ENABLE == PWM_CHn_PEEER_Disable)   || \
-                                        (ENABLE == PWM_CHn_PEEER_ExtEnable) || \
-                                        (ENABLE == PWM_CHn_PEEER_PWMEnable))  
-
-#define IS_PWM_Output(ENABLE)          ((ENABLE == PWM_CHn_PEEER_Disable)   || \
-                                        (ENABLE == PWM_CHn_PEEER_PWMEnable))  
-
-#define PWM_CHn_CMR_RisingEdge          0x0ul
-#define PWM_CHn_CMR_FallingEdge         0x1ul
-#define IS_PWM_CHn_CMR(MODE)           ((MODE == PWM_CHn_CMR_RisingEdge) || \
-                                        (MODE == PWM_CHn_CMR_FallingEdge)) 
-
-#define PWM_CHn_PDMR_Oneshot            (0x0ul)
-#define PWM_CHn_PDMR_Periodic           (0x1ul)
-#define IS_PWM_CHn_PDMR(MODE)          ((MODE == PWM_CHn_PDMR_Periodic) || \
-                                        (MODE == PWM_CHn_PDMR_Oneshot))
-
-
-
-
-#define PWM_CHn_DZER_Enable             (0x1ul)             
-#define PWM_CHn_DZER_Disable            (0x0ul)             
-
-
-
-
-
-//M20170223 becky  (PWM_CHn_DZER - > IS_PWM_CHn_DZER )
-#define IS_PWM_CHn_DZER(ENABLE)           ((ENABLE == PWM_CHn_DZER_Enable) || \
-                                        (ENABLE == PWM_CHn_DZER_Disable)) 
-
-#define IS_PWM_Deadznoe(CHn)           (((CHn == PWM_CH0) && (PWM_CH1->DZER == PWM_CHn_DZER_Disable)) || \
-                                        ((CHn == PWM_CH1) && (PWM_CH0->DZER == PWM_CHn_DZER_Disable)) || \
-                                        ((CHn == PWM_CH2) && (PWM_CH3->DZER == PWM_CHn_DZER_Disable)) || \
-                                        ((CHn == PWM_CH3) && (PWM_CH2->DZER == PWM_CHn_DZER_Disable)) || \
-                                        ((CHn == PWM_CH4) && (PWM_CH5->DZER == PWM_CHn_DZER_Disable)) || \
-                                        ((CHn == PWM_CH5) && (PWM_CH4->DZER == PWM_CHn_DZER_Disable)) || \
-                                        ((CHn == PWM_CH6) && (PWM_CH7->DZER == PWM_CHn_DZER_Disable)) || \
-                                        ((CHn == PWM_CH7) && (PWM_CH6->DZER == PWM_CHn_DZER_Disable)))
-
-#define IS_PWM_CHn_DZCR_FILTER(MAXVAL)  (MAXVAL <= 0x3FF)
-
-
-void PWM_DeInit(PWM_CHn_TypeDef* PWM_CHn);
-void PWM_TimerModeInit(PWM_CHn_TypeDef* PWM_CHn, PWM_TimerModeInitTypeDef* PWM_TimerModeInitStruct);
-void PWM_CaptureModeInit(PWM_CHn_TypeDef* PWM_CHn, PWM_CaptureModeInitTypeDef* PWM_CaptureModeInitStruct);
-void PWM_CounterModeInit(PWM_CHn_TypeDef* PWM_CHn, PWM_CounterModeInitTypeDef* PWM_CounterModeInitStruct);
-void PWM_DeadzoneModeInit(PWM_CHn_TypeDef* PWM_CHn, PWM_DeadzoneModeInitTypDef* PWM_DeadzoneModeInitStruct);
-void PWM_CtrlPWMOutput(PWM_CHn_TypeDef* PWM_CHn, uint32_t outputEnDisable );
-void PWM_CtrlPWMOutputEnable(PWM_CHn_TypeDef* PWM_CHn) ;
-void PWM_CtrlPWMOutputDisable(PWM_CHn_TypeDef* PWM_CHn) ;
-void PWM_IntConfig(PWM_CHn_TypeDef* PWM_CHn, FunctionalState state);
-FlagStatus PWM_GetIntEnableStatus(PWM_CHn_TypeDef* PWM_CHn);
-void PWM_CHn_IntConfig(PWM_CHn_TypeDef* PWM_CHn, uint32_t PWM_CHn_IER, FunctionalState state);
-void PWM_CHn_Start(PWM_CHn_TypeDef* PWM_CHn);
-void PWM_Multi_Start(uint32_t ssr_bit_flag);
-void PWM_CHn_Stop(PWM_CHn_TypeDef* PWM_CHn);
-void PWM_Multi_Stop(uint32_t ssr_bit_flag);
-void PWM_CHn_Pause(PWM_CHn_TypeDef* PWM_CHn);
-void PWM_Multi_Pause(uint32_t psr_bit_flag);
-void PWM_CHn_Restart(PWM_CHn_TypeDef* PWM_CHn);
-void PWM_Multi_Restart(uint32_t psr_bit_flag);
-uint32_t PWM_CHn_GetIntEnableStatus(PWM_CHn_TypeDef* PWM_CHn);
-uint32_t PWM_CHn_GetIntFlagStatus(PWM_CHn_TypeDef* PWM_CHn);
-void PWM_CHn_ClearInt(PWM_CHn_TypeDef* PWM_CHn, uint32_t PWM_CHn_ICR);
-uint32_t PWM_CHn_GetTCR(PWM_CHn_TypeDef* PWM_CHn);
-uint32_t PWM_CHn_GetPCR(PWM_CHn_TypeDef* PWM_CHn);
-uint32_t PWM_CHn_GetPR(PWM_CHn_TypeDef* PWM_CHn);
-void PWM_CHn_SetPR(PWM_CHn_TypeDef* PWM_CHn, uint32_t PR);
-uint32_t PWM_CHn_GetMR(PWM_CHn_TypeDef* PWM_CHn);
-void PWM_CHn_SetMR(PWM_CHn_TypeDef* PWM_CHn, uint32_t MR);
-uint32_t PWM_CHn_GetLR(PWM_CHn_TypeDef* PWM_CHn);
-void PWM_CHn_SetLR(PWM_CHn_TypeDef* PWM_CHn, uint32_t LR);
-uint32_t PWM_CHn_GetUDMR(PWM_CHn_TypeDef* PWM_CHn);
-void PWM_CHn_SetUDMR(PWM_CHn_TypeDef* PWM_CHn, uint32_t UDMR);
-uint32_t PWM_CHn_GetTCMR(PWM_CHn_TypeDef* PWM_CHn);
-void PWM_CHn_SetTCMR(PWM_CHn_TypeDef* PWM_CHn, uint32_t TCMR);
-uint32_t PWM_CHn_GetPEEER(PWM_CHn_TypeDef* PWM_CHn);
-void PWM_CHn_SetPEEER(PWM_CHn_TypeDef* PWM_CHn, uint32_t PEEER);
-uint32_t PWM_CHn_GetCMR(PWM_CHn_TypeDef* PWM_CHn);
-void PWM_CHn_SetCMR(PWM_CHn_TypeDef* PWM_CHn, uint32_t CMR);
-uint32_t PWM_CHn_GetCR(PWM_CHn_TypeDef* PWM_CHn);
-uint32_t PWM_CHn_GetPDMR(PWM_CHn_TypeDef* PWM_CHn);
-void PWM_CHn_SetPDMR(PWM_CHn_TypeDef* PWM_CHn, uint32_t PDMR);
-void PWM_CHn_SetDZER(PWM_CHn_TypeDef* PWM_CHn, uint32_t DZER);
-uint32_t PWM_CHn_GetDZCR(PWM_CHn_TypeDef* PWM_CHn);
-void PWM_CHn_SetDZCR(PWM_CHn_TypeDef* PWM_CHn, uint32_t DZCR);
-void PWM_CH0_ClearMatchInt(void);
-void PWM_CH0_ClearOverflowInt(void);
-void PWM_CH0_ClearCaptureInt(void);
-void PWM_CH1_ClearMatchInt(void);
-void PWM_CH1_ClearOverflowInt(void);
-void PWM_CH1_ClearCaptureInt(void);
-void PWM_CH2_ClearMatchInt(void);
-void PWM_CH2_ClearOverflowInt(void);
-void PWM_CH2_ClearCaptureInt(void);
-void PWM_CH3_ClearMatchInt(void);
-void PWM_CH3_ClearOverflowInt(void);
-void PWM_CH3_ClearCaptureInt(void);
-void PWM_CH4_ClearMatchInt(void);
-void PWM_CH4_ClearOverflowInt(void);
-void PWM_CH4_ClearCaptureInt(void);
-void PWM_CH5_ClearMatchInt(void);
-void PWM_CH5_ClearOverflowInt(void);
-void PWM_CH5_ClearCaptureInt(void);
-void PWM_CH6_ClearMatchInt(void);
-void PWM_CH6_ClearOverflowInt(void);
-void PWM_CH6_ClearCaptureInt(void);
-void PWM_CH7_ClearMatchInt(void);
-void PWM_CH7_ClearOverflowInt(void);
-void PWM_CH7_ClearCaptureInt(void);
+/* Interrupts and flags management functions **********************************/
+void PWM_ITConfig(PWM_TypeDef* PWMx, uint32_t PWM_IT, FunctionalState NewState);
+ITStatus PWM_GetITStatus(PWM_TypeDef* PWMx, uint32_t PWM_IT);
+void PWM_ClearITPendingBit(PWM_TypeDef* PWMx, uint32_t PWM_IT);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif //__W7500X_PWM_H
+#endif /* __W7500X_PWM_H */
 
 /**
-  * @}
-  */
+ * @}
+ */
 
 /**
-  * @}
-  */
+ * @}
+ */
+
+/******************** (C) COPYRIGHT WIZnet *****END OF FILE********************/

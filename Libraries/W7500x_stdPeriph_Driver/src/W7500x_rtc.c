@@ -1,211 +1,509 @@
 /**
-  ******************************************************************************
-  * @file    W7500x_rtc.c
-  * @author  
-  * @version 
-  * @date    
-  * @brief   
-  ******************************************************************************
-  * @attention
-  *
+ ******************************************************************************
+ * @file    w7500x_rtc.c
+ * @author  WIZnet
+ * @brief   This file provides firmware functions to manage the following
+ *          functionalities of the Real-Time Clock (RTC) peripheral:
+ ******************************************************************************
+ * @attention
  *
-  ******************************************************************************
-  */
+ * <h2><center>&copy; COPYRIGHT 2018 WIZnet</center></h2>
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************
+ */
 
-/* Includes ------------------------------------------------------------------*/
-#include "W7500x_crg.h"
-#include "W7500x_rtc.h"
+/*include -------------------------------------*/
+#include "w7500x_rtc.h"
 
-/********************************************************************//**
- * @brief		Initializes the RTC peripheral.
- * @param[in]	RTCx	RTC peripheral selected, should be W7500x_RTC
- * @return 		None
- *********************************************************************/
-void RTC_Init (RTC_TypeDef *RTCx)
+/** @addtogroup W7500x_StdPeriph_Driver
+ * @{
+ */
+
+/** @defgroup RTC
+ * @brief RTC driver modules
+ * @{
+ */
+
+/* Private typedef -----------------------------------------------------------*/
+/* Private define ------------------------------------------------------------*/
+#define RTC_ALARM_MASK       (0x7FUL)
+
+/* Private macro -------------------------------------------------------------*/
+/* Private variables ---------------------------------------------------------*/
+/* Private function prototypes -----------------------------------------------*/
+static uint16_t RTC_DecToBcd(uint16_t Value);
+static uint16_t RTC_BcdToDec(uint16_t Value);
+
+/* Private functions ---------------------------------------------------------*/
+
+/** @defgroup RTC_Private_Functions
+ * @{
+ */
+
+/**
+ * @brief  Enables or disables the RTC.
+ * @param  NewState: new state of the RTC.
+ *          This parameter can be: ENABLE or DISABLE.
+ * @retval None
+ */
+void RTC_Cmd(FunctionalState NewState)
 {
-	assert_param(PARAM_RTCx(RTCx));
+    /* Check the parameters */
+    assert_param(IS_FUNCTIONAL_STATE(NewState));
 
-    //CRG->RTCCLK_SEL = (0x01ul);
-    //CRG->RTCCLK_PRE = (0x80ul);
-    CRG->RTCCLK_32K = (0x01ul);
-
-    RTCx->RTCCON = RTC_CON_CLKEN_Enable;
+    if (NewState != DISABLE) {
+        RTC->RTCCON |= RTC_RTCCON_CLKEN;
+    } else {
+        RTC->RTCCON &= ~RTC_RTCCON_CLKEN;
+    }
 }
 
-/*********************************************************************//**
- * @brief		De-initializes the RTC peripheral registers to their
-*                  default reset values.
- * @param[in]	RTCx	RTC peripheral selected, should be W7500x_RTC
- * @return 		None
- **********************************************************************/
-void RTC_DeInit(RTC_TypeDef *RTCx)
+/**
+ * @brief  Enables or disables the RTC Divider.
+ * @param  NewState: new state of the RTC Divider.
+ *          This parameter can be: ENABLE or DISABLE.
+ * @retval None
+ */
+void RTC_DividerCmd(FunctionalState NewState)
 {
-	assert_param(PARAM_RTCx(RTCx));
+    /* Check the parameters */
+    assert_param(IS_FUNCTIONAL_STATE(NewState));
 
-	RTCx->RTCCON     = 0x0;
-	RTCx->RTCINTE    = 0x0;
-	RTCx->RTCINTP    = 0x0;
-	RTCx->RTCAMR     = 0x0;
-	RTCx->BCDSEC     = 0x0;
-	RTCx->BCDMIN     = 0x0;
-	RTCx->BCDHOUR    = 0x0;
-	RTCx->BCDDAY     = 0x0;
-	RTCx->BCDDATE    = 0x0;
-	RTCx->BCDMON     = 0x0;
-	RTCx->BCDYEAR    = 0x0;
-	RTCx->PRESEC     = 0x0;
-	RTCx->PREMIN     = 0x0;
-	RTCx->PREHOUR    = 0x0;
-	RTCx->PREDAY     = 0x0;
-	RTCx->PREDATE    = 0x0;
-	RTCx->PREMON     = 0x0;
-	RTCx->PREYEAR    = 0x0;
+    if (NewState != DISABLE) {
+        RTC->RTCCON |= RTC_RTCCON_DIVRST;
+    } else {
+        RTC->RTCCON &= ~RTC_RTCCON_DIVRST;
+    }
 }
 
-void RTC_EnableINT(RTC_TypeDef *RTCx)
+/**
+ * @brief  Set the RTC current time.
+ * @param  RTC_Format: specifies the format of the entered parameters.
+ *          This parameter can be  one of the following values:
+ *            @arg RTC_Format_BIN:  Binary data format
+ *            @arg RTC_Format_BCD:  BCD data format
+ * @param  RTC_TimeStruct: pointer to a RTC_TimeTypeDef structure that contains
+ *                        the time configuration information for the RTC.
+ * @retval None
+ */
+void RTC_SetTime(uint32_t RTC_Format, RTC_TimeTypeDef* RTC_TimeStruct)
 {
-	assert_param(PARAM_RTCx(RTCx));
+    /* Check the parameters */
+    assert_param(IS_RTC_FORMAT(RTC_Format));
 
-	RTCx->RTCCON |= RTC_CON_INTEN_Enable;
+    /* Check the input parameters format */
+    if (RTC_Format != RTC_Format_BIN) {
+
+        assert_param(IS_RTC_MINUTES(RTC_BcdToDec(RTC_TimeStruct->RTC_Hours)));
+        assert_param(IS_RTC_MINUTES(RTC_BcdToDec(RTC_TimeStruct->RTC_Minutes)));
+        assert_param(IS_RTC_SECONDS(RTC_BcdToDec(RTC_TimeStruct->RTC_Seconds)));
+        RTC->BCDHOUR = RTC_TimeStruct->RTC_Hours;
+        RTC->BCDMIN = RTC_TimeStruct->RTC_Minutes;
+        RTC->BCDSEC = RTC_TimeStruct->RTC_Seconds;
+    } else {
+        assert_param(IS_RTC_HOURS(RTC_TimeStruct->RTC_Hours));
+        assert_param(IS_RTC_MINUTES(RTC_TimeStruct->RTC_Minutes));
+        assert_param(IS_RTC_SECONDS(RTC_TimeStruct->RTC_Seconds));
+        RTC->BCDHOUR = RTC_DecToBcd(RTC_TimeStruct->RTC_Hours);
+        RTC->BCDMIN = RTC_DecToBcd(RTC_TimeStruct->RTC_Minutes);
+        RTC->BCDSEC = RTC_DecToBcd(RTC_TimeStruct->RTC_Seconds);
+    }
 }
 
-void RTC_DisableINT(RTC_TypeDef *RTCx)
+/**
+ * @brief  Fills each RTC_TimeStruct member with its default value
+ *         (Time = 00h:00min:00sec).
+ * @param  RTC_TimeStruct: pointer to a RTC_TimeTypeDef structure which will be
+ *         initialized.
+ * @retval None
+ */
+void RTC_TimeStructInit(RTC_TimeTypeDef* RTC_TimeStruct)
 {
-	assert_param(PARAM_RTCx(RTCx));
-
-	RTC_ClearINTMask(RTCx);
-	RTCx->RTCCON &= ~RTC_CON_INTEN_Disable;
+    /* Time = 00h:00min:00sec */
+    RTC_TimeStruct->RTC_Hours = 0;
+    RTC_TimeStruct->RTC_Minutes = 0;
+    RTC_TimeStruct->RTC_Seconds = 0;
 }
 
-void RTC_ClearINTMask(RTC_TypeDef *RTCx)
+/**
+ * @brief  Get the RTC current Time.
+ * @param  RTC_Format: specifies the format of the returned parameters.
+ *          This parameter can be  one of the following values:
+ *            @arg RTC_Format_BIN:  Binary data format
+ *            @arg RTC_Format_BCD:  BCD data format
+ * @param  RTC_TimeStruct: pointer to a RTC_TimeTypeDef structure that will
+ *                         contain the returned current time configuration.
+ * @retval None
+ */
+void RTC_GetTime(uint32_t RTC_Format, RTC_TimeTypeDef* RTC_TimeStruct)
 {
-	assert_param(PARAM_RTCx(RTCx));
+    /* Check the parameters */
+    assert_param(IS_RTC_FORMAT(RTC_Format));
 
-	RTCx->RTCINTE &= ~(0x3Ful);
+    /* Fill the structure fields with the read parameters */
+    RTC_TimeStruct->RTC_Hours = (RTC->RTCTIME0 & RTC_RTCTIME0_CBCDHOUR) >> 16;
+    RTC_TimeStruct->RTC_Minutes = (RTC->RTCTIME0 & RTC_RTCTIME0_CBCDMIN) >> 8;
+    RTC_TimeStruct->RTC_Seconds = RTC->RTCTIME0 & RTC_RTCTIME0_CBCDSEC;
+
+    /* Check the input parameters format */
+    if (RTC_Format == RTC_Format_BIN) {
+        /* Convert the structure parameters to Binary format */
+        RTC_TimeStruct->RTC_Hours = (uint8_t) RTC_BcdToDec(RTC_TimeStruct->RTC_Hours);
+        RTC_TimeStruct->RTC_Minutes = (uint8_t) RTC_BcdToDec(RTC_TimeStruct->RTC_Minutes);
+        RTC_TimeStruct->RTC_Seconds = (uint8_t) RTC_BcdToDec(RTC_TimeStruct->RTC_Seconds);
+    }
 }
 
-void RTC_SetINTMask(RTC_TypeDef *RTCx, RTC_INTMASK_POS pos)
+/**
+ * @brief  Set the RTC current date.
+ * @param  RTC_Format: specifies the format of the entered parameters.
+ *          This parameter can be  one of the following values:
+ *            @arg RTC_Format_BIN:  Binary data format
+ *            @arg RTC_Format_BCD:  BCD data format
+ * @param  RTC_DateStruct: pointer to a RTC_DateTypeDef structure that contains
+ *                         the date configuration information for the RTC.
+ * @retval None
+ */
+void RTC_SetDate(uint32_t RTC_Format, RTC_DateTypeDef* RTC_DateStruct)
 {
-	assert_param(PARAM_RTCx(RTCx));
-	assert_param(IS_INTMASK_POS(pos));
+    /* Check the parameters */
+    assert_param(IS_RTC_FORMAT(RTC_Format));
 
-	if(pos == RTC_INTMASK_ALARM)
-		RTCx->RTCINTE &= ~(0x01ul << pos);
-	else
-		RTC_ClearINTMask(RTCx);
-	RTCx->RTCINTE |= (0x01ul << pos);
+    /* Check the input parameters format */
+    if (RTC_Format != RTC_Format_BIN) {
+        assert_param(IS_RTC_YEAR(RTC_BcdToDec(RTC_DateStruct->RTC_Year)));
+        assert_param(IS_RTC_MONTH(RTC_BcdToDec(RTC_DateStruct->RTC_Month)));
+        assert_param(IS_RTC_DATE(RTC_BcdToDec(RTC_DateStruct->RTC_Date)));
+        assert_param(IS_RTC_WEEKDAY(RTC_BcdToDec(RTC_DateStruct->RTC_WeekDay)));
+        RTC->BCDYEAR = RTC_DateStruct->RTC_Year;
+        RTC->BCDMON = RTC_DateStruct->RTC_Month;
+        RTC->BCDDATE = RTC_DateStruct->RTC_Date;
+        RTC->BCDDAY = RTC_DateStruct->RTC_WeekDay;
+    } else {
+        assert_param(IS_RTC_YEAR(RTC_DateStruct->RTC_Year));
+        assert_param(IS_RTC_MONTH(RTC_DateStruct->RTC_Month));
+        assert_param(IS_RTC_DATE(RTC_DateStruct->RTC_Date));
+        assert_param(IS_RTC_WEEKDAY(RTC_DateStruct->RTC_WeekDay));
+        RTC->BCDYEAR = RTC_DecToBcd(RTC_DateStruct->RTC_Year);
+        RTC->BCDMON = RTC_DecToBcd(RTC_DateStruct->RTC_Month);
+        RTC->BCDDATE = RTC_DecToBcd(RTC_DateStruct->RTC_Date);
+        RTC->BCDDAY = RTC_DecToBcd(RTC_DateStruct->RTC_WeekDay);
+    }
 }
 
-void RTC_ClearINTPendingBit(RTC_TypeDef *RTCx)
+/**
+ * @brief  Fills each RTC_DateStruct member with its default value
+ *         (Monday, January 01 xx00).
+ * @param  RTC_DateStruct: pointer to a RTC_DateTypeDef structure which will be
+ *         initialized.
+ * @retval None
+ */
+void RTC_DateStructInit(RTC_DateTypeDef* RTC_DateStruct)
 {
-	assert_param(PARAM_RTCx(RTCx));
-
-	RTCx->RTCINTP ^= ~RTC_INTP_CIF;
+    /* Monday, January 01 0000 */
+    RTC_DateStruct->RTC_WeekDay = 1;
+    RTC_DateStruct->RTC_Date = 1;
+    RTC_DateStruct->RTC_Month = 1;
+    RTC_DateStruct->RTC_Year = 0;
 }
 
-void RTC_ClearAlarmMask(RTC_TypeDef *RTCx)
+/**
+ * @brief  Get the RTC current date.
+ * @param  RTC_Format: specifies the format of the returned parameters.
+ *          This parameter can be one of the following values:
+ *            @arg RTC_Format_BIN: Binary data format
+ *            @arg RTC_Format_BCD: BCD data format
+ * @param RTC_DateStruct: pointer to a RTC_DateTypeDef structure that will
+ *                        contain the returned current date configuration.
+ * @retval None
+ */
+void RTC_GetDate(uint32_t RTC_Format, RTC_DateTypeDef* RTC_DateStruct)
 {
-	assert_param(PARAM_RTCx(RTCx));
+    /* Check the parameters */
+    assert_param(IS_RTC_FORMAT(RTC_Format));
 
-	RTCx->RTCAMR &= ~(0x7Ful);
+    /* Fill the structure fields with the read parameters */
+    RTC_DateStruct->RTC_Year = (RTC->RTCTIME1 & RTC_RTCTIME1_CBCDYEAR) >> 16;
+    RTC_DateStruct->RTC_Month = (RTC->RTCTIME1 & RTC_RTCTIME1_CBCDMON) >> 8;
+    RTC_DateStruct->RTC_Date = RTC->RTCTIME1 & RTC_RTCTIME1_CBCDDATE;
+    RTC_DateStruct->RTC_WeekDay = (RTC->RTCTIME0 & RTC_RTCTIME0_CBCDDAY) >> 24;
+
+    /* Check the input parameters format */
+    if (RTC_Format == RTC_Format_BIN) {
+        /* Convert the structure parameters to Binary format */
+        RTC_DateStruct->RTC_Year = (uint16_t) RTC_BcdToDec(RTC_DateStruct->RTC_Year);
+        RTC_DateStruct->RTC_Month = (uint8_t) RTC_BcdToDec(RTC_DateStruct->RTC_Month);
+        RTC_DateStruct->RTC_Date = (uint8_t) RTC_BcdToDec(RTC_DateStruct->RTC_Date);
+        RTC_DateStruct->RTC_WeekDay = (uint8_t) (RTC_DateStruct->RTC_WeekDay);
+    }
 }
 
-void RTC_SetAlarmMask(RTC_TypeDef *RTCx, RTC_INTMASK_POS pos)
+/**
+ * @brief  Set the specified RTC Alarm.
+ * @note   The Alarm register can only be written when the corresponding Alarm
+ *         is disabled (Use the RTC_AlarmCmd(DISABLE)).
+ * @param  RTC_Format: specifies the format of the returned parameters.
+ *          This parameter can be one of the following values:
+ *            @arg RTC_Format_BIN: Binary data format
+ *            @arg RTC_Format_BCD: BCD data format
+ * @param  RTC_AlarmStruct: pointer to a RTC_AlarmTypeDef structure that
+ *                          contains the alarm configuration parameters.
+ * @retval None
+ */
+void RTC_SetAlarm(uint32_t RTC_Format, RTC_AlarmTypeDef* RTC_AlarmStruct)
 {
-	assert_param(PARAM_RTCx(RTCx));
-	assert_param(IS_INTMASK_POS(pos));
-
-	RTC_SetINTMask(RTCx, pos);
-	RTC_ClearAlarmMask(RTCx);
-	RTCx->RTCAMR |= (0x7Ful);
+    /* Check the input parameters format */
+    if (RTC_Format != RTC_Format_BIN) {
+        assert_param(IS_RTC_MINUTES(RTC_BcdToDec(RTC_AlarmStruct->RTC_AlarmTime.RTC_Hours)));
+        assert_param(IS_RTC_MINUTES(RTC_BcdToDec(RTC_AlarmStruct->RTC_AlarmTime.RTC_Minutes)));
+        assert_param(IS_RTC_SECONDS(RTC_BcdToDec(RTC_AlarmStruct->RTC_AlarmTime.RTC_Seconds)));
+        assert_param(IS_RTC_YEAR(RTC_BcdToDec(RTC_AlarmStruct->RTC_AlarmDate.RTC_Year)));
+        assert_param(IS_RTC_MONTH(RTC_BcdToDec(RTC_AlarmStruct->RTC_AlarmDate.RTC_Month)));
+        assert_param(IS_RTC_DATE(RTC_BcdToDec(RTC_AlarmStruct->RTC_AlarmDate.RTC_Date)));
+        assert_param(IS_RTC_WEEKDAY(RTC_BcdToDec(RTC_AlarmStruct->RTC_AlarmDate.RTC_WeekDay)));
+        RTC->PREHOUR = RTC_AlarmStruct->RTC_AlarmTime.RTC_Hours;
+        RTC->PREMIN = RTC_AlarmStruct->RTC_AlarmTime.RTC_Minutes;
+        RTC->PRESEC = RTC_AlarmStruct->RTC_AlarmTime.RTC_Seconds;
+        RTC->PREYEAR = RTC_AlarmStruct->RTC_AlarmDate.RTC_Year;
+        RTC->PREMON = RTC_AlarmStruct->RTC_AlarmDate.RTC_Month;
+        RTC->PREDATE = RTC_AlarmStruct->RTC_AlarmDate.RTC_Date;
+        RTC->PREDAY = RTC_AlarmStruct->RTC_AlarmDate.RTC_WeekDay;
+    } else {
+        assert_param(IS_RTC_HOURS(RTC_AlarmStruct->RTC_AlarmTime.RTC_Hours));
+        assert_param(IS_RTC_MINUTES(RTC_AlarmStruct->RTC_AlarmTime.RTC_Minutes));
+        assert_param(IS_RTC_SECONDS(RTC_AlarmStruct->RTC_AlarmTime.RTC_Seconds));
+        assert_param(IS_RTC_YEAR(RTC_AlarmStruct->RTC_AlarmDate.RTC_Year));
+        assert_param(IS_RTC_MONTH(RTC_AlarmStruct->RTC_AlarmDate.RTC_Month));
+        assert_param(IS_RTC_DATE(RTC_AlarmStruct->RTC_AlarmDate.RTC_Date));
+        assert_param(IS_RTC_WEEKDAY(RTC_AlarmStruct->RTC_AlarmDate.RTC_WeekDay));
+        RTC->PREHOUR = RTC_DecToBcd(RTC_AlarmStruct->RTC_AlarmTime.RTC_Hours);
+        RTC->PREMIN = RTC_DecToBcd(RTC_AlarmStruct->RTC_AlarmTime.RTC_Minutes);
+        RTC->PRESEC = RTC_DecToBcd(RTC_AlarmStruct->RTC_AlarmTime.RTC_Seconds);
+        RTC->PREYEAR = RTC_DecToBcd(RTC_AlarmStruct->RTC_AlarmDate.RTC_Year);
+        RTC->PREMON = RTC_DecToBcd(RTC_AlarmStruct->RTC_AlarmDate.RTC_Month);
+        RTC->PREDATE = RTC_DecToBcd(RTC_AlarmStruct->RTC_AlarmDate.RTC_Date);
+        RTC->PREDAY = RTC_DecToBcd(RTC_AlarmStruct->RTC_AlarmDate.RTC_WeekDay);
+    }
 }
 
-void RTC_ClearAlarmPendingBit(RTC_TypeDef *RTCx)
+/**
+ * @brief  Fills each RTC_AlarmStruct member with its default value
+ *         (Time = 00h:00mn:00sec / Date = 1st day of the month/Mask =
+ *         all fields are masked).
+ * @param  RTC_AlarmStruct: pointer to a @ref RTC_AlarmTypeDef structure which
+ *         will be initialized.
+ * @retval None
+ */
+void RTC_AlarmStructInit(RTC_AlarmTypeDef* RTC_AlarmStruct)
 {
-	assert_param(PARAM_RTCx(RTCx));
+    /* Alarm Time Settings : Time = 00h:00mn:00sec */
+    RTC_AlarmStruct->RTC_AlarmTime.RTC_Hours = 0;
+    RTC_AlarmStruct->RTC_AlarmTime.RTC_Minutes = 0;
+    RTC_AlarmStruct->RTC_AlarmTime.RTC_Seconds = 0;
 
-	RTCx->RTCINTP ^= ~RTC_INTP_ALF;
+    /* Monday, January 01 0000 */
+    RTC_AlarmStruct->RTC_AlarmDate.RTC_WeekDay = 1;
+    RTC_AlarmStruct->RTC_AlarmDate.RTC_Date = 1;
+    RTC_AlarmStruct->RTC_AlarmDate.RTC_Month = 1;
+    RTC_AlarmStruct->RTC_AlarmDate.RTC_Year = 0;
 }
 
-uint8_t RTC_GetStatusPendingBit(RTC_TypeDef *RTCx)
+/**
+ * @brief  Get the RTC Alarm value and masks.
+ * @param  RTC_Format: specifies the format of the output parameters.
+ *          This parameter can be one of the following values:
+ *            @arg RTC_Format_BIN: Binary data format
+ *            @arg RTC_Format_BCD: BCD data format
+ * @param  RTC_AlarmStruct: pointer to a RTC_AlarmTypeDef structure that will
+ *                          contains the output alarm configuration values.
+ * @retval None
+ */
+void RTC_GetAlarm(uint32_t RTC_Format, RTC_AlarmTypeDef* RTC_AlarmStruct)
 {
-	assert_param(PARAM_RTCx(RTCx));
+    /* Check the parameters */
+    assert_param(IS_RTC_FORMAT(RTC_Format));
 
-	return (uint8_t)(RTCx->RTCINTP & RTC_INTP_BITMASK);
+    /* Fill the structure fields with the read parameters */
+    RTC_AlarmStruct->RTC_AlarmTime.RTC_Hours = RTC->PREHOUR;
+    RTC_AlarmStruct->RTC_AlarmTime.RTC_Minutes = RTC->PREMIN;
+    RTC_AlarmStruct->RTC_AlarmTime.RTC_Seconds = RTC->PRESEC;
+    RTC_AlarmStruct->RTC_AlarmDate.RTC_Year = RTC->PREYEAR;
+    RTC_AlarmStruct->RTC_AlarmDate.RTC_Month = RTC->PREMON;
+    RTC_AlarmStruct->RTC_AlarmDate.RTC_Date = RTC->PREDATE;
+    RTC_AlarmStruct->RTC_AlarmDate.RTC_WeekDay = RTC->PREDAY;
+
+    /* Check the input parameters format */
+    if (RTC_Format == RTC_Format_BIN) {
+        /* Convert the structure parameters to Binary format */
+        RTC_AlarmStruct->RTC_AlarmTime.RTC_Hours = RTC_BcdToDec(RTC_AlarmStruct->RTC_AlarmTime.RTC_Hours);
+        RTC_AlarmStruct->RTC_AlarmTime.RTC_Minutes = RTC_BcdToDec(RTC_AlarmStruct->RTC_AlarmTime.RTC_Minutes);
+        RTC_AlarmStruct->RTC_AlarmTime.RTC_Seconds = RTC_BcdToDec(RTC_AlarmStruct->RTC_AlarmTime.RTC_Seconds);
+        RTC_AlarmStruct->RTC_AlarmDate.RTC_Year = RTC_BcdToDec(RTC_AlarmStruct->RTC_AlarmDate.RTC_Year);
+        RTC_AlarmStruct->RTC_AlarmDate.RTC_Month = RTC_BcdToDec(RTC_AlarmStruct->RTC_AlarmDate.RTC_Month);
+        RTC_AlarmStruct->RTC_AlarmDate.RTC_Date = RTC_BcdToDec(RTC_AlarmStruct->RTC_AlarmDate.RTC_Date);
+        RTC_AlarmStruct->RTC_AlarmDate.RTC_WeekDay = RTC_BcdToDec(RTC_AlarmStruct->RTC_AlarmDate.RTC_WeekDay);
+    }
 }
 
-void RTC_SetFullTime (RTC_TypeDef *RTCx, RTC_TIME_Type *pFullTime)
+/**
+ * @brief  Enables or disables the RTC Alarm.
+ * @param  NewState: new state of the specified alarm.
+ *          This parameter can be: ENABLE or DISABLE.
+ * @retval None
+ */
+void RTC_AlarmCmd(FunctionalState NewState)
 {
-	assert_param(PARAM_RTCx(RTCx));
-	assert_param(IS_SEC(pFullTime->SEC));
-	assert_param(IS_MIN(pFullTime->MIN));
-	assert_param(IS_HOUR(pFullTime->HOUR));
-	assert_param(IS_DOW(pFullTime->DOW));
-	assert_param(IS_DOM(pFullTime->DOM));
-	assert_param(IS_MONTH(pFullTime->MONTH));
-	assert_param(IS_YEAR(pFullTime->YEAR));
+    /* Check the parameters */
+    assert_param(IS_FUNCTIONAL_STATE(NewState));
 
-	RTCx->BCDSEC =  (uint32_t)(pFullTime->SEC & RTC_SEC_MASK);
-	RTCx->BCDMIN =  (uint32_t)(pFullTime->MIN & RTC_MIN_MASK);
-	RTCx->BCDHOUR = (uint32_t)(pFullTime->HOUR & RTC_HOUR_MASK);
-	RTCx->BCDDAY =  (uint32_t)(pFullTime->DOW & RTC_DOW_MASK);
-	RTCx->BCDDATE = (uint32_t)(pFullTime->DOM & RTC_DOM_MASK);
-	RTCx->BCDMON =  (uint32_t)(pFullTime->MONTH & RTC_MONTH_MASK);
-	RTCx->BCDYEAR = (uint32_t)(pFullTime->YEAR & RTC_YEAR_MASK);
+    /* Configure the Alarm state */
+    if (NewState != DISABLE) {
+        RTC->RTCAMR |= RTC_ALARM_MASK;
+    } else {
+        RTC->RTCAMR &= ~RTC_ALARM_MASK;
+    }
 }
 
-void RTC_GetFullTime (RTC_TypeDef *RTCx, RTC_TIME_Type *pFullTime)
+/**
+ * @brief  Enables or disables the specified RTC interrupts.
+ * @param  RTC_IT: specifies the RTC interrupt sources to be enabled or disabled.
+ *          This parameter can be any combination of the following values:
+ *            @arg RTC_IT_ALARM:    Alarm interrupt mask
+ *            @arg RTC_IT_MON:      Month interrupt mask
+ *            @arg RTC_IT_DAY:      Day interrupt mask
+ *            @arg RTC_IT_DATE:     Date interrupt mask
+ *            @arg RTC_IT_HOUR:     Hour interrupt mask
+ *            @arg RTC_IT_MIN:      Minute interrupt mask
+ *            @arg RTC_IT_SEC:      Second interrupt mask
+ * @param  NewState: new state of the specified RTC interrupts.
+ *          This parameter can be: ENABLE or DISABLE.
+ * @retval None
+ */
+void RTC_ITConfig(uint32_t RTC_IT, FunctionalState NewState)
 {
-	assert_param(PARAM_RTCx(RTCx));
+    /* Check the parameters */
+    assert_param(IS_RTC_CONFIG_IT(RTC_IT));
+    assert_param(IS_FUNCTIONAL_STATE(NewState));
 
-	pFullTime->SEC = (uint8_t)((RTCx->RTCTIME0 & RTC_CTIME_SEC_MASK) );
-	pFullTime->MIN = (uint8_t)((RTCx->RTCTIME0 & RTC_CTIME_MIN_MASK)  >> 8);
-	pFullTime->HOUR = (uint8_t)((RTCx->RTCTIME0 & RTC_CTIME_HOUR_MASK) >> 16);
-	pFullTime->DOW = (uint8_t)((RTCx->RTCTIME0 & RTC_CTIME_DOW_MASK) >> 24);
-	pFullTime->DOM = (uint8_t)((RTCx->RTCTIME1 & RTC_CTIME_DOM_MASK) );
-	pFullTime->MONTH = (uint8_t)((RTCx->RTCTIME1 & RTC_CTIME_MONTH_MASK) >> 8);
-	pFullTime->YEAR = (uint16_t)((RTCx->RTCTIME1 & RTC_CTIME_YEAR_MASK) >> 16);
+    if (NewState != DISABLE) {
+        RTC->RTCINTE |= RTC_IT;
+        RTC->RTCCON |= RTC_RTCCON_INTEN;
+    } else {
+        RTC->RTCINTE &= ~RTC_IT;
+        RTC->RTCCON &= ~RTC_RTCCON_INTEN;
+    }
 }
 
-void RTC_SetFullAlarmTime (RTC_TypeDef *RTCx, RTC_TIME_Type *pFullTime)
+/**
+ * @brief  Checks whether the specified RTC interrupt has occurred or not.
+ * @param  RTC_IT: specifies the RTC interrupt source to check.
+ *          This parameter can be one of the following values:
+ *            @arg RTC_IT_ALARMP:      Alarm interrupt
+ *            @arg RTC_IT_COUNTERP:    Counter interrupt
+ * @retval The new state of RTC_IT (SET or RESET).
+ */
+ITStatus RTC_GetITStatus(uint32_t RTC_IT)
 {
-	assert_param(PARAM_RTCx(RTCx));
-	assert_param(IS_SEC(pFullTime->SEC));
-	assert_param(IS_MIN(pFullTime->MIN));
-	assert_param(IS_HOUR(pFullTime->HOUR));
-	assert_param(IS_DOW(pFullTime->DOW));
-	assert_param(IS_DOM(pFullTime->DOM));
-	assert_param(IS_MONTH(pFullTime->MONTH));
-	assert_param(IS_YEAR(pFullTime->YEAR));
+    ITStatus bitstatus = RESET;
 
-	RTCx->PRESEC =  (uint32_t)(pFullTime->SEC & RTC_SEC_MASK);
-	RTCx->PREMIN =  (uint32_t)(pFullTime->MIN & RTC_MIN_MASK);
-	RTCx->PREHOUR = (uint32_t)(pFullTime->HOUR & RTC_HOUR_MASK);
-	RTCx->PREDAY =  (uint32_t)(pFullTime->DOW & RTC_DOW_MASK);
-	RTCx->PREDATE = (uint32_t)(pFullTime->DOM & RTC_DOM_MASK);
-	RTCx->PREMON =  (uint32_t)(pFullTime->MONTH & RTC_MONTH_MASK);
-	RTCx->PREYEAR = (uint32_t)(pFullTime->YEAR & RTC_YEAR_MASK);
+    /* Check the parameters */
+    assert_param(IS_RTC_GET_IT(RTC_IT));
+
+    if ((RTC->RTCINTP & RTC_IT) != ((uint16_t) RESET)) {
+        bitstatus = SET;
+    } else {
+        bitstatus = RESET;
+    }
+
+    return bitstatus;
 }
 
-void RTC_GetFullAlarmTime (RTC_TypeDef *RTCx, RTC_TIME_Type *pFullTime)
+/**
+ * @brief  Clears the RTC's interrupt pending bits.
+ * @param  RTC_IT: specifies the RTC interrupt pending bit to clear.
+ *          This parameter can be one of the following values:
+ *            @arg RTC_IT_ALARMP:      Alarm interrupt
+ *            @arg RTC_IT_COUNTERP:    Counter interrupt
+ * @retval None
+ */
+void RTC_ClearITPendingBit(uint32_t RTC_IT)
 {
-	assert_param(PARAM_RTCx(RTCx));
+    /* Check the parameters */
+    assert_param(IS_RTC_CLEAR_IT(RTC_IT));
 
-	pFullTime->SEC = (uint8_t)(RTCx->PRESEC);
-	pFullTime->MIN = (uint8_t)(RTCx->PREMIN);
-	pFullTime->HOUR = (uint8_t)(RTCx->PREHOUR);
-	pFullTime->DOW = (uint8_t)(RTCx->PREDAY);
-	pFullTime->DOM = (uint8_t)(RTCx->PREDATE);
-	pFullTime->MONTH = (uint8_t)(RTCx->PREMON);
-	pFullTime->YEAR = (uint16_t)(RTCx->PREYEAR);
+    /* Set RTCINTP */
+    RTC->RTCINTP = RTC_IT;
 }
 
-void rtc_wrw( uint32_t addr, uint32_t data)
+/**
+ * @brief  Converts a 2 digit decimal to BCD format.
+ * @param  Value: Byte to be converted.
+ * @retval Converted byte
+ */
+static uint16_t RTC_DecToBcd(uint16_t Value)
 {
-	*(volatile uint32_t *)(addr) = data;
+    uint8_t bcdhigh1000 = 0;
+    uint8_t bcdhigh100 = 0;
+    uint8_t bcdhigh10 = 0;
+
+    while (Value >= 1000) {
+        bcdhigh1000++;
+        Value -= 1000;
+    }
+
+    while (Value >= 100) {
+        bcdhigh100++;
+        Value -= 100;
+    }
+
+    while (Value >= 10) {
+        bcdhigh10++;
+        Value -= 10;
+    }
+
+    return ((uint16_t) (bcdhigh1000 << 12) | (bcdhigh100 << 8) | (bcdhigh10 << 4) | Value);
 }
 
-uint32_t rtc_rdw( uint32_t addr)
+/**
+ * @brief  Convert from 2 digit BCD to Binary.
+ * @param  Value: BCD value to be converted.
+ * @retval Converted word
+ */
+static uint16_t RTC_BcdToDec(uint16_t Value)
 {
-	return *(volatile uint32_t *)(addr);
+    uint16_t tmp10 = 0;
+    uint16_t tmp100 = 0;
+    uint16_t tmp1000 = 0;
+
+    tmp10 = ((Value & 0x00F0) >> 4) * 10;
+    tmp100 = ((Value & 0x0F00) >> 8) * 100;
+    tmp1000 = ((Value & 0xF000) >> 12) * 1000;
+
+    return (tmp1000 + tmp100 + tmp10 + (Value & 0x0F));
 }
+
+/**
+ * @}
+ */
+
+/**
+ * @}
+ */
+
+/**
+ * @}
+ */
+
+/******************** (C) COPYRIGHT WIZnet *****END OF FILE********************/

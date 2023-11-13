@@ -1,92 +1,112 @@
-/*******************************************************************************************************************************************************
- * Copyright ¨Ï 2016 <WIZnet Co.,Ltd.> 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ¡°Software¡±), 
- * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
- * THE SOFTWARE IS PROVIDED ¡°AS IS¡±, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
- * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
- * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*********************************************************************************************************************************************************/
 /**
-  ******************************************************************************
-  * @file    W7500x_stdPeriph_Driver/inc/W7500x_adc.h
-  * @author  IOP Team
-  * @version V1.0.0
-  * @date    01-May-2015
-  * @brief   This file contains all the functions prototypes for the ADC 
-  *          firmware library.
-  ******************************************************************************
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    w7500x_adc.h
+ * @author  WIZnet
+ * @brief   This file contains all the functions prototypes for the Analog-to-
+ *          digital converter (ADC) firmware library.
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; COPYRIGHT 2018 WIZnet</center></h2>
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************
+ */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __W7500X_ADC_H
 #define __W7500X_ADC_H
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "W7500x.h"
+#include "w7500x.h"
 
+/** @addtogroup W7500x_StdPeriph_Driver
+ * @{
+ */
 
-/** @addtogroup W7500x_Periph_Driver
-  * @{
-  */
+/** @addtogroup ADC
+ * @{
+ */
+/* Exported types ------------------------------------------------------------*/
+/* Exported constants --------------------------------------------------------*/
+/** @defgroup ADC_Exported_Constants
+ * @{
+ */
 
-/** @addtogroup WDT
-  * @{
-  */ 
-  
-  
-  
-typedef enum { ADC_CH0 = 0, 
-	       ADC_CH1 = 1,
-	       ADC_CH2 = 2, 
-	       ADC_CH3 = 3,
-	       ADC_CH4 = 4,
-	       ADC_CH5 = 5,
-	       ADC_CH6 = 6,
-	       ADC_CH7 = 7,
-	       ADC_CH15 = 15} ADC_CH;
+/** @defgroup ADC_channels
+ * @{
+ */
 
-#define IS_ADC_CH_NUM(NUM)                (((NUM) == ADC_CH0) || \
-		                           ((NUM) == ADC_CH1) || \
-		                           ((NUM) == ADC_CH2) || \
-		                           ((NUM) == ADC_CH3) || \
-		                           ((NUM) == ADC_CH4) || \
-		                           ((NUM) == ADC_CH5) || \
-		                           ((NUM) == ADC_CH6) || \
-		                           ((NUM) == ADC_CH7) || \
-		                           ((NUM) == ADC_CH15))
+#define ADC_Channel_0               0x00UL
+#define ADC_Channel_1               0x01UL
+#define ADC_Channel_2               0x02UL
+#define ADC_Channel_3               0x03UL
+#define ADC_Channel_4               0x04UL
+#define ADC_Channel_5               0x05UL
+#define ADC_Channel_6               0x06UL
+#define ADC_Channel_7               0x07UL
+#define ADC_Channel_15              0x0FUL
 
-void ADC_Init(void); 
-void ADC_DeInit(void);
-void ADC_PowerDownEnable (FunctionalState NewState);
-void ADC_ChannelSelect (ADC_CH num);
-void ADC_Start (void);
-uint16_t ADC_ReadData (void);
-void ADC_InterruptMask (FunctionalState NewState);
-uint8_t ADC_IsEOC (void);
-void ADC_InterruptClear (void);
+#define IS_ADC_CHANNEL(CHANNEL)     (((CHANNEL) == ADC_Channel_0)  || \
+                                     ((CHANNEL) == ADC_Channel_1)  || \
+                                     ((CHANNEL) == ADC_Channel_2)  || \
+                                     ((CHANNEL) == ADC_Channel_3)  || \
+                                     ((CHANNEL) == ADC_Channel_4)  || \
+                                     ((CHANNEL) == ADC_Channel_5)  || \
+                                     ((CHANNEL) == ADC_Channel_6)  || \
+                                     ((CHANNEL) == ADC_Channel_7)  || \
+                                     ((CHANNEL) == ADC_Channel_15))
+/**
+ * @}
+ */
+
+/**
+ * @}
+ */
+
+/* Exported macro ------------------------------------------------------------*/
+/* Exported functions ------------------------------------------------------- */
+
+/* Initialization and Configuration functions *********************************/
+void ADC_Cmd(FunctionalState NewState);
+
+/* Channels Configuration functions *******************************************/
+void ADC_ChannelConfig(uint32_t ADC_Channel);
+void ADC_StartOfConversion(void);
+uint16_t ADC_GetConversionValue(void);
+
+/* Interrupts and flags management functions **********************************/
+void ADC_ITConfig(FunctionalState NewState);
+ITStatus ADC_GetITStatus(void);
+void ADC_ClearIT(void);
 
 #ifdef __cplusplus
- }
+}
 #endif
 
-#endif  //__W7500X_ADC_H
-
-
-/**
-  * @}
-  */
+#endif /* __W7500X_ADC_H */
 
 /**
-  * @}
-  */
+ * @}
+ */
+
+/**
+ * @}
+ */
+
+/******************** (C) COPYRIGHT WIZnet *****END OF FILE********************/

@@ -1,78 +1,100 @@
-/*******************************************************************************************************************************************************
- * Copyright ¨Ï 2016 <WIZnet Co.,Ltd.> 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ¡°Software¡±), 
- * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
- * THE SOFTWARE IS PROVIDED ¡°AS IS¡±, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
- * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
- * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*********************************************************************************************************************************************************/
-/**************************************************************************/
 /**
- * @file    system_W7500x.h 
- * @author  IOP Team
- * @version V1.0.0
- * @date    01-May-2015
- * @brief   CMSIS Cortex-M0 Core Peripheral Access Layer Header File for
- *          Device W7500x
  ******************************************************************************
+ * @file    system_w7500x.h
+ * @author  WIZnet
+ * @brief   CMSIS Cortex-M0 Device Peripheral Access Layer System Header File.
  *
+ ******************************************************************************
  * @attention
- * @par Revision history
- *    <2015/05/01> 1st Release
  *
- * <h2><center>&copy; COPYRIGHT 2015 WIZnet Co.,Ltd.</center></h2>
+ * <h2><center>&copy; COPYRIGHT 2018 WIZnet</center></h2>
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ *
  ******************************************************************************
  */
 
-#ifndef SYSTEM_W7500x_H   /* ToDo: replace '<Device>' with your device name */
-#define SYSTEM_W7500x_H
+/** @addtogroup CMSIS
+ * @{
+ */
+
+/** @addtogroup w7500x_system
+ * @{
+ */
+
+/**
+ * @brief Define to prevent recursive inclusion
+ */
+#ifndef __SYSTEM_W7500x_H
+#define __SYSTEM_W7500x_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "W7500x.h"
+/** @addtogroup W7500x_System_Includes
+ * @{
+ */
+#include "w7500x.h"
+/**
+ * @}
+ */
 
-extern uint32_t SystemCoreClock;     /*!< System Clock Frequency (Core Clock)  */
-extern uint32_t SystemFrequency;     /*!< System Clock Frequency (Core Clock)  */    
-extern uint32_t GetSystemClock(void);    /*!< Get System Clock Frequency */
-
+/** @addtogroup W7500x_System_Exported_types
+ * @{
+ */
 
 /**
- * Initialize the system
- *
- * @param  none
- * @return none
- *
- * @brief  Setup the microcontroller system.
- *         Initialize the System and update the SystemCoreClock variable.
+ * @}
  */
-extern void SystemInit (void);
+
+/** @addtogroup W7500x_System_Exported_Constants
+ * @{
+ */
 
 /**
- * Update SystemCoreClock variable
- *
- * @param  none
- * @return none
- *
- * @brief  Updates the SystemCoreClock with current core Clock
- *         retrieved from cpu registers.
+ * @}
  */
-extern void SystemCoreClockUpdate (void);
 
-/*----------------------------------------------------------------------------
-  Define clocks
- *----------------------------------------------------------------------------*/
-#define EXTERN_XTAL     (8000000UL)     /* External Oscillator Frequency        */
-#define INTERN_XTAL     (8000000UL)     /* Internal Oscillator Frequency         */
+/** @addtogroup W7500x_System_Exported_Macros
+ * @{
+ */
 
+/**
+ * @}
+ */
+
+/** @addtogroup W7500x_System_Exported_Functions
+ * @{
+ */
+extern uint32_t GetSystemClock(void); /*!< Get System Clock Frequency */
+extern uint32_t GetSourceClock(void); /*!< Get PLL Source Clock Frequency */
+extern void SystemInit(void);
+extern void SystemCoreClockUpdate(void);
+/**
+ * @}
+ */
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* SYSTEM_W7500x_H */
+#endif /* __SYSTEM_W7500x_H */
+
+/**
+ * @}
+ */
+
+/**
+ * @}
+ */
+/******************** (C) COPYRIGHT WIZnet *****END OF FILE********************/

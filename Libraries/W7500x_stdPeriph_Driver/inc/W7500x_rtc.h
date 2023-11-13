@@ -1,12 +1,27 @@
-/*
- *********************************************************************
- * @file
- * @version
- * @author
- * @data
- * @brief
- *********************************************************************
+/**
+ ******************************************************************************
+ * @file    w7500x_rtc.h
+ * @author  WIZnet
+ * @brief   This file contains all the functions prototypes for the RTC firmware
+ *          library.
+ ******************************************************************************
  * @attention
+ *
+ * <h2><center>&copy; COPYRIGHT 2018 WIZnet</center></h2>
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************
  */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -14,179 +29,194 @@
 #define __W7500X_RTC_H
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "W7500x.h"
+#include "w7500x.h"
 
-	 
-/* ----------------------- BIT DEFINITIONS ----------------------------------- */
-#define RTC_CON_CLKEN_Disable       (0x00ul << 0)
-#define RTC_CON_CLKEN_Enable        (0x01ul << 0)
-#define RTC_CON_DIVRST_Reset        (0x01ul << 1)
-#define RTC_CON_INTEN_Disable       (0x00ul << 5)
-#define RTC_CON_INTEN_Enable        (0x01ul << 5)
-
-/**********************************************************************
-* RTCINTP register definitions
-**********************************************************************/
-/** RTCINTP register mask */
-#define RTC_INTP_BITMASK		(0x00000003)
-/** Bit inform the source interrupt is counter increment*/
-#define RTC_INTP_CIF			(0x01ul << 0)
-/** Bit inform the source interrupt is alarm match*/
-#define RTC_INTP_ALF			(0x01ul << 1)
-
-/**********************************************************************
-* Time Counter Group and Alarm register group
-**********************************************************************/
-/** SEC register mask */
-#define RTC_SEC_MASK			(0x0000007F)
-/** MIN register mask */
-#define RTC_MIN_MASK			(0x0000007F)
-/** HOUR register mask */
-#define RTC_HOUR_MASK			(0x0000003F)
-/** DOW register mask */
-#define RTC_DOW_MASK			(0x0000000F)
-/** DOM register mask */
-#define RTC_DOM_MASK			(0x0000003F)
-/** MONTH register mask */
-#define RTC_MONTH_MASK			(0x0000001F)
-/** YEAR register mask */
-#define RTC_YEAR_MASK			(0x0000FFFF)
-
-#define RTC_CTIME_SEC_MASK			(0x0000007F)
-#define RTC_CTIME_MIN_MASK			(0x00007F00)
-#define RTC_CTIME_HOUR_MASK			(0x003F0000)
-#define RTC_CTIME_DOW_MASK			(0x0F000000)
-#define RTC_CTIME_DOM_MASK			(0x0000003F)
-#define RTC_CTIME_MONTH_MASK		(0x00001F00)
-#define RTC_CTIME_YEAR_MASK			(0xFFFF0000)
-
-#define RTC_SECOND_MAX		59 /*!< Maximum value of second */
-#define RTC_SECOND_MIN		0 /*!< Maximum value of second */
-#define RTC_MINUTE_MAX		59 /*!< Maximum value of minute*/
-#define RTC_MINUTE_MIN		0 /*!< Maximum value of minute*/
-#define RTC_HOUR_MAX		23 /*!< Maximum value of hour*/
-#define RTC_HOUR_MIN		0 /*!< Maximum value of hour*/
-#define RTC_DAYOFWEEK_MAX	7 /*!< Maximum value of day of week*/
-#define RTC_DAYOFWEEK_MIN	1 /*!< Minimum value of day of week*/
-#define RTC_DAYOFMONTH_MAX 	31 /*!< Maximum value of day of month*/
-#define RTC_DAYOFMONTH_MIN 	1 /*!< Minimum value of day of month*/
-#define RTC_MONTH_MAX		12 /*!< Maximum value of month*/
-#define RTC_MONTH_MIN		1 /*!< Minimum value of month*/
-#define RTC_YEAR_MAX		4095 /*!< Maximum value of year*/
-#define RTC_YEAR_MIN		0 /*!< Maximum value of year*/
-
-typedef struct {
-	uint8_t  SEC; 		/*!< Seconds Register */
-	uint8_t  MIN; 		/*!< Minutes Register */
-	uint8_t  HOUR; 		/*!< Hours Register */
-	uint8_t  DOW; 		/*!< Day of Week Register */
-	uint8_t  DOM;		/*!< Day of Month Register */
-	uint8_t  MONTH; 	/*!< Months Register */
-	uint16_t YEAR; 		/*!< Years Register */
-} RTC_TIME_Type;
-
-/** @brief Consolidated RTC Time */
-typedef struct {
-	uint32_t TIME0; 	/*!< RTCTIME0 Register */
-	uint32_t TIME1; 	/*!< RTCTIME1 Register */
-} RTC_CONTIME_Type;
-
-/** @brief RTC time type option */
-typedef enum {
-	RTC_TIMETYPE_SECOND = 0, 		/*!< Second */
-	RTC_TIMETYPE_MINUTE = 1, 		/*!< Month */
-	RTC_TIMETYPE_HOUR = 2, 			/*!< Hour */
-	RTC_TIMETYPE_DAYOFWEEK = 3, 	/*!< Day of week */
-	RTC_TIMETYPE_DAYOFMONTH = 4, 	/*!< Day of month */
-	RTC_TIMETYPE_MONTH = 5, 		/*!< Month */
-	RTC_TIMETYPE_YEAR = 6 			/*!< Year */
-} RTC_TIMETYPE_Num;
-
-/** @brief RTC interrupt source */
-typedef enum {
-	RTC_INT_COUNTER_INCREASE = RTC_INTP_CIF, 	/*!<  Counter Increment Interrupt */
-	RTC_INT_ALARM = RTC_INTP_ALF 				/*!< The alarm interrupt */
-} RTC_INT_OPT;
-
-/** @brief RTC Interrupt Mask register */
-typedef enum {
-	RTC_INTMASK_SECOND = 0, 		/*!< Second */
-	RTC_INTMASK_MINUTE = 1, 		/*!< Month */
-	RTC_INTMASK_HOUR = 2, 			/*!< Hour */
-	RTC_INTMASK_DATE = 3, 			/*!< Day of month */
-	RTC_INTMASK_DAY = 4, 			/*!< Day of week */
-	RTC_INTMASK_MONTH = 5, 			/*!< Month */
-	RTC_INTMASK_ALARM = 6 			/*!< Alarm */
-} RTC_INTMASK_POS;
-
-/* ---------------- CHECK PARAMETER DEFINITIONS ---------------------------- */
-/** Macro to determine if it is valid RTC peripheral */
-#define PARAM_RTCx(x)	(((uint32_t *)x)==((uint32_t *)RTC))
-#define IS_INTMASK_POS(POS) (((POS) == RTC_INTMASK_SECOND) || \
-                             ((POS) == RTC_INTMASK_MINUTE) || \
-                             ((POS) == RTC_INTMASK_HOUR) || \
-                             ((POS) == RTC_INTMASK_DATE) || \
-                             ((POS) == RTC_INTMASK_DAY) || \
-                             ((POS) == RTC_INTMASK_MONTH) || \
-                             ((POS) == RTC_INTMASK_ALARM) )
-#define IS_SEC(SEC) (((SEC) >= RTC_SECOND_MIN) && \
-                     ((SEC) <= RTC_SECOND_MAX) )
-#define IS_MIN(MIN) (((MIN) >= RTC_MINUTE_MIN) && \
-                     ((MIN) <= RTC_MINUTE_MAX) )
-#define IS_HOUR(HOUR) (((HOUR) >= RTC_HOUR_MIN) && \
-                       ((HOUR) <= RTC_HOUR_MAX) )
-#define IS_DOW(DOW) (((DOW) >= RTC_DAYOFWEEK_MIN) && \
-                     ((DOW) <= RTC_DAYOFWEEK_MAX) )
-#define IS_DOM(DOM) (((DOM) >= RTC_DAYOFMONTH_MIN) && \
-                     ((DOM) <= RTC_DAYOFMONTH_MAX) )
-#define IS_MONTH(MONTH) (((MONTH) >= RTC_MONTH_MIN) && \
-                         ((MONTH) <= RTC_MONTH_MAX) )
-#define IS_YEAR(YEAR) (((YEAR) >= RTC_YEAR_MIN) && \
-                       ((YEAR) <= RTC_YEAR_MAX) )
-
-/* Public Functions ----------------------------------------------------------- */
-/** @defgroup RTC_Public_Functions
+/** @addtogroup W7500x_StdPeriph_Driver
  * @{
  */
 
-void RTC_Init (RTC_TypeDef *RTCx);
-void RTC_DeInit(RTC_TypeDef *RTCx);
-void RTC_EnableINT(RTC_TypeDef *RTCx);
-void RTC_DisableINT(RTC_TypeDef *RTCx);
-void RTC_ClearINTMask(RTC_TypeDef *RTCx);
-void RTC_SetINTMask(RTC_TypeDef *RTCx, RTC_INTMASK_POS pos);
-void RTC_ClearINTPendingBit(RTC_TypeDef *RTCx);
-void RTC_ClearAlarmMask(RTC_TypeDef *RTCx);
-void RTC_SetAlarmMask(RTC_TypeDef *RTCx, RTC_INTMASK_POS pos);
-void RTC_ClearAlarmPendingBit(RTC_TypeDef *RTCx);
-uint8_t RTC_GetStatusPendingBit(RTC_TypeDef *RTCx);
-void RTC_SetFullTime (RTC_TypeDef *RTCx, RTC_TIME_Type *pFullTime);
-void RTC_GetFullTime (RTC_TypeDef *RTCx, RTC_TIME_Type *pFullTime);
-void RTC_SetFullAlarmTime (RTC_TypeDef *RTCx, RTC_TIME_Type *pFullTime);
-void RTC_GetFullAlarmTime (RTC_TypeDef *RTCx, RTC_TIME_Type *pFullTime);
+/** @addtogroup RTC
+ * @{
+ */
+/* Exported types ------------------------------------------------------------*/
+/**
+ * @brief  RTC Time structure definition
+ */
+typedef struct
+{
+    uint8_t RTC_Hours;      /*!< Specifies the RTC Time Hour.
+                             This parameter must be set to a value in the 0-23 range. */
 
-void rtc_wrw( uint32_t addr, uint32_t data);
-uint32_t rtc_rdw( uint32_t addr);
+    uint8_t RTC_Minutes;    /*!< Specifies the RTC Time Minutes.
+                             This parameter must be set to a value in the 0-59 range. */
+
+    uint8_t RTC_Seconds;    /*!< Specifies the RTC Time Seconds.
+                             This parameter must be set to a value in the 0-59 range. */
+} RTC_TimeTypeDef;
+
+/**
+ * @brief  RTC Date structure definition
+ */
+typedef struct
+{
+    uint16_t RTC_Year;       /*!< Specifies the RTC Date Year.
+                             This parameter must be set to a value in the 0-4095 range. */
+
+    uint8_t RTC_Month;      /*!< Specifies the RTC Date Month.
+                             This parameter can be a value of @ref RTC_Month_Date_Definitions */
+
+    uint8_t RTC_Date;       /*!< Specifies the RTC Date.
+                             This parameter must be set to a value in the 1-31 range. */
+
+    uint8_t RTC_WeekDay;    /*!< Specifies the RTC Date WeekDay.
+                             This parameter can be a value of @ref RTC_WeekDay_Definitions */
+} RTC_DateTypeDef;
+
+/**
+ * @brief  RTC Alarm structure definition
+ */
+typedef struct
+{
+    RTC_TimeTypeDef RTC_AlarmTime;      /*!< Specifies the RTC Alarm Time members. */
+
+    RTC_DateTypeDef RTC_AlarmDate;      /*!< Specifies the RTC Alarm Date members. */
+
+} RTC_AlarmTypeDef;
+
+/* Exported constants --------------------------------------------------------*/
+/** @defgroup RTC_Exported_Constants
+ * @{
+ */
+
+/** @defgroup RTC_Input_parameter_format_definitions
+  * @{
+  */
+#define RTC_Format_BIN                  ((uint32_t)0x000000000)
+#define RTC_Format_BCD                  ((uint32_t)0x000000001)
+
+#define IS_RTC_FORMAT(FORMAT)           (((FORMAT) == RTC_Format_BIN) || \
+                                         ((FORMAT) == RTC_Format_BCD))
+/**
+  * @}
+  */
+
+/** @defgroup RTC_Time_Definitions
+ * @{
+ */
+
+#define IS_RTC_HOURS(HOURS)             ((HOURS) <= 23)
+#define IS_RTC_MINUTES(MINUTES)         ((MINUTES) <= 59)
+#define IS_RTC_SECONDS(SECONDS)         ((SECONDS) <= 59)
+/**
+ * @}
+ */
+
+/** @defgroup RTC_Year_Date_Definitions
+  * @{
+  */
+
+#define IS_RTC_YEAR(YEAR)              ((YEAR) <= 4095)
+/**
+  * @}
+  */
+
+/** @defgroup RTC_Month_Date_Definitions
+ * @{
+ */
+#define IS_RTC_MONTH(MONTH)             (((MONTH) >= 1) && ((MONTH) <= 12))
+#define IS_RTC_DATE(DATE)               (((DATE) >= 1) && ((DATE) <= 31))
 
 /**
  * @}
  */
+
+/** @defgroup RTC_WeekDay_Definitions
+ * @{
+ */
+
+#define IS_RTC_WEEKDAY(WEEKDAY)         (((WEEKDAY) >= 1) && ((WEEKDAY) <= 7))
+/**
+ * @}
+ */
+
+/** @defgroup RTC_Interrupts_Definitions
+  * @{
+  */
+
+#define RTC_IT_ALARM            RTC_RTCINTE_AINT
+#define RTC_IT_MON              RTC_RTCINTE_IMMON
+#define RTC_IT_DAY              RTC_RTCINTE_IMDAY
+#define RTC_IT_DATE             RTC_RTCINTE_IMDATE
+#define RTC_IT_HOUR             RTC_RTCINTE_IMHOUR
+#define RTC_IT_MIN              RTC_RTCINTE_IMMIN
+#define RTC_IT_SEC              RTC_RTCINTE_IMSEC
+
+#define IS_RTC_CONFIG_IT(IT)    (((IT) & RTC_IT_ALARM) || \
+                                 ((IT) & RTC_IT_MON)   || \
+                                 ((IT) & RTC_IT_DAY)   || \
+                                 ((IT) & RTC_IT_DATE)  || \
+                                 ((IT) & RTC_IT_HOUR)  || \
+                                 ((IT) & RTC_IT_MIN)   || \
+                                 ((IT) & RTC_IT_SEC))
+
+#define RTC_IT_ALARMP           RTC_RTCINTP_RTCALF
+#define RTC_IT_COUNTERP         RTC_RTCINTP_RTCCIF
+
+#define IS_RTC_GET_IT(IT)       (((IT) == RTC_IT_ALARMP) || \
+                                 ((IT) == RTC_IT_COUNTERP))
+
+#define IS_RTC_CLEAR_IT(IT)     (((IT) == RTC_IT_ALARMP) || \
+                                 ((IT) == RTC_IT_COUNTERP))
+/**
+  * @}
+  */
+
+/**
+ * @}
+ */
+
+/* Exported macro ------------------------------------------------------------*/
+/* Exported functions ------------------------------------------------------- */
+
+/* Initialization and Configuration functions *********************************/
+void RTC_Cmd(FunctionalState NewState);
+void RTC_DividerCmd(FunctionalState NewState);
+
+/* Time and Date configuration functions **************************************/
+void RTC_SetTime(uint32_t RTC_Format, RTC_TimeTypeDef* RTC_TimeStruct);
+void RTC_TimeStructInit(RTC_TimeTypeDef* RTC_TimeStruct);
+void RTC_GetTime(uint32_t RTC_Format, RTC_TimeTypeDef* RTC_TimeStruct);
+void RTC_SetDate(uint32_t RTC_Format, RTC_DateTypeDef* RTC_DateStruct);
+void RTC_DateStructInit(RTC_DateTypeDef* RTC_DateStruct);
+void RTC_GetDate(uint32_t RTC_Format, RTC_DateTypeDef* RTC_DateStruct);
+
+/* Alarms (Alarm A) configuration functions  **********************************/
+void RTC_SetAlarm(uint32_t RTC_Format, RTC_AlarmTypeDef* RTC_AlarmStruct);
+void RTC_AlarmStructInit(RTC_AlarmTypeDef* RTC_AlarmStruct);
+void RTC_GetAlarm(uint32_t RTC_Format, RTC_AlarmTypeDef* RTC_AlarmStruct);
+void RTC_AlarmCmd(FunctionalState NewState);
+
+/* Interrupts and flags management functions **********************************/
+void RTC_ITConfig(uint32_t RTC_IT, FunctionalState NewState);
+ITStatus RTC_GetITStatus(uint32_t RTC_IT);
+void RTC_ClearITPendingBit(uint32_t RTC_IT);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /*  __W7500X_RTC_H */
+#endif /* __W7500X_RTC_H */
 
 /**
  * @}
  */
 
-/* --------------------------------- End Of File ------------------------------ */
+/**
+ * @}
+ */
 
-
-
+/******************** (C) COPYRIGHT WIZnet *****END OF FILE********************/
