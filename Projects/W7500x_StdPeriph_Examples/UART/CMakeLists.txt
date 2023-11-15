@@ -1,4 +1,0 @@
-add_subdirectory(UART_HardwareFlowControl)
-add_subdirectory(UART_Interrupt)
-add_subdirectory(UART_Polling)
-add_subdirectory(UART_Printf)
