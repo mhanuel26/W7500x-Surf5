@@ -86,11 +86,11 @@ extern "C" {
 
  Tip: If you want to use the Internal 8MHz RC oscillator clock, uncomment the line below.
  */
-//#define OCLK_VALUE 12000000UL
+ #define OCLK_VALUE 12000000UL
 /**
  * @brief In the following line adjust the value of PLL
  */
-#define PLL_VALUE 1
+#define PLL_VALUE 2
 
 #if defined (OCLK_VALUE)
 #if ((OCLK_VALUE * PLL_VALUE) > 48000000) || (OCLK_VALUE > 24000000)
