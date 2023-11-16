@@ -63,9 +63,7 @@ int main(void)
 
     printf("System Loop Start\r\n");
 	
-	GPIO_SetBits(GPIOC, GPIO_Pin_5);
-	GPIO_SetBits(GPIOC, GPIO_Pin_8);
-	GPIO_SetBits(GPIOC, GPIO_Pin_9);
+	GPIO_ResetBits(GPIOC, GPIO_Pin_15);
     while (1) {
 
     }
@@ -106,7 +104,7 @@ static void GPIO_Config(void)
     GPIO_ITInitTypeDef GPIO_ITInitStructure;
     NVIC_InitTypeDef NVIC_InitStructure;
 
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_8 | GPIO_Pin_9;
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;
     GPIO_InitStructure.GPIO_Direction = GPIO_Direction_OUT;
     GPIO_InitStructure.GPIO_Pad = GPIO_OpenDrainDisable | GPIO_HighDrivingStrength | GPIO_PuPd_NOPULL;
     GPIO_InitStructure.GPIO_AF = PAD_AF1;

@@ -308,9 +308,7 @@ void WZTOE_Handler(void)
  */
 void EXTI_Handler(void)
 {
-    GPIO_ResetBits(GPIOC, GPIO_Pin_5);
-    GPIO_ResetBits(GPIOC, GPIO_Pin_8);
-    GPIO_ResetBits(GPIOC, GPIO_Pin_9);
+    GPIO_SetBits(GPIOC, GPIO_Pin_15);
 }
 
 /**

@@ -38,7 +38,7 @@
  your application
  */
 #if !defined (USE_WIZWIKI_W7500_EVAL) && !defined (USE_WIZWIKI_W7500P_EVAL) && !defined (USE_WIZWIKI_W7500_ECO_EVAL)
-#define USE_WIZWIKI_W7500_EVAL
+//#define USE_WIZWIKI_W7500_EVAL
 //#define USE_WIZWIKI_W7500P_EVAL
 //#define USE_WIZWIKI_W7500_ECO_EVAL
 //#define USE_MY_EVAL
