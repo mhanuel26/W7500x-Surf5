@@ -10,7 +10,7 @@ Link
 
 
 Surf 5 is a library developed based on the W7500x_StdPeriph_Lib, designed for use with the W7500 MCU. 
-For detailed information about W7500x_StdPeriph_Lib, please refer to the [README.md](https://github.com/Wiznet/W7500x_StdPeriph_Lib/blob/master/README.md) button.
+For detailed information about W7500x_StdPeriph_Lib, please refer to the [README.md](https://github.com/Wiznet/W7500x_StdPeriph_Lib/blob/master/README.md).
 
 
 
