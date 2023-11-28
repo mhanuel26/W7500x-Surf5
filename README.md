@@ -1,35 +1,32 @@
+<br />
+<br />
+<br />
 **Please refer to [getting_started.md](https://github.com/Wiznet/W7500x-Surf5/blob/main/getting_started.md) for examples usage.**
-
-
-
-<!--
-Link
--->
-
+<br />
+<br />
+<br />
 # W7500x-Surf5
 
 
 Surf 5 is a library developed based on the W7500x_StdPeriph_Lib, designed for use with the W7500 MCU. 
 For detailed information about W7500x_StdPeriph_Lib, please refer to the [README.md](https://github.com/Wiznet/W7500x_StdPeriph_Lib/blob/master/README.md).
 
-
-
-
 ## Supported devices and toolchains
 
 ### Supported Surf5 devices
 
 The W7500x-Surf5 Library supports [Surf 5](https://docs.wiznet.io/Product/Open-Source-Hardware/surf5) devices.
-
+<br />
+<br />
 ### Supported toolchains
 
 The Standard Peripherals Library supports the following toolchains:
 - MDK-ARM (KEIL 5)
 - GNU MCU (Eclipse)
 - GNU Arm Embbeded Toolchain(VS Code)
-
-
-
+<br />
+<br />
+<br />
 ## How to use the Library
 
 ### Create a project
@@ -39,7 +36,8 @@ Create a project in various toolchains.
 If you want to create a project in the Keil 5 environment, use the template project under Project\W7500x_StdPeriph_Templates within the library. 
 
 Alternatively, if you want to create a project in the VS Code environment, use the template project under Project\W7500x_StdPeriph_Examples within the library.
-
+<br />
+<br />
 ### Configure w7500x.h
 
 The Library entry point is w7500x.h (under Libraries\CMSIS\Device\WIZnet\W7500\Include), user has to include it in the application main and configure it:
@@ -62,28 +60,29 @@ The Library entry point is w7500x.h (under Libraries\CMSIS\Device\WIZnet\W7500\I
    */
   #define PLL_VALUE 1
   ```
-  
+<br />
+<br />
+<br />
 ### Add the system_w7500x.c
 
 Add the system_w7500x.c (under Libraries\CMSIS\Device\WIZnet\W7500\Source) file in your application, this file provide functions to setup the W7500x system.
-
-
-
-
+<br />
+<br />
+<br />
 ## How to use the Examples
 
 ### Copy and Paste
 
 Copy all source files from under Projects\W7500x_StdPeriph_Examples\xxx\xxx folder to the under src folder.
-  
-
-
-
+<br />
+<br />
+<br />
 ## Revision History
 
 ### v1.0.0
 - First release
-
+<br />
+<br />
 ### v1.0.1 (Release soon)
 - Add i2c example using GPIO
 - Fix some bugs for GPIO function
