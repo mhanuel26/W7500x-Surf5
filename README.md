@@ -1,4 +1,4 @@
-Please refer to [getting_started.md][link-getting_started] for examples usage.
+**Please refer to [getting_started.md](https://github.com/Wiznet/W7500x-Surf5/blob/main/getting_started.md) for examples usage.**
 
 
 
@@ -6,17 +6,13 @@ Please refer to [getting_started.md][link-getting_started] for examples usage.
 Link
 -->
 
-[link-getting_started]: https://github.com/Wiznet/W7500x-Surf5/blob/main/getting_started.md
-
-
-#W7500x-Surf5
+# W7500x-Surf5
 
 
 Surf 5 is a library developed based on the W7500x_StdPeriph_Lib, designed for use with the W7500 MCU. 
-For detailed information about W7500x_StdPeriph_Lib, please refer to the **README.md** button below.
-[README.md][link-README.md]
+For detailed information about W7500x_StdPeriph_Lib, please refer to the [README.md](https://github.com/Wiznet/W7500x_StdPeriph_Lib/blob/master/README.md) button.
 
-[link-README.md] : https://github.com/Wiznet/W7500x_StdPeriph_Lib/blob/master/README.md
+
 
 
 ## Supported devices and toolchains
@@ -28,11 +24,11 @@ The W7500x-Surf5 Library supports [Surf 5](https://docs.wiznet.io/Product/Open-S
 ### Supported toolchains
 
 The Standard Peripherals Library supports the following toolchains:
-- MDK-ARM 
-- GNU MCU Eclipse
+- MDK-ARM (KEIL 5)
+- GNU MCU (Eclipse)
 - GNU Arm Embbeded Toolchain(VS Code)
 
-For VS Code development environment, see the https://docs.wiznet.io/Product/Open-Source-Hardware/surf5/getting-started/fw-examples page.
+
 
 ## How to use the Library
 
@@ -71,12 +67,16 @@ The Library entry point is w7500x.h (under Libraries\CMSIS\Device\WIZnet\W7500\I
 
 Add the system_w7500x.c (under Libraries\CMSIS\Device\WIZnet\W7500\Source) file in your application, this file provide functions to setup the W7500x system.
 
+
+
+
 ## How to use the Examples
 
 ### Copy and Paste
 
 Copy all source files from under Projects\W7500x_StdPeriph_Examples\xxx\xxx folder to the under src folder.
   
+
 
 
 ## Revision History
