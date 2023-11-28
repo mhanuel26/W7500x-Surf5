@@ -8,7 +8,7 @@
 
 ### Step 1 : 
 
-Click this [Install UART to USB Driver](ttps://docs.wiznet.io/Product/Open-Source-Hardware/surf5/getting-started/install-usb-driver) link above to install the 'UART to USB Driver' for connecting your PC to Surf 5.
+Click this [Install UART to USB Driver](https://docs.wiznet.io/Product/Open-Source-Hardware/surf5/getting-started/install-usb-driver) link above to install the 'UART to USB Driver' for connecting your PC to Surf 5.
 
 
 
