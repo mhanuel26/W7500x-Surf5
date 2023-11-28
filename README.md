@@ -6,7 +6,7 @@
 
 # W7500x-Surf5
 
-Surf 5 is a library developed based on the W7500x_StdPeriph_Lib, designed for use with the W7500 MCU. 
+W7500x-Surf5 library is developed based on the W7500x_StdPeriph_Lib, designed for use with the W7500 MCU. 
 For detailed information about W7500x_StdPeriph_Lib, please refer to the [W7500x_StdPeriph_Lib README](https://github.com/Wiznet/W7500x_StdPeriph_Lib/blob/master/README.md).
 
 ## Supported devices and toolchains
