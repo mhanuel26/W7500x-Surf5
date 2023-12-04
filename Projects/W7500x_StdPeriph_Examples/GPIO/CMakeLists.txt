@@ -1,3 +1,2 @@
 add_subdirectory(GPIO_Interrupt)
 add_subdirectory(GPIO_IOToggle)
-add_subdirectory(GPIO_I2C)

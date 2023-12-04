@@ -33,7 +33,14 @@ endfunction()
 
 function(create_binary_file PROJECT_NAME)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${PROJECT_NAME}> $<IF:$<BOOL:$<TARGET_PROPERTY:${PROJECT_NAME},OUTPUT_NAME>>,$<TARGET_PROPERTY:${PROJECT_NAME},OUTPUT_NAME>,$<TARGET_PROPERTY:${PROJECT_NAME},NAME>>.bin)
-    endfunction()
+endfunction()
+
+function(create_elf_file PROJECT_NAME)
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> $<TARGET_FILE_DIR:${PROJECT_NAME}>/${PROJECT_NAME}.elf
+        COMMENT "Copying to ELF file: ${PROJECT_NAME}.elf"
+    )
+endfunction()
 
 set(EXAMPLES_DIR ${CMAKE_SOURCE_DIR}/Projects/W7500x_StdPeriph_Examples)
 add_subdirectory(${EXAMPLES_DIR})

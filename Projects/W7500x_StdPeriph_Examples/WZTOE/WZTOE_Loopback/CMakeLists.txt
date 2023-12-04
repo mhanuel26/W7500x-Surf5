@@ -37,5 +37,5 @@ target_link_libraries(${TARGET_NAME} PRIVATE
 
 complie_link_option(${TARGET_NAME})
 create_binary_file(${TARGET_NAME})
-
+create_elf_file(${TARGET_NAME})
 
