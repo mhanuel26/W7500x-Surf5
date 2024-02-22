@@ -53,7 +53,7 @@ void Delay(__IO uint32_t nTime);
 int main(void)
 {
     uint8_t i;
-	
+	uint8_t adcChannelOffset = 2;
     SystemInit();
 
     UART_Config();
@@ -67,18 +67,22 @@ int main(void)
     printf("System Loop Start\r\n");
 
     while (1) {
-        for (i = 0; i < ADC_Channel_4; i++) {
+        for (i = 0; i < 4; i++) {   //Surf 5 ADC Channel : CH2, CH3, CH6, CH7
             ADC_Cmd(ENABLE);
-            ADC_ChannelConfig(i);
+            
+            if(i >= 2) adcChannelOffset = 4;
+            else if (i < 2) adcChannelOffset = 2;
+
+            ADC_ChannelConfig(i+adcChannelOffset);
             ADC_StartOfConversion();
             if (i == 0) {
-                printf("ADC_GetConversionValue : [%d] : %d,", i, ADC_GetConversionValue());
+                printf("ADC_GetConversionValue : [%d] : %d,", i+adcChannelOffset, ADC_GetConversionValue());
             }
             else if (i == 3) {
-                printf(" [%d] : %d\r\n", i, ADC_GetConversionValue());
+                printf(" [%d] : %d\r\n", i+adcChannelOffset, ADC_GetConversionValue());
             }
             else {
-                printf(" [%d] : %d,", i, ADC_GetConversionValue());
+                printf(" [%d] : %d,", i+adcChannelOffset, ADC_GetConversionValue());
             }
             ADC_Cmd(DISABLE);
         }

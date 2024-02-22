@@ -328,3 +328,20 @@ target_link_libraries(DNS_FILES PUBLIC
         SOCKET_FILES
         WZTOE_FILES
         )
+
+#SNTP_FILES
+add_library(SNTP_FILES STATIC)
+
+target_sources(SNTP_FILES PUBLIC
+        ${CMAKE_SOURCE_DIR}/Libraries/ioLibrary/Internet/SNTP/sntp.c
+        )
+
+target_include_directories(SNTP_FILES PUBLIC
+        ${CMAKE_SOURCE_DIR}/Libraries/ioLibrary/Internet/SNTP
+        )
+
+target_link_libraries(SNTP_FILES PUBLIC
+        SOCKET_FILES
+        WZTOE_FILES
+        )
+

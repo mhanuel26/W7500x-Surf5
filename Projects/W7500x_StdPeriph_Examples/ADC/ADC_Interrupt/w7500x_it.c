@@ -194,7 +194,7 @@ void DUALTIMER0_Handler(void)
     if (DUALTIMER_GetITStatus(DUALTIMER0_0) == SET) {
         DUALTIMER_ClearIT(DUALTIMER0_0);
         ADC_Cmd(ENABLE);
-        ADC_ChannelConfig(ADC_Channel_0);
+        ADC_ChannelConfig(ADC_Channel_2);
         ADC_StartOfConversion();
     }
 }

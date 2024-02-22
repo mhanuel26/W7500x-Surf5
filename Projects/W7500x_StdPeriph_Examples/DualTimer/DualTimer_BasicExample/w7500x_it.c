@@ -191,9 +191,11 @@ void DMA_Handler(void)
  */
 void DUALTIMER0_Handler(void)
 {
+    //USER LED(PC15) Blink Per 1 Sec 
+    
     if (DUALTIMER_GetITStatus(DUALTIMER0_0) == SET) {
         DUALTIMER_ClearIT(DUALTIMER0_0);
-        GPIO_ToggleBits(GPIOC, GPIO_Pin_5 | GPIO_Pin_8 | GPIO_Pin_9);
+        GPIO_ToggleBits(GPIOC, GPIO_Pin_15);
     }
 }
 

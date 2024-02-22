@@ -104,7 +104,7 @@ static void GPIO_Config(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
 
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13;
     GPIO_InitStructure.GPIO_Direction = GPIO_Direction_IN;
     GPIO_InitStructure.GPIO_Pad = GPIO_Pad_Default;
     GPIO_InitStructure.GPIO_AF = PAD_AF0;

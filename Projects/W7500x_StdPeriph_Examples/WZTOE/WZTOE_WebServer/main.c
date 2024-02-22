@@ -167,7 +167,7 @@ static void GPIO_Config(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
 
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_13 | GPIO_Pin_14;
     GPIO_InitStructure.GPIO_Direction = GPIO_Direction_IN;
     GPIO_InitStructure.GPIO_Pad = GPIO_Pad_Default;
     GPIO_InitStructure.GPIO_AF = PAD_AF0;
@@ -273,6 +273,7 @@ void dhcp_conflict(void)
 int32_t WebServer(uint8_t sn, uint8_t* buf, uint16_t port)
 {
     uint8_t i;
+    uint8_t adcChannelOffset = 2;
     int32_t ret;
     uint16_t size = 0;
     uint8_t destip[4];
@@ -316,11 +317,13 @@ int32_t WebServer(uint8_t sn, uint8_t* buf, uint16_t port)
                     return ret;
                 }
 
-                for (i = 0; i < ADC_Channel_4; i++) {
+                for (i = 0; i < 4; i++) {
                     ADC_Cmd(ENABLE);
-                    ADC_ChannelConfig(i);
+                    if(i >= 2) adcChannelOffset = 4;
+                    else if (i < 2) adcChannelOffset = 2;
+                    ADC_ChannelConfig(i+adcChannelOffset);
                     ADC_StartOfConversion();
-                    sprintf(adc_buf, "analog input %d is %d<br />\r\n", i, ADC_GetConversionValue());
+                    sprintf(adc_buf, "analog input %d is %d<br />\r\n", i+adcChannelOffset, ADC_GetConversionValue());
                     ret = send(sn, adc_buf, strlen(adc_buf));
                     if (ret < 0) {
                         close(sn);

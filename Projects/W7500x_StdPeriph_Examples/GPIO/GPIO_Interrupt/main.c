@@ -63,7 +63,7 @@ int main(void)
 
     printf("System Loop Start\r\n");
 	
-	GPIO_ResetBits(GPIOC, GPIO_Pin_15);
+	GPIO_SetBits(GPIOC, GPIO_Pin_15);
     while (1) {
 
     }
