@@ -1,0 +1,8 @@
+tools/
+build/
+/Projects/W7500x_StdPeriph_Templates
+/Projects/W7500x_StdPeriph_Templates/MDK
+/Projects/W7500x_StdPeriph_Templates/MDK/obj
+tools/arm-none-eabi-gcc.cmake
+*.crf
+*.htm

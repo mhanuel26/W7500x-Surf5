@@ -1,0 +1,18 @@
+{
+    "files.associations": {
+        "wizchip_conf.h": "c",
+        "cmp.h": "c",
+        "main.h": "c",
+        "socket.h": "c",
+        "cmp_server.h": "c",
+        "w7500x.h": "c",
+        "stdio.h": "c",
+        "system_w7500x.h": "c",
+        "max7219.h": "c",
+        "w7500x_ssp.h": "c",
+        "blinky.h": "c",
+        "string.h": "c",
+        "dhcp.h": "c"
+    },
+    "cortex-debug.variableUseNaturalFormat": false
+}

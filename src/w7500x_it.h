@@ -43,7 +43,7 @@ void NMI_Handler(void);
 void HardFault_Handler(void);
 void SVC_Handler(void);
 void PendSV_Handler(void);
-void SysTick_Handler(void);
+//void SysTick_Handler(void);
 
 void SSP0_Handler(void);
 void SSP1_Handler(void);
@@ -64,7 +64,7 @@ void PWM3_Handler(void);
 void PWM4_Handler(void);
 void PWM5_Handler(void);
 void PWM6_Handler(void);
-void PWM7_Handler(void);
+//void PWM7_Handler(void);
 void RTC_Handler(void);
 void ADC_Handler(void);
 void WZTOE_Handler(void);

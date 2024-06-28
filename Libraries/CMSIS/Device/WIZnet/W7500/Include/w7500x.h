@@ -90,7 +90,7 @@ extern "C" {
 /**
  * @brief In the following line adjust the value of PLL
  */
-#define PLL_VALUE 1
+#define PLL_VALUE 2
 
 #if defined (OCLK_VALUE)
 #if ((OCLK_VALUE * PLL_VALUE) > 48000000) || (OCLK_VALUE > 24000000)

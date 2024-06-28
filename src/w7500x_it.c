@@ -85,9 +85,9 @@ void PendSV_Handler(void)
  * @param  None
  * @retval None
  */
-void SysTick_Handler(void)
-{
-}
+//void SysTick_Handler(void)
+//{
+//}
 
 /******************************************************************************/
 /*                 W7500x Peripherals Interrupt Handlers                      */
@@ -191,6 +191,11 @@ void DMA_Handler(void)
  */
 void DUALTIMER0_Handler(void)
 {
+    if (DUALTIMER_GetITStatus(DUALTIMER0_0)) {
+        DUALTIMER_ClearIT(DUALTIMER0_0);
+        DHCP_time_handler();
+        // printf("dual timer isr\r\n");
+    }
 }
 
 /**
@@ -270,9 +275,9 @@ void PWM6_Handler(void)
  * @param  None
  * @retval None
  */
-void PWM7_Handler(void)
-{
-}
+//void PWM7_Handler(void)
+//{
+//}
 
 /**
  * @brief  This function handles RTC Handler.

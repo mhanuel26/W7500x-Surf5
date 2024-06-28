@@ -198,6 +198,7 @@ extern "C" {
 /** @defgroup WZTOE_Sn_CR_Register_values
  * @{
  */
+#define Sn_CR_RESET         (0x00)     /**< socket reset state or after command is acknoledge */
 #define Sn_CR_OPEN          (0x01)     /**< initialize or open socket */
 #define Sn_CR_LISTEN        (0x02)     /**< wait connection request in tcp mode(Server mode) */
 #define Sn_CR_CONNECT       (0x04)     /**< send connection request in tcp mode(Client mode) */

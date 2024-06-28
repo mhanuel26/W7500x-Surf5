@@ -26,7 +26,12 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "wizchip_conf.h"
+#include "w7500x_ssp.h"
 #include "dhcp.h"
+#include "cmp_server.h"
+#include <string.h>
+#include "cmp_server.h"
+#include "max7219.h"
 
 /** @addtogroup W7500x_StdPeriph_Examples
  * @{
@@ -38,13 +43,15 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
-#define DATA_BUF_SIZE 2048
-
+// #define DATA_BUF_SIZE 2048
+#define SEVEN_SEGMENT
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 static __IO uint32_t TimingDelay;
 uint8_t test_buf[DATA_BUF_SIZE];
 wiz_NetInfo gWIZNETINFO;
+//UART_InitTypeDef UART_InitStructure;
+SSP_InitTypeDef SSP0_InitStructure;
 
 /* Private function prototypes -----------------------------------------------*/
 static void UART_Config(void);
@@ -55,9 +62,10 @@ void dhcp_assign(void);
 void dhcp_update(void);
 void dhcp_conflict(void);
 int32_t WebServer(uint8_t sn, uint8_t* buf, uint16_t port);
+int32_t process_cfg_socket(void);
 void delay(__IO uint32_t milliseconds);
-void TimingDelay_Decrement(void);
-
+// void TimingDelay_Decrement(void);
+void delay_ms(__IO uint32_t nCount);
 /* Private functions ---------------------------------------------------------*/
 
 /**
@@ -69,6 +77,15 @@ int main(void)
 {
     uint32_t ret;
     uint8_t dhcp_retry = 0;
+    int rc;
+    int iNumControllers, iSegmentMode;
+#ifdef SEVEN_SEGMENT
+	iNumControllers = 1;
+	iSegmentMode = 1;
+#else
+	iNumControllers = 4; // assume 4 x 8x8 array
+	iSegmentMode = 0;
+#endif
 
     SystemInit();
 
@@ -86,6 +103,7 @@ int main(void)
 
     printf("SourceClock : %d\r\n", (int) GetSourceClock());
     printf("SystemClock : %d\r\n", (int) GetSystemClock());
+
 
     /* Initialize PHY */
 #ifdef W7500
@@ -127,14 +145,81 @@ int main(void)
      * Displays the network information allocated by DHCP. */
     Network_Config();
 
-    printf("System Loop Start\r\n");
+    // init_ether_cfg();
 
+	// /* Initialize the library
+	//  * num controllers, BCD mode, SPI channel, GPIO pin number for CS*/ 
+	// rc = maxInit(iNumControllers, iSegmentMode, 0, 0);
+	// if (rc != 0)
+	// {
+	// 	printf("Problem initializing max7219\n");
+	// 	return 0;
+	// }
+	// maxSetIntensity(4);
+
+    // // maxSegmentString("3.1415926");
+    // maxSegmentString("2.7182818");
+
+    printf("System Loop Start\r\n");
+    int res;
     while (1) {
+
+        
         WebServer(1, test_buf, 80);
+        
+// 		if ((res = process_cfg_socket()) < 0) 				// process the configuration socket
+// 		{
+// #ifdef DEBUG_ETHERNET
+// 			printf("CFG SOCKET ERROR : %d\r\n", res);
+// #endif
+// 		}
+
+        GPIO_ResetBits(GPIOC, GPIO_Pin_15);
+        // GPIO_ResetBits(GPIOA, GPIO_Pin_0);
+        delay_ms(1000);
+        GPIO_SetBits(GPIOC, GPIO_Pin_15);
+        // GPIO_SetBits(GPIOA, GPIO_Pin_0);
+        delay_ms(1000);
+
     }
 	
 	return 0;
 }
+
+
+
+/**
+ * @brief  Configures the GPIO Peripheral.
+ * @note
+ * @param  None
+ * @retval None
+ */
+static void GPIO_Config(void)
+{
+    GPIO_InitTypeDef GPIO_InitStructure;
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;
+    GPIO_InitStructure.GPIO_Direction = GPIO_Direction_OUT;
+    GPIO_InitStructure.GPIO_AF = PAD_AF1;
+    GPIO_Init(GPIOC, &GPIO_InitStructure);
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
+    GPIO_InitStructure.GPIO_Direction = GPIO_Direction_OUT;
+    GPIO_InitStructure.GPIO_AF = PAD_AF0;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+}
+
+/**
+  * @brief  Delay Function
+  */
+void delay_ms(__IO uint32_t nCount)
+{
+    volatile uint32_t delay = nCount * 940;  //
+    for(; delay != 0; delay--)
+        __NOP();
+}
+
+
 
 /**
  * @brief  Configures the UART Peripheral.
@@ -157,22 +242,22 @@ static void UART_Config(void)
 #endif
 }
 
-/**
- * @brief  Configures the GPIO Peripheral.
- * @note   GPIO pin configures for ADC
- * @param  None
- * @retval None
- */
-static void GPIO_Config(void)
-{
-    GPIO_InitTypeDef GPIO_InitStructure;
+// /**
+//  * @brief  Configures the GPIO Peripheral.
+//  * @note   GPIO pin configures for ADC
+//  * @param  None
+//  * @retval None
+//  */
+// static void GPIO_Config(void)
+// {
+//     GPIO_InitTypeDef GPIO_InitStructure;
 
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_13 | GPIO_Pin_14;
-    GPIO_InitStructure.GPIO_Direction = GPIO_Direction_IN;
-    GPIO_InitStructure.GPIO_Pad = GPIO_Pad_Default;
-    GPIO_InitStructure.GPIO_AF = PAD_AF0;
-    GPIO_Init(GPIOC, &GPIO_InitStructure);
-}
+//     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_13 | GPIO_Pin_14;
+//     GPIO_InitStructure.GPIO_Direction = GPIO_Direction_IN;
+//     GPIO_InitStructure.GPIO_Pad = GPIO_Pad_Default;
+//     GPIO_InitStructure.GPIO_AF = PAD_AF0;
+//     GPIO_Init(GPIOC, &GPIO_InitStructure);
+// }
 
 /**
  * @brief  Configures the DUALTIMER Peripheral.
@@ -280,7 +365,10 @@ int32_t WebServer(uint8_t sn, uint8_t* buf, uint16_t port)
     uint16_t destport;
     uint8_t adc_buf[128] = { '\0', };
 
-    switch (getSn_SR(sn))
+    uint8_t res = getSn_SR(sn);
+    printf("sn = %d", sn);
+    printf("res = %d", res);
+    switch (res)
     {
         case SOCK_ESTABLISHED:
 
@@ -302,13 +390,13 @@ int32_t WebServer(uint8_t sn, uint8_t* buf, uint16_t port)
                 ret = send(sn, "HTTP/1.1 200 OK\r\n"
                         "Content-Type: text/html\r\n"
                         "Connection: close\r\n"
-                        "Refresh: 5\r\n"
+                        // "Refresh: 5\r\n"
                         "\r\n"
                         "<!DOCTYPE HTML>\r\n"
                         "<html>\r\n", sizeof("HTTP/1.1 200 OK\r\n"
                         "Content-Type: text/html\r\n"
                         "Connection: close\r\n"
-                        "Refresh: 5\r\n"
+                        // "Refresh: 5\r\n"
                         "\r\n"
                         "<!DOCTYPE HTML>\r\n"
                         "<html>\r\n") - 1);
@@ -317,21 +405,29 @@ int32_t WebServer(uint8_t sn, uint8_t* buf, uint16_t port)
                     return ret;
                 }
 
-                for (i = 0; i < 4; i++) {
-                    ADC_Cmd(ENABLE);
-                    if(i >= 2) adcChannelOffset = 4;
-                    else if (i < 2) adcChannelOffset = 2;
-                    ADC_ChannelConfig(i+adcChannelOffset);
-                    ADC_StartOfConversion();
-                    sprintf(adc_buf, "analog input %d is %d<br />\r\n", i+adcChannelOffset, ADC_GetConversionValue());
-                    ret = send(sn, adc_buf, strlen(adc_buf));
-                    if (ret < 0) {
-                        close(sn);
-                        return ret;
-                    }
-                    ADC_Cmd(DISABLE);
-                    memset(adc_buf, '\0', 128);
+                sprintf(adc_buf, "HELLO WIZNET WORLD<br />\r\n");
+                ret = send(sn, adc_buf, strlen(adc_buf));
+                if (ret < 0) {
+                    close(sn);
+                    return ret;
                 }
+
+
+                // for (i = 0; i < 4; i++) {
+                //     ADC_Cmd(ENABLE);
+                //     if(i >= 2) adcChannelOffset = 4;
+                //     else if (i < 2) adcChannelOffset = 2;
+                //     ADC_ChannelConfig(i+adcChannelOffset);
+                //     ADC_StartOfConversion();
+                //     sprintf(adc_buf, "analog input %d is %d<br />\r\n", i+adcChannelOffset, ADC_GetConversionValue());
+                //     ret = send(sn, adc_buf, strlen(adc_buf));
+                //     if (ret < 0) {
+                //         close(sn);
+                //         return ret;
+                //     }
+                //     ADC_Cmd(DISABLE);
+                //     memset(adc_buf, '\0', 128);
+                // }
 
                 ret = send(sn, "</html>\r\n", sizeof("</html>\r\n") - 1);
                 if (ret < 0) {
@@ -368,30 +464,30 @@ int32_t WebServer(uint8_t sn, uint8_t* buf, uint16_t port)
     return 1;
 }
 
-/**
- * @brief  Inserts a delay time.
- * @param  nTime: specifies the delay time length, in milliseconds.
- * @retval None
- */
-void delay(__IO uint32_t milliseconds)
-{
-    TimingDelay = milliseconds;
+// /**
+//  * @brief  Inserts a delay time.
+//  * @param  nTime: specifies the delay time length, in milliseconds.
+//  * @retval None
+//  */
+// void delay(__IO uint32_t milliseconds)
+// {
+//     TimingDelay = milliseconds;
 
-    while (TimingDelay != 0)
-        ;
-}
+//     while (TimingDelay != 0)
+//         ;
+// }
 
-/**
- * @brief  Decrements the TimingDelay variable.
- * @param  None
- * @retval None
- */
-void TimingDelay_Decrement(void)
-{
-    if (TimingDelay != 0x00) {
-        TimingDelay--;
-    }
-}
+// /**
+//  * @brief  Decrements the TimingDelay variable.
+//  * @param  None
+//  * @retval None
+//  */
+// void TimingDelay_Decrement(void)
+// {
+//     if (TimingDelay != 0x00) {
+//         TimingDelay--;
+//     }
+// }
 
 #ifdef  USE_FULL_ASSERT
 
@@ -413,6 +509,9 @@ void assert_failed(uint8_t* file, uint32_t line)
     }
 }
 #endif
+
+
+
 
 /**
  * @}

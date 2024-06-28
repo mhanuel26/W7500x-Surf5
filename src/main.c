@@ -1,89 +1,48 @@
-/**
- ******************************************************************************
- * @file    main.c
- * @author  WIZnet
- * @brief   Main program body
- ******************************************************************************
- * @attention
- *
- * <h2><center>&copy; COPYRIGHT 2018 WIZnet</center></h2>
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
- * THE POSSIBILITY OF SUCH DAMAGE.
- *
- ******************************************************************************
- */
-
-/* Includes ------------------------------------------------------------------*/
+/*============================================================================
+* Super-Simple Tasker (SST/C) Example
+*
+* Copyright (C) 2006-2023 Quantum Leaps, <state-machine.com>.
+*
+* SPDX-License-Identifier: MIT
+*
+* Permission is hereby granted, free of charge, to any person obtaining a
+* copy of this software and associated documentation files (the "Software"),
+* to deal in the Software without restriction, including without limitation
+* the rights to use, copy, modify, merge, publish, distribute, sublicense,
+* and/or sell copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in
+* all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+* THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+* DEALINGS IN THE SOFTWARE.
+============================================================================*/
 #include "main.h"
+#include "sst.h"           /* SST framework */
+#include "bsp.h"           /* Board Support Package interface */
+#include "blinky.h"        /* application shared interface */
 
-/** @addtogroup W7500x_StdPeriph_Examples
- * @{
- */
+/*..........................................................................*/
+int main() {
+    SST_init(); /* initialize the SST kernel */
+    BSP_init(); /* initialize the Board Support Package */
 
-/** @addtogroup Empty
- * @{
- */
+    /* instantiate and start all SST tasks... */
+    Blinky_instantiate();
+    static SST_Evt const *blinkyQSto[10]; /* Event queue storage */
+    SST_Task_start(
+        AO_Blinky,     /* AO pointer to start */
+        1U,            /* SST-priority */
+        blinkyQSto,    /* storage for the AO's queue */
+        ARRAY_NELEM(blinkyQSto),   /* queue length */
+        (void *)0);    /* initialization event (not used) */
 
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
-/* Private function prototypes -----------------------------------------------*/
-/* Private functions ---------------------------------------------------------*/
-
-/**
- * @brief  Main program.
- * @param  None
- * @retval None
- */
-int main(void)
-{
-    SystemInit();
-
-    while (1) {
-
-    }
-
-    return 0;
+    return SST_Task_run(); /* run the SST tasks */
+    /* NOTE; in embedded systems SST_Task_run() should not return */
 }
-
-#ifdef  USE_FULL_ASSERT
-
-/**
- * @brief  Reports the name of the source file and the source line number
- *         where the assert_param error has occurred.
- * @param  file: pointer to the source file name
- * @param  line: assert_param error line source number
- * @retval None
- */
-void assert_failed(uint8_t* file, uint32_t line)
-{
-    /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-
-    /* Infinite loop */
-    while (1)
-    {
-    }
-}
-#endif
-
-/**
- * @}
- */
-
-/**
- * @}
- */
-
-/******************** (C) COPYRIGHT WIZnet *****END OF FILE********************/

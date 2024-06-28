@@ -129,8 +129,8 @@ static void Network_Config(void)
     wiz_NetInfo gWIZNETINFO;
 
     uint8_t mac_addr[6] = { 0x00, 0x08, 0xDC, 0x01, 0x02, 0x03 };
-    uint8_t ip_addr[4] = { 192, 168, 0, 12 };
-    uint8_t gw_addr[4] = { 192, 168, 0, 1 }; 
+    uint8_t ip_addr[4] = { 192, 168, 68, 201 };
+    uint8_t gw_addr[4] = { 192, 168, 68, 1 }; 
     uint8_t sub_addr[4] = { 255, 255, 255, 0 };
     uint8_t dns_addr[4] = { 8, 8, 8, 8 };
 

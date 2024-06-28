@@ -4,7 +4,10 @@ set(TARGET_NAME WZTOE_WebServer)
 
 add_executable(${TARGET_NAME}
 
-  ${CMAKE_SOURCE_DIR}/Projects/W7500x_StdPeriph_Examples/WZTOE/WZTOE_WebServer/main.c 
+  ${CMAKE_SOURCE_DIR}/Projects/W7500x_StdPeriph_Examples/WZTOE/WZTOE_WebServer/main.c
+  ${CMAKE_SOURCE_DIR}/Projects/W7500x_StdPeriph_Examples/WZTOE/WZTOE_WebServer/cmp.c
+  ${CMAKE_SOURCE_DIR}/Projects/W7500x_StdPeriph_Examples/WZTOE/WZTOE_WebServer/cmp_server.c
+  ${CMAKE_SOURCE_DIR}/Projects/W7500x_StdPeriph_Examples/WZTOE/WZTOE_WebServer/max7219.c
   ${CMAKE_SOURCE_DIR}/Projects/W7500x_StdPeriph_Examples/WZTOE/WZTOE_WebServer/W7500x_it.c
   ${CMAKE_SOURCE_DIR}/Projects/W7500x_StdPeriph_Examples/WZTOE/WZTOE_WebServer/retarget.c
   ${CMAKE_SOURCE_DIR}/Libraries/CMSIS/Device/WIZnet/W7500/Source/GCC/startup_w7500.s

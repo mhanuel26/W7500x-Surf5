@@ -82,7 +82,7 @@ void _sys_exit(int return_code) {
 /******************************************************************************/
 /* Retarget functions for GNU Tools for ARM Embedded Processors               */
 /******************************************************************************/
-#include <sys/stat.h>
+//#include <sys/stat.h>
 
 __attribute__ ((used)) int _write(int fd, char *ptr, int len)
 {
