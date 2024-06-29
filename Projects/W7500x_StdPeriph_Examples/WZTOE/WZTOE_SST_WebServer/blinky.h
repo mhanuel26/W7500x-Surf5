@@ -23,17 +23,19 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 * DEALINGS IN THE SOFTWARE.
 ============================================================================*/
-#ifndef BSP_H_
-#define BSP_H_
+#ifndef BLINKY_H_
+#define BLINKY_H_
 
-#define BSP_TICKS_PER_SEC 1000U
-#define DATA_BUF_SIZE 2048
+#include "dbc_assert.h" /* Design By Contract (DBC) assertions */
 
-void BSP_init(void);
+enum Signals {
+    TIMEOUT1_SIG,
+    TIMEOUT2_SIG,
+    /* ... */
+    MAX_SIG  /* the last signal */
+};
 
-void BSP_ledOn(void);
-void BSP_ledOff(void);
-void BSP_a0on(void);
-void BSP_a0off(void);
+void Blinky_instantiate(void);
+extern SST_Task * const AO_Blinky;  /* opaque task pointer */
 
-#endif /* BSP_H_ */
+#endif /* BLINKY_H_ */

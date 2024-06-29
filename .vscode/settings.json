@@ -12,7 +12,8 @@
         "w7500x_ssp.h": "c",
         "blinky.h": "c",
         "string.h": "c",
-        "dhcp.h": "c"
+        "dhcp.h": "c",
+        "bsp.h": "c"
     },
     "cortex-debug.variableUseNaturalFormat": false
 }

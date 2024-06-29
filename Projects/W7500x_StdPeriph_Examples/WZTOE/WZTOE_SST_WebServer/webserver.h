@@ -23,17 +23,22 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 * DEALINGS IN THE SOFTWARE.
 ============================================================================*/
-#ifndef BSP_H_
-#define BSP_H_
+#ifndef WEB_SERVER_H_
+#define WEB_SERVER_H_
 
-#define BSP_TICKS_PER_SEC 1000U
-#define DATA_BUF_SIZE 2048
+#include "dbc_assert.h" /* Design By Contract (DBC) assertions */
 
-void BSP_init(void);
+enum WebSignals {
+    GET_SN_SR_SIG,
+    /* ... */
+    MAX_SERVER_SIG  /* the last signal */
+};
 
-void BSP_ledOn(void);
-void BSP_ledOff(void);
-void BSP_a0on(void);
-void BSP_a0off(void);
+#define TRUE    0x01
+#define FALSE   0x00
 
-#endif /* BSP_H_ */
+void Webserver_instantiate(void);
+void Webserver_set_phyready(void);
+extern SST_Task * const AO_Server;  /* opaque task pointer */
+
+#endif /* WEB_SERVER_H_ */
