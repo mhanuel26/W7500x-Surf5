@@ -190,19 +190,14 @@ int8_t listen(uint8_t sn)
     CHECK_SOCKNUM();
     CHECK_SOCKMODE(Sn_MR_TCP);
     CHECK_SOCKINIT();
-    if(getSn_CR(sn) == Sn_CR_RESET){
-        setSn_CR(sn,Sn_CR_LISTEN);
-    }else{
-        return SOCK_BUSY;
+    setSn_CR(sn,Sn_CR_LISTEN);
+    while(getSn_CR(sn));
+    while(getSn_SR(sn) != SOCK_LISTEN)
+    {
+        close(sn);
+        return SOCKERR_SOCKCLOSED;
     }
     return SOCK_OK;
-
-    // while(getSn_CR(sn));
-    // while(getSn_SR(sn) != SOCK_LISTEN)
-    // {
-    //     close(sn);
-    //     return SOCKERR_SOCKCLOSED;
-    // }
 }
 
 

@@ -1,17 +1,20 @@
 
 # Build the executable based on the source files
-set(TARGET_NAME WZTOE_WebServer)
+set(TARGET_NAME WZTOE_MessagePack)
 
 add_executable(${TARGET_NAME}
 
-  ${CMAKE_SOURCE_DIR}/Projects/W7500x_StdPeriph_Examples/WZTOE/WZTOE_WebServer/main.c 
-  ${CMAKE_SOURCE_DIR}/Projects/W7500x_StdPeriph_Examples/WZTOE/WZTOE_WebServer/W7500x_it.c
-  ${CMAKE_SOURCE_DIR}/Projects/W7500x_StdPeriph_Examples/WZTOE/WZTOE_WebServer/retarget.c
+  ${CMAKE_SOURCE_DIR}/Projects/W7500x_StdPeriph_Examples/WZTOE/WZTOE_MessagePack/main.c
+  ${CMAKE_SOURCE_DIR}/Projects/W7500x_StdPeriph_Examples/WZTOE/WZTOE_MessagePack/cmp.c
+  ${CMAKE_SOURCE_DIR}/Projects/W7500x_StdPeriph_Examples/WZTOE/WZTOE_MessagePack/cmp_server.c
+  ${CMAKE_SOURCE_DIR}/Projects/W7500x_StdPeriph_Examples/WZTOE/WZTOE_MessagePack/max7219.c
+  ${CMAKE_SOURCE_DIR}/Projects/W7500x_StdPeriph_Examples/WZTOE/WZTOE_MessagePack/W7500x_it.c
+  ${CMAKE_SOURCE_DIR}/Projects/W7500x_StdPeriph_Examples/WZTOE/WZTOE_MessagePack/retarget.c
   ${CMAKE_SOURCE_DIR}/Libraries/CMSIS/Device/WIZnet/W7500/Source/GCC/startup_w7500.s
   )
 
 target_include_directories(${TARGET_NAME} PUBLIC
-  ${CMAKE_SOURCE_DIR}/Projects/W7500x_StdPeriph_Examples/WZTOE/WZTOE_WebServer
+  ${CMAKE_SOURCE_DIR}/Projects/W7500x_StdPeriph_Examples/WZTOE/WZTOE_MessagePack
   )
 
 target_link_libraries(${TARGET_NAME} PRIVATE

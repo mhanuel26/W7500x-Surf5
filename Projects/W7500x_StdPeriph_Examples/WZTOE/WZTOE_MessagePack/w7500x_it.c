@@ -40,7 +40,6 @@
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 extern void TimingDelay_Decrement(void);
-
 /* Private functions ---------------------------------------------------------*/
 
 /******************************************************************************/
@@ -90,7 +89,7 @@ void PendSV_Handler(void)
  */
 void SysTick_Handler(void)
 {
-    TimingDelay_Decrement();
+    // TimingDelay_Decrement();
 }
 
 /******************************************************************************/
@@ -198,6 +197,7 @@ void DUALTIMER0_Handler(void)
     if (DUALTIMER_GetITStatus(DUALTIMER0_0)) {
         DUALTIMER_ClearIT(DUALTIMER0_0);
         DHCP_time_handler();
+        // printf("dual timer isr\r\n");
     }
 }
 
@@ -273,14 +273,14 @@ void PWM6_Handler(void)
 {
 }
 
-/**
- * @brief  This function handles PWM7 Handler.
- * @param  None
- * @retval None
- */
-void PWM7_Handler(void)
-{
-}
+// /**
+//  * @brief  This function handles PWM7 Handler.
+//  * @param  None
+//  * @retval None
+//  */
+// void PWM7_Handler(void)
+// {
+// }
 
 /**
  * @brief  This function handles RTC Handler.

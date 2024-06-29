@@ -8,6 +8,7 @@
       "cwd": "${workspaceFolder}",
       "executable": "build/src/src.elf",
       // "executable": "build/Projects/W7500x_StdPeriph_Examples/WZTOE/WZTOE_WebServer/WZTOE_WebServer.elf",
+      // "executable": "build/Projects/W7500x_StdPeriph_Examples/WZTOE/WZTOE_WebServer/WZTOE_MessagePack.elf",
       // "executable": "build/Projects/W7500x_StdPeriph_Examples/WZTOE/WZTOE_Loopback/WZTOE_Loopback.elf",
       "name": "Debug with PyOCD",
       "request": "launch",
