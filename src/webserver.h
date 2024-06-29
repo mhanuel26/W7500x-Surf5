@@ -34,7 +34,11 @@ enum WebSignals {
     MAX_SERVER_SIG  /* the last signal */
 };
 
+#define TRUE    0x01
+#define FALSE   0x00
+
 void Webserver_instantiate(void);
+void Webserver_set_phyready(void);
 extern SST_Task * const AO_Server;  /* opaque task pointer */
 
 #endif /* WEB_SERVER_H_ */

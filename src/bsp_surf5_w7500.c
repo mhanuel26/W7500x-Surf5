@@ -324,8 +324,6 @@ void SST_onStart(void) {
     NVIC_SetPriority(SysTick_IRQn, 0U);
     /* ... */
 
-
-
     /* Initialize PHY */
 #ifdef W7500
     printf("PHY Init : %s\r\n", PHY_Init(GPIOB, GPIO_Pin_15, GPIO_Pin_14) == SET ? "Success" : "Fail");
@@ -365,7 +363,7 @@ void SST_onStart(void) {
     /* Network information setting after DHCP operation.
      * Displays the network information allocated by DHCP. */
     Network_Config();
-
+    Webserver_set_phyready();
 }
 /*..........................................................................*/
 void SST_onIdle(void) {

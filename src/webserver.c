@@ -40,6 +40,7 @@ typedef struct {
     SST_Task super; /* inherit SST_Task */
 
     SST_TimeEvt te1;
+    volatile uint8_t phy_rdy;
 } Server;
 
 extern uint8_t test_buf[DATA_BUF_SIZE];
@@ -47,14 +48,28 @@ extern uint8_t test_buf[DATA_BUF_SIZE];
 static void Webserver_ctor(Server * const me);
 static void Webserver_init(Server * const me, SST_Evt const * const ie);
 static void Webserver_dispatch(Server * const me, SST_Evt const * const e);
-int32_t WebServer(uint8_t sn, uint8_t* buf, uint16_t port);
+static int32_t WebServer(uint8_t sn, uint8_t* buf, uint16_t port);
 
 /*..........................................................................*/
 static Server Webserver_inst; /* the Blinky instance */
 SST_Task * const AO_Server = &Webserver_inst.super; /* opaque AO pointer */
 
+bool Webserver_get_phyready(void){
+    bool res;
+    SST_LockKey key = SST_Task_lock(3U);
+    res = (Webserver_inst.phy_rdy == TRUE);
+    SST_Task_unlock(key);
+    return res;
+}
+
+void Webserver_set_phyready(void){
+    SST_LockKey key = SST_Task_lock(3U);
+    Webserver_inst.phy_rdy = TRUE;
+    SST_Task_unlock(key);
+}
 /*..........................................................................*/
 void Webserver_instantiate(void) {
+    Webserver_inst.phy_rdy = FALSE;
     Webserver_ctor(&Webserver_inst);
 }
 /*..........................................................................*/
@@ -70,9 +85,8 @@ void Webserver_ctor(Server * const me) {
 /* Server implementation with one periodic time event */
 
 static void Webserver_init(Server * const me, SST_Evt const * const ie) {
-    (void)ie; /* unused parameter */
+    (void)ie; /* Server instance parameter */
     SST_TimeEvt_arm(&me->te1, 1U, 0U);
-
 }
 /*..........................................................................*/
 static void Webserver_dispatch(Server * const me, SST_Evt const * const e) {
@@ -108,7 +122,7 @@ static void Webserver_dispatch(Server * const me, SST_Evt const * const e) {
  * @param  port: Socket port number to use.
  * @retval Success or Fail of configuration functions
  */
-int32_t WebServer(uint8_t sn, uint8_t* buf, uint16_t port)
+static int32_t WebServer(uint8_t sn, uint8_t* buf, uint16_t port)
 {
     int32_t ret;
     uint16_t size = 0;
@@ -116,6 +130,9 @@ int32_t WebServer(uint8_t sn, uint8_t* buf, uint16_t port)
     uint16_t destport;
     uint8_t adc_buf[128] = { '\0', };
 
+    // if(){
+
+    // }
     switch (getSn_SR(sn))
     {
         case SOCK_ESTABLISHED:
