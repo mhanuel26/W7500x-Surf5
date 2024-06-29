@@ -30,13 +30,13 @@
 #include "sst.h"
 #include "bsp.h"
 #include "blinky.h"
+#include "webserver.h"
 
 #include "w7500x.h"  /* CMSIS-compliant header file for the MCU used */
 /* add other drivers if necessary... */
 #include "wizchip_conf.h"
 #include "dhcp.h"
-//DBC_MODULE_NAME("bsp_nucleo-l053r8") /* for DBC assertions in this module */
-#define DATA_BUF_SIZE 2048
+DBC_MODULE_NAME("bsp_surf5_w7500") /* for DBC assertions in this module */
 
 uint8_t test_buf[DATA_BUF_SIZE];
 wiz_NetInfo gWIZNETINFO;
@@ -96,11 +96,20 @@ void assert_failed(char const * const module, int const label) {
 #ifdef REGULAR_IRQS
 /* repurpose regular IRQs for SST Tasks */
 /* prototypes */
-//void PVD_IRQHandler(void);
-
-//void PVD_IRQHandler(void)  { SST_Task_activate(AO_Blinky);  }
-
-
+/**
+ * @brief  This function handles RTC Handler for SST Task Server.
+ * @param  None
+ * @retval None
+ */
+void RTC_Handler(void)
+{
+    SST_Task_activate(AO_Server);  
+}
+/**
+ * @brief  This function handles RTC Handler.
+ * @param  None
+ * @retval None
+ */
 void PWM7_Handler(void);
 
 void PWM7_Handler(void)	{ 
@@ -135,6 +144,7 @@ void BSP_init(void) {
 #ifdef REGULAR_IRQS
     /* repurpose regular IRQs for SST Tasks */
     SST_Task_setIRQ(AO_Blinky,  PWM7_IRQn);
+    SST_Task_setIRQ(AO_Server,  RTC_IRQn);
 #else
     /* use reserved IRQs for SST Tasks */
     SST_Task_setIRQ(AO_Blinky,  14U);

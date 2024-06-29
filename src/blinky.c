@@ -26,6 +26,7 @@
 #include "sst.h"           /* SST framework */
 #include "bsp.h"           /* Board Support Package interface */
 #include "blinky.h"        /* application shared interface */
+#include <stdio.h>
 
 DBC_MODULE_NAME("blinky")  /* for DBC assertions in this module */
 

@@ -27,21 +27,34 @@
 #include "sst.h"           /* SST framework */
 #include "bsp.h"           /* Board Support Package interface */
 #include "blinky.h"        /* application shared interface */
+#include "webserver.h"        /* application shared interface */
+
 
 /*..........................................................................*/
 int main() {
     SST_init(); /* initialize the SST kernel */
     BSP_init(); /* initialize the Board Support Package */
 
-    /* instantiate and start all SST tasks... */
-    Blinky_instantiate();
-    static SST_Evt const *blinkyQSto[10]; /* Event queue storage */
+    // /* instantiate and start all SST tasks... */
+    // Blinky_instantiate();
+    
+    // static SST_Evt const *blinkyQSto[10]; /* Event queue storage */
+    // SST_Task_start(
+    //     AO_Blinky,     /* AO pointer to start */
+    //     2U,            /* SST-priority */ 
+    //     blinkyQSto,    /* storage for the AO's queue */
+    //     ARRAY_NELEM(blinkyQSto),   /* queue length */
+    //     (void *)0);    /* initialization event (not used) */
+
+    Webserver_instantiate();
+
+    static SST_Evt const *serverQSto[10]; /* Event queue storage */
     SST_Task_start(
-        AO_Blinky,     /* AO pointer to start */
+        AO_Server,     /* AO pointer to start */
         1U,            /* SST-priority */
-        blinkyQSto,    /* storage for the AO's queue */
-        ARRAY_NELEM(blinkyQSto),   /* queue length */
-        (void *)0);    /* initialization event (not used) */
+        serverQSto,    /* storage for the AO's queue */
+        ARRAY_NELEM(serverQSto),   /* queue length */
+        (void *)0);    /* initialization event (not used) */    
 
     return SST_Task_run(); /* run the SST tasks */
     /* NOTE; in embedded systems SST_Task_run() should not return */
