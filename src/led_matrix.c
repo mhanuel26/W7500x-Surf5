@@ -27,6 +27,7 @@
 #include "bsp.h"           /* Board Support Package interface */
 #include "led_matrix.h"        /* application shared interface */
 #include <stdio.h>
+#include <string.h>
 #include "max7219.h"
 
 DBC_MODULE_NAME("led_matrix")  /* for DBC assertions in this module */
@@ -47,7 +48,10 @@ static void Matrix_dispatch(Matrix * const me, SST_Evt const * const e);
 /*..........................................................................*/
 static Matrix Matrix_inst; /* the Matrix instance */
 SST_Task * const AO_Matrix = &Matrix_inst.super; /* opaque AO pointer */
-
+static uint32_t scroll_iter = 0;
+static uint32_t pixel_scroll = 0;
+static int iPitch;
+static uint8_t bImg[40*8];
 /*..........................................................................*/
 void Matrix_instantiate(void) {
     Matrix_ctor(&Matrix_inst);
@@ -63,7 +67,6 @@ void Matrix_ctor(Matrix * const me) {
     SST_TimeEvt_ctor(&me->te3, USER_ONE_SHOT, &me->super);
 }
 
-
 /*--------------------------------------------------------------------------*/
 static void Matrix_init(Matrix * const me, SST_Evt const * const ie) {
     (void)ie; /* unused parameter */
@@ -75,20 +78,47 @@ static void Matrix_dispatch(Matrix * const me, SST_Evt const * const e) {
     switch (e->sig) {
         case SCROLL_MATRIX: {
             BSP_a1on();
-            SST_TimeEvt_arm(&me->te2, BSP_TICKS_PER_SEC / 4U, 0U);
+#ifndef SEVEN_SEGMENT
+            maxSendImage(bImg, iPitch);
+			maxScrollBitmap(bImg, iPitch, 1);
+            pixel_scroll--;
+            if(pixel_scroll > 0U){
+                SST_TimeEvt_arm(&me->te1, 40U, 0U);
+            }else{
+                scroll_iter --;
+                if(scroll_iter > 0U){
+                    pixel_scroll = iPitch*8;
+                    SST_TimeEvt_arm(&me->te1, 40U, 0U);
+                }else{
+                    pixel_scroll = 0;
+                }
+            }
+#endif
             BSP_a1off();
-            break;
-        }
-        case USER_SIG1: {
-            BSP_a1on();
-            BSP_a1off();
-            SST_TimeEvt_arm(&me->te1, BSP_TICKS_PER_SEC * 3U/4U, 0U);
             break;
         }
         case USER_ONE_SHOT: {
             BSP_a1on();
             const char * tmp = SST_EVT_DOWNCAST(MatrixWorkEvt, e)->text;
+#ifdef SEVEN_SEGMENT
             maxSegmentString((char*)tmp);
+#else
+            scroll_iter = SST_EVT_DOWNCAST(MatrixWorkEvt, e)->scroll_iter;
+            iPitch = BYTES_PER_LINE;
+            pixel_scroll = iPitch*8;
+            memset(bImg, 0, iPitch*8);
+            maxDrawString((char*)tmp, bImg, iPitch, 1); // draw narrow digits
+            if(scroll_iter > 0){
+                SST_TimeEvt_arm(&me->te1, 1U, 0U);
+            }else{
+                maxSendImage(bImg, iPitch);
+            }
+#endif
+            BSP_a1off();
+            break;
+        }
+        case USER_SIG1: {
+            BSP_a1on();
             BSP_a1off();
             break;
         }

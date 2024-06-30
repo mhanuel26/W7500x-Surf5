@@ -26,7 +26,7 @@
 #ifndef BSP_H_
 #define BSP_H_
 
-#define SEVEN_SEGMENT
+// #define SEVEN_SEGMENT
 #define BSP_TICKS_PER_SEC 1000U
 #define DATA_BUF_SIZE 2048
 
@@ -38,5 +38,7 @@ void BSP_a0on(void);
 void BSP_a0off(void);
 void BSP_a1on(void);
 void BSP_a1off(void);
+void BSP_cs_assert(void);
+void BSP_cs_deassert(void);
 
 #endif /* BSP_H_ */

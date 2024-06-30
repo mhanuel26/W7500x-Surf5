@@ -5,13 +5,14 @@
 #include "w7500x_ssp.h"
 #include "max7219.h"
 #include <assert.h>
+#include "bsp.h"
 //
 // MAX7219 LED Matrix controller library
 // Copyright (c) 2018 BitBank Software, Inc.
 // Written by Larry Bank
 // bitbank@pobox.com
 // Project started 3/10/2018
-// Modified by Manuel Iglesias Abbatemarco 06/20/2024
+// Modified by Manuel Abbatemarco 06/30/2024
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -176,25 +177,22 @@ void maxSendSequence(uint8_t *pSequence, uint8_t len)
 {
   // The CS line stays low throughout a "transaction". Send all of the control uint8_ts for all of the chained
   // controllers in a single transaction. When the CS line rises, the data will be latched
-//    AIOWriteGPIO(iCSPin, 0);
-//    AIOWriteSPI(file_spi, pSequence, len);
-//    AIOWriteGPIO(iCSPin, 1);
-
 	FlagStatus ssp0_tx_empty;
-	GPIO_ResetBits(GPIOA, iCSPin); // Set the SSEL pin to LOW
+  BSP_cs_assert();
 	uint16_t data;
 	for(uint8_t j=0; j<len/2; j++){
 		data = (*pSequence++ << 8);
 		data |= *pSequence++;
 		SSP_SendData(SSPx, data);                   //Master Data Send
+    while(1){
+      ssp0_tx_empty = SSP_GetFlagStatus(SSPx, SSP_SR_BSY);
+      if(ssp0_tx_empty == RESET){
+        break;
+      }
+    }
 	}
-	while(1){
-		ssp0_tx_empty = SSP_GetFlagStatus(SSPx, SSP_SR_BSY);
-		if(ssp0_tx_empty == RESET){
-			break;
-		}
-	}
-	GPIO_SetBits(GPIOA, iCSPin);   // Set the SSEL pin to HIGH
+  BSP_cs_deassert();
+
 } /* maxSendSequence() */
 
 //
@@ -469,8 +467,8 @@ int maxInit(uint8_t iNum, uint8_t bDecodeMode, uint8_t iChannel, uint8_t iSelect
 	// Configure the port and pin number connected to the SSEL pin
 	GPIO_InitStruct.GPIO_Pin = iCSPin;  // X is the SSEL pin number
 	GPIO_InitStruct.GPIO_Direction = GPIO_Direction_OUT;
-	GPIO_InitStruct.GPIO_Pad = GPIO_PuPd_UP;
-	GPIO_InitStruct.GPIO_AF =  PAD_AF0;
+	GPIO_InitStruct.GPIO_Pad = GPIO_PuPd_NOPULL;
+	GPIO_InitStruct.GPIO_AF =  PAD_AF1;
 
 	GPIO_Init(GPIOA, &GPIO_InitStruct);  // GPIOX is the port to which the SSEL pin belongs.
 	GPIO_SetBits(GPIOA, iCSPin);   // Set the SSEL pin to HIGH

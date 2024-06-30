@@ -17,5 +17,5 @@
         "led_matrix.h": "c",
         "dbc_assert.h": "c"
     },
-    "cortex-debug.variableUseNaturalFormat": false
+    "cortex-debug.variableUseNaturalFormat": true
 }

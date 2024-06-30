@@ -28,9 +28,12 @@
 
 #include "dbc_assert.h" /* Design By Contract (DBC) assertions */
 
+#define BYTES_PER_LINE  24
+
 typedef struct {
     SST_Evt super;    /* inherit SST_Evt */
     char text[40]; /* number of toggles of the signal */
+    uint32_t scroll_iter;
 } MatrixWorkEvt;
 
 enum MatrixSignals {

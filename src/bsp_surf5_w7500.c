@@ -42,7 +42,8 @@ DBC_MODULE_NAME("bsp_surf5_w7500") /* for DBC assertions in this module */
 
 uint8_t test_buf[DATA_BUF_SIZE];
 wiz_NetInfo gWIZNETINFO;
-
+char cTemp[32];
+uint8_t bImg[BYTES_PER_LINE*8];
 /* Local-scope defines -----------------------------------------------------*/
 static void BSP_GPIO_Config(void);
 static void BSP_UART_Config(void);
@@ -229,6 +230,9 @@ void BSP_a0off(void) { GPIO_ResetBits(GPIOA, GPIO_Pin_0); }
 /* SURF5 GPIOA 1 */
 void BSP_a1on(void) { GPIO_SetBits(GPIOA, GPIO_Pin_1); }
 void BSP_a1off(void) { GPIO_ResetBits(GPIOA, GPIO_Pin_1); }
+
+void BSP_cs_assert(void) { GPIO_ResetBits(GPIOA, GPIO_Pin_5); }
+void BSP_cs_deassert(void) { GPIO_SetBits(GPIOA, GPIO_Pin_5); }
 
 /**
  * @brief  Configures the Network Information.
@@ -419,17 +423,24 @@ void SST_onStart(void) {
 	{
 		printf("Problem initializing max7219\n");
 	}
-    maxSetIntensity(1);
-    // BSP_a1on();
-    // maxSegmentString("3.1415926");
-    // // maxSegmentString("2.7182818");
-    // BSP_a1off();
+    maxSetIntensity(4);    
+
+#ifdef SEVEN_SEGMENT
+    /* Send event to 7 segment max7219 controller */
     static MatrixWorkEvt const fInitDoneEvt = {
         .super.sig = USER_ONE_SHOT,
-        .text = "12345678"
+        .text = "00000000"
     };
     SST_Task_post(AO_Matrix, &fInitDoneEvt.super);
-
+#else
+    /* Send event to led matrix max7219 controller */
+    static MatrixWorkEvt const fInitDoneEvt = {
+        .super.sig = USER_ONE_SHOT,
+        .text = "max7219 sst scroll task!",
+        .scroll_iter = 2        // 0 here for one shot image send.
+    };
+    SST_Task_post(AO_Matrix, &fInitDoneEvt.super);
+#endif
     
 }
 /*..........................................................................*/
