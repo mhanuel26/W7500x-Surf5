@@ -1,11 +1,11 @@
 /*============================================================================
-* Super-Simple Tasker (SST/C) Example for STM32 NUCLEO-L053R8
+* Super-Simple Tasker (SST/C) Example for WIZNET W7500P SURF5 BOARD. 
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
 *                    Modern Embedded Software
 *
-* Copyright (C) 2005 Quantum Leaps, <state-machine.com>.
+* Copyright (C) 2024 Quantum Leaps, <state-machine.com>.
 *
 * SPDX-License-Identifier: MIT
 *
@@ -31,7 +31,9 @@
 #include "bsp.h"
 #include "blinky.h"
 #include "webserver.h"
-
+#include "led_matrix.h"
+#include "max7219.h"
+#include <string.h>
 #include "w7500x.h"  /* CMSIS-compliant header file for the MCU used */
 /* add other drivers if necessary... */
 #include "wizchip_conf.h"
@@ -106,7 +108,7 @@ void RTC_Handler(void)
     SST_Task_activate(AO_Server);  
 }
 /**
- * @brief  This function handles RTC Handler.
+ * @brief  This function handles PWM7 for Blinky Task
  * @param  None
  * @retval None
  */
@@ -115,6 +117,18 @@ void PWM7_Handler(void);
 void PWM7_Handler(void)	{ 
     SST_Task_activate(AO_Blinky);  
 } 
+
+/**
+ * @brief  This function handles PWM6 for Led Matrix Task
+ * @param  None
+ * @retval None
+ */
+void PWM6_Handler(void);
+
+void PWM6_Handler(void)	{ 
+    SST_Task_activate(AO_Matrix);  
+} 
+
 
 #else /* use reserved IRQs for SST Tasks */
 /* prototypes */
@@ -145,6 +159,7 @@ void BSP_init(void) {
     /* repurpose regular IRQs for SST Tasks */
     SST_Task_setIRQ(AO_Blinky,  PWM7_IRQn);
     SST_Task_setIRQ(AO_Server,  RTC_IRQn);
+    SST_Task_setIRQ(AO_Matrix,  PWM6_IRQn);
 #else
     /* use reserved IRQs for SST Tasks */
     SST_Task_setIRQ(AO_Blinky,  14U);
@@ -187,17 +202,33 @@ static void BSP_UART_Config(void)
  */
 static void BSP_GPIO_Config(void)
 {
+    /* Surf5 USER LED GPIO */
     GPIO_InitTypeDef GPIO_InitStructure;
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;
     GPIO_InitStructure.GPIO_Direction = GPIO_Direction_OUT;
     GPIO_InitStructure.GPIO_AF = PAD_AF1;
     GPIO_Init(GPIOC, &GPIO_InitStructure);
+    /* Init a GPIO for Web Task Debug Monitoring using Logic Analyser*/
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
+    GPIO_InitStructure.GPIO_Direction = GPIO_Direction_OUT;
+    GPIO_InitStructure.GPIO_AF = PAD_AF0;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+    /* Init a GPIO for LED MATRIX Debug Monitoring using Logic Analyser*/
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
+    GPIO_InitStructure.GPIO_Direction = GPIO_Direction_OUT;
+    GPIO_InitStructure.GPIO_AF = PAD_AF0;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
 }
 
-void BSP_ledOn(void)  { GPIO_ResetBits(GPIOC, GPIO_Pin_15);       } /* SURF5 LED2 */
+/* SURF5 LED2 */
+void BSP_ledOn(void)  { GPIO_ResetBits(GPIOC, GPIO_Pin_15);       } 
 void BSP_ledOff(void) { GPIO_SetBits(GPIOC, GPIO_Pin_15); }
+/* SURF5 GPIOA 0 */
 void BSP_a0on(void) { GPIO_SetBits(GPIOA, GPIO_Pin_0); }
 void BSP_a0off(void) { GPIO_ResetBits(GPIOA, GPIO_Pin_0); }
+/* SURF5 GPIOA 1 */
+void BSP_a1on(void) { GPIO_SetBits(GPIOA, GPIO_Pin_1); }
+void BSP_a1off(void) { GPIO_ResetBits(GPIOA, GPIO_Pin_1); }
 
 /**
  * @brief  Configures the Network Information.
@@ -292,6 +323,15 @@ static void DUALTIMER_Config(void)
 void SST_onStart(void) {
     uint32_t ret;
     uint8_t dhcp_retry = 0;
+    int rc;
+    int iNumControllers, iSegmentMode;
+#ifdef SEVEN_SEGMENT
+	iNumControllers = 1;
+	iSegmentMode = 1;
+#else
+	iNumControllers = 4; // assume 4 x 8x8 array
+	iSegmentMode = 0;
+#endif
     NVIC_InitTypeDef NVIC_InitStructure;
     SystemInit();
     // SystemCoreClockUpdate();
@@ -314,6 +354,12 @@ void SST_onStart(void) {
     /* set priorities of ISRs used in the system */
     NVIC_InitStructure.NVIC_IRQChannel = PWM7_IRQn;
     NVIC_InitStructure.NVIC_IRQChannelPriority = 0x1;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
+
+    /* set priorities of ISRs used in the system */
+    NVIC_InitStructure.NVIC_IRQChannel = PWM6_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPriority = 0x2;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 
@@ -361,10 +407,30 @@ void SST_onStart(void) {
         }
     }
 
-    /* Network information setting after DHCP operation.
+    /* Network information setting after DHCP operation.    
      * Displays the network information allocated by DHCP. */
     Network_Config();
     Webserver_set_phyready();
+
+    /* Initialize the dot-matrix library
+	 * num controllers, BCD mode, SPI channel, GPIO pin number for CS*/ 
+	rc = maxInit(iNumControllers, iSegmentMode, 0, 0);
+	if (rc != 0)
+	{
+		printf("Problem initializing max7219\n");
+	}
+    maxSetIntensity(1);
+    // BSP_a1on();
+    // maxSegmentString("3.1415926");
+    // // maxSegmentString("2.7182818");
+    // BSP_a1off();
+    static MatrixWorkEvt const fInitDoneEvt = {
+        .super.sig = USER_ONE_SHOT,
+        .text = "12345678"
+    };
+    SST_Task_post(AO_Matrix, &fInitDoneEvt.super);
+
+    
 }
 /*..........................................................................*/
 void SST_onIdle(void) {

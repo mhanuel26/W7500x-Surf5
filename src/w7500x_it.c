@@ -266,9 +266,9 @@ void PWM5_Handler(void)
  * @param  None
  * @retval None
  */
-void PWM6_Handler(void)
-{
-}
+// void PWM6_Handler(void)
+// {
+// }
 
 /**
  * @brief  This function handles PWM7 Handler.
@@ -279,11 +279,11 @@ void PWM6_Handler(void)
 //{
 //}
 
-// /**
-//  * @brief  This function handles RTC Handler.
-//  * @param  None
-//  * @retval None
-//  */
+/**
+ * @brief  This function handles RTC Handler.
+ * @param  None
+ * @retval None
+ */
 // void RTC_Handler(void)
 // {
 // }

@@ -68,6 +68,9 @@ void delay(__IO uint32_t milliseconds);
 void delay_ms(__IO uint32_t nCount);
 /* Private functions ---------------------------------------------------------*/
 
+void BSP_a1on(void) { GPIO_SetBits(GPIOA, GPIO_Pin_1); }
+void BSP_a1off(void) { GPIO_ResetBits(GPIOA, GPIO_Pin_1); }
+
 /**
  * @brief  Main program.
  * @param  None
@@ -147,25 +150,27 @@ int main(void)
 
     // init_ether_cfg();
 
-	// /* Initialize the library
-	//  * num controllers, BCD mode, SPI channel, GPIO pin number for CS*/ 
-	// rc = maxInit(iNumControllers, iSegmentMode, 0, 0);
-	// if (rc != 0)
-	// {
-	// 	printf("Problem initializing max7219\n");
-	// 	return 0;
-	// }
+	/* Initialize the dot-matrix library
+	 * num controllers, BCD mode, SPI channel, GPIO pin number for CS*/ 
+	rc = maxInit(iNumControllers, iSegmentMode, 0, 0);
+	if (rc != 0)
+	{
+		printf("Problem initializing max7219\n");
+		return 0;
+	}
 	// maxSetIntensity(4);
 
-    // // maxSegmentString("3.1415926");
-    // maxSegmentString("2.7182818");
+    // maxSegmentString("3.1415926");
+    BSP_a1on();
+    maxSegmentString("2.7182818");
+    BSP_a1off();
 
     printf("System Loop Start\r\n");
     int res;
     while (1) {
 
         
-        WebServer(1, test_buf, 80);
+        // WebServer(1, test_buf, 80);
         
 // 		if ((res = process_cfg_socket()) < 0) 				// process the configuration socket
 // 		{
@@ -204,6 +209,12 @@ static void GPIO_Config(void)
     GPIO_Init(GPIOC, &GPIO_InitStructure);
 
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
+    GPIO_InitStructure.GPIO_Direction = GPIO_Direction_OUT;
+    GPIO_InitStructure.GPIO_AF = PAD_AF0;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+        /* Init a GPIO for LED MATRIX Debug Monitoring using Logic Analyser*/
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
     GPIO_InitStructure.GPIO_Direction = GPIO_Direction_OUT;
     GPIO_InitStructure.GPIO_AF = PAD_AF0;
     GPIO_Init(GPIOA, &GPIO_InitStructure);

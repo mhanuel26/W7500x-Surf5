@@ -13,7 +13,9 @@
         "blinky.h": "c",
         "string.h": "c",
         "dhcp.h": "c",
-        "bsp.h": "c"
+        "bsp.h": "c",
+        "led_matrix.h": "c",
+        "dbc_assert.h": "c"
     },
     "cortex-debug.variableUseNaturalFormat": false
 }

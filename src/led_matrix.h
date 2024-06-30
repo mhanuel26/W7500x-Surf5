@@ -1,7 +1,7 @@
 /*============================================================================
-* Super-Simple Tasker (SST/C) Example
+* Super-Simple Tasker (SST/C) Example for LED MATRIX OR 7 SEGMENT USING MAX7219
 *
-* Copyright (C) 2006-2023 Quantum Leaps, <state-machine.com>.
+* Copyright (C) 2024 Manuel Iglesias
 *
 * SPDX-License-Identifier: MIT
 *
@@ -23,20 +23,25 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 * DEALINGS IN THE SOFTWARE.
 ============================================================================*/
-#ifndef BSP_H_
-#define BSP_H_
+#ifndef LED_MATRIX_H_
+#define LED_MATRIX_H_
 
-#define SEVEN_SEGMENT
-#define BSP_TICKS_PER_SEC 1000U
-#define DATA_BUF_SIZE 2048
+#include "dbc_assert.h" /* Design By Contract (DBC) assertions */
 
-void BSP_init(void);
+typedef struct {
+    SST_Evt super;    /* inherit SST_Evt */
+    char text[40]; /* number of toggles of the signal */
+} MatrixWorkEvt;
 
-void BSP_ledOn(void);
-void BSP_ledOff(void);
-void BSP_a0on(void);
-void BSP_a0off(void);
-void BSP_a1on(void);
-void BSP_a1off(void);
+enum MatrixSignals {
+    SCROLL_MATRIX,
+    USER_SIG1, 
+    USER_ONE_SHOT, 
+    /* ... */
+    LED_MATRIX_MAX_SIG  /* the last signal */
+};
 
-#endif /* BSP_H_ */
+void Matrix_instantiate(void);
+extern SST_Task * const AO_Matrix;  /* opaque task pointer */
+
+#endif /* BLINKY_LED_MATRIX_H_H_ */

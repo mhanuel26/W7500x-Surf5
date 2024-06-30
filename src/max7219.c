@@ -158,7 +158,7 @@ const uint8_t ucSmallFont[] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3e,0x45,0x51
 
 static uint8_t iNumControllers;
 static uint16_t iCSPin;
-// static int file_spi = -1;
+static int file_spi = -1;
 static SSP_TypeDef* SSPx;
 
 static void SSPx_Master_Init(void);
@@ -474,10 +474,6 @@ int maxInit(uint8_t iNum, uint8_t bDecodeMode, uint8_t iChannel, uint8_t iSelect
 
 	GPIO_Init(GPIOA, &GPIO_InitStruct);  // GPIOX is the port to which the SSEL pin belongs.
 	GPIO_SetBits(GPIOA, iCSPin);   // Set the SSEL pin to HIGH
-
-	// AIOAddGPIO(iCSPin, GPIO_OUT);
-	// AIOWriteGPIO(iCSPin, 1);
-	
 
 	maxPowerUp(1); // turn on the LED controllers
 	maxSetLimit(8); // tell it to display 8 rows of 8 pixels

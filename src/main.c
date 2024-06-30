@@ -28,6 +28,7 @@
 #include "bsp.h"           /* Board Support Package interface */
 #include "blinky.h"        /* application shared interface */
 #include "webserver.h"        /* application shared interface */
+#include "led_matrix.h"
 
 
 /*..........................................................................*/
@@ -37,7 +38,6 @@ int main() {
 
     /* instantiate and start all SST tasks... */
     Blinky_instantiate();
-    
     static SST_Evt const *blinkyQSto[10]; /* Event queue storage */
     SST_Task_start(
         AO_Blinky,     /* AO pointer to start */
@@ -46,9 +46,17 @@ int main() {
         ARRAY_NELEM(blinkyQSto),   /* queue length */
         (void *)0);    /* initialization event (not used) */
 
-    Webserver_instantiate();
+    Matrix_instantiate();
+    static SST_Evt const *matrixQSto[10]; /* Event queue storage */
+    SST_Task_start(
+        AO_Matrix,     /* AO pointer to start */
+        1U,            /* SST-priority */
+        matrixQSto,    /* storage for the AO's queue */
+        ARRAY_NELEM(matrixQSto),   /* queue length */
+        (void *)0);    /* initialization event (not used) */        
 
-    static SST_Evt const *serverQSto[10]; /* Event queue storage */
+    Webserver_instantiate();
+    static SST_Evt const *serverQSto[100]; /* Event queue storage */
     SST_Task_start(
         AO_Server,     /* AO pointer to start */
         1U,            /* SST-priority */

@@ -96,7 +96,7 @@ static void Webserver_dispatch(Server * const me, SST_Evt const * const e) {
             if(Webserver_get_phyready()) {
                 WebServer(1, test_buf, 80);
             }
-            SST_TimeEvt_arm(&me->te1, BSP_TICKS_PER_SEC * 1U/10U, 0U);
+            SST_TimeEvt_arm(&me->te1, BSP_TICKS_PER_SEC * 1U/1000U, 0U);
             BSP_a0off();
             break;
         }
