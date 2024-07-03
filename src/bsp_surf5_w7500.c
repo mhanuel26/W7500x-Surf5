@@ -475,16 +475,16 @@ void SST_onStart(void) {
     /* Send event to led matrix max7219 controller */
     static MatrixWorkEvt const fInitDoneEvt = {
         .super.sig = USER_ONE_SHOT,
-        .text = "Surf5 Design Contest 2024.",
+        .text = "Surf5 Design Contest.",
         .scroll_iter = 1        // 0 here for one shot image send.
     };
     SST_Task_post(AO_Matrix, &fInitDoneEvt.super);
-    static MatrixWorkEvt const fInitDoneEvt2 = {
-        .super.sig = USER_ONE_SHOT,
-        .text = "CLOCK",
-        .scroll_iter = 0        // 0 here for one shot image send.
-    };
-    SST_Task_post(AO_Matrix, &fInitDoneEvt2.super);
+    // static MatrixWorkEvt const fInitDoneEvt2 = {
+    //     .super.sig = USER_ONE_SHOT,
+    //     .text = "CLOCK",
+    //     .scroll_iter = 0        // 0 here for one shot image send.
+    // };
+    // SST_Task_post(AO_Matrix, &fInitDoneEvt2.super);
 #endif
     
 }

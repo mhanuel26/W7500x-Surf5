@@ -131,7 +131,7 @@ static void Sntpserver_dispatch(Client * const me, SST_Evt const * const e) {
                 copy_datetime_object(&time);               
                 memset(fInitDoneEvt.text, 0, sizeof(fInitDoneEvt.text));
                 sprintf(fInitDoneEvt.text, "%02d:%02d:%02d", time.hh, time.mm, time.ss);
-                // SST_Task_post(AO_Matrix, &fInitDoneEvt.super);
+                SST_Task_post(AO_Matrix, &fInitDoneEvt.super);
                 printf("Software date-time:%d/%02d/%d-%02d:%02d:%02d\n\r", time.dd, time.mo, time.yy, time.hh, time.mm, time.ss);
                 SST_TimeEvt_arm(&me->te1, BSP_TICKS_PER_SEC * 1U, 0U);      /* update clock every second */
             }

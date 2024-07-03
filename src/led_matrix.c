@@ -52,6 +52,7 @@ static uint32_t scroll_iter = 0;
 static uint32_t pixel_scroll = 0;
 static int iPitch;
 static uint8_t bImg[40*8];
+static bool free = true;
 /*..........................................................................*/
 void Matrix_instantiate(void) {
     Matrix_ctor(&Matrix_inst);
@@ -91,6 +92,7 @@ static void Matrix_dispatch(Matrix * const me, SST_Evt const * const e) {
                     SST_TimeEvt_arm(&me->te1, 40U, 0U);
                 }else{
                     pixel_scroll = 0;
+                    free = true;
                 }
             }
 #endif
@@ -99,19 +101,23 @@ static void Matrix_dispatch(Matrix * const me, SST_Evt const * const e) {
         }
         case USER_ONE_SHOT: {
             BSP_a1on();
+            
             const char * tmp = SST_EVT_DOWNCAST(MatrixWorkEvt, e)->text;
 #ifdef SEVEN_SEGMENT
             maxSegmentString((char*)tmp);
 #else
-            scroll_iter = SST_EVT_DOWNCAST(MatrixWorkEvt, e)->scroll_iter;
-            iPitch = BYTES_PER_LINE;
-            pixel_scroll = iPitch*8;
-            memset(bImg, 0, iPitch*8);
-            maxDrawString((char*)tmp, bImg, iPitch, 1); // draw narrow digits
-            if(scroll_iter > 0){
-                SST_TimeEvt_arm(&me->te1, 1U, 0U);
-            }else{
-                maxSendImage(bImg, iPitch);
+            if(free){
+                scroll_iter = SST_EVT_DOWNCAST(MatrixWorkEvt, e)->scroll_iter;
+                iPitch = BYTES_PER_LINE;
+                pixel_scroll = iPitch*8;
+                memset(bImg, 0, iPitch*8);
+                maxDrawString((char*)tmp, bImg, iPitch, 1); // draw narrow digits
+                if(scroll_iter > 0){
+                    SST_TimeEvt_arm(&me->te1, 1U, 0U);
+                }else{
+                    maxSendImage(bImg, iPitch);
+                }
+                free = false;
             }
 #endif
             BSP_a1off();
