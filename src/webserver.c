@@ -25,7 +25,7 @@
 ============================================================================*/
 #include "sst.h"           /* SST framework */
 #include "bsp.h"           /* Board Support Package interface */
-#include "webserver.h"           /* Board Support Package interface */
+#include "server.h"           /* Board Support Package interface */
 #include "wizchip_conf.h"
 #include "w7500x.h"
 #include <stdio.h>
@@ -43,7 +43,7 @@ typedef struct {
     volatile uint8_t phy_rdy;
 } Server;
 
-extern uint8_t test_buf[DATA_BUF_SIZE];
+extern uint8_t srv_buf[DATA_BUF_SIZE];
 
 static void Webserver_ctor(Server * const me);
 static void Webserver_init(Server * const me, SST_Evt const * const ie);
@@ -94,7 +94,7 @@ static void Webserver_dispatch(Server * const me, SST_Evt const * const e) {
         case GET_SN_SR_SIG: {
             BSP_a0on();
             if(Webserver_get_phyready()) {
-                WebServer(1, test_buf, 80);
+                WebServer(SOCKET_WEB, srv_buf, 80);
             }
             SST_TimeEvt_arm(&me->te1, BSP_TICKS_PER_SEC * 1U/1000U, 0U);
             BSP_a0off();

@@ -26,9 +26,14 @@
 #ifndef BSP_H_
 #define BSP_H_
 
+#define TRUE    0x01
+#define FALSE   0x00
+
 // #define SEVEN_SEGMENT
 #define BSP_TICKS_PER_SEC 1000U
 #define DATA_BUF_SIZE 2048
+#define WEBSRV_SN       1
+#define SOCKET_SNTP     0
 
 void BSP_init(void);
 
@@ -38,6 +43,8 @@ void BSP_a0on(void);
 void BSP_a0off(void);
 void BSP_a1on(void);
 void BSP_a1off(void);
+void BSP_c0on(void);
+void BSP_c0off(void);
 void BSP_cs_assert(void);
 void BSP_cs_deassert(void);
 

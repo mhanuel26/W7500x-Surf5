@@ -27,8 +27,8 @@
 #include "sst.h"           /* SST framework */
 #include "bsp.h"           /* Board Support Package interface */
 #include "blinky.h"        /* application shared interface */
-#include "webserver.h"        /* application shared interface */
-#include "led_matrix.h"
+#include "server.h"        /* application shared interface for web server and sntp */
+#include "led_matrix.h"    /* application shared interface for led matrix using max7219 */
 
 
 /*..........................................................................*/
@@ -41,16 +41,16 @@ int main() {
     static SST_Evt const *blinkyQSto[10]; /* Event queue storage */
     SST_Task_start(
         AO_Blinky,     /* AO pointer to start */
-        2U,            /* SST-priority */ 
+        3U,            /* SST-priority */ 
         blinkyQSto,    /* storage for the AO's queue */
         ARRAY_NELEM(blinkyQSto),   /* queue length */
         (void *)0);    /* initialization event (not used) */
 
     Matrix_instantiate();
-    static SST_Evt const *matrixQSto[10]; /* Event queue storage */
+    static SST_Evt const *matrixQSto[100]; /* Event queue storage */
     SST_Task_start(
         AO_Matrix,     /* AO pointer to start */
-        1U,            /* SST-priority */
+        2U,            /* SST-priority */
         matrixQSto,    /* storage for the AO's queue */
         ARRAY_NELEM(matrixQSto),   /* queue length */
         (void *)0);    /* initialization event (not used) */        
@@ -63,6 +63,15 @@ int main() {
         serverQSto,    /* storage for the AO's queue */
         ARRAY_NELEM(serverQSto),   /* queue length */
         (void *)0);    /* initialization event (not used) */    
+
+    Sntpserver_instantiate();
+    static SST_Evt const *sntpQSto[10]; /* Event queue storage */
+    SST_Task_start(
+        AO_Sntp,     /* AO pointer to start */
+        1U,            /* SST-priority */
+        sntpQSto,    /* storage for the AO's queue */
+        ARRAY_NELEM(sntpQSto),   /* queue length */
+        (void *)0);    /* initialization event (not used) */   
 
     return SST_Task_run(); /* run the SST tasks */
     /* NOTE; in embedded systems SST_Task_run() should not return */

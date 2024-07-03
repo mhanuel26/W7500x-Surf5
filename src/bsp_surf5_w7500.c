@@ -30,7 +30,7 @@
 #include "sst.h"
 #include "bsp.h"
 #include "blinky.h"
-#include "webserver.h"
+#include "server.h"
 #include "led_matrix.h"
 #include "max7219.h"
 #include <string.h>
@@ -38,12 +38,18 @@
 /* add other drivers if necessary... */
 #include "wizchip_conf.h"
 #include "dhcp.h"
+#include "sntp.h"
 DBC_MODULE_NAME("bsp_surf5_w7500") /* for DBC assertions in this module */
 
-uint8_t test_buf[DATA_BUF_SIZE];
+uint8_t srv_buf[DATA_BUF_SIZE];
 wiz_NetInfo gWIZNETINFO;
 char cTemp[32];
 uint8_t bImg[BYTES_PER_LINE*8];
+/* SNTP */
+static uint8_t g_sntp_buf[DATA_BUF_SIZE] = {
+    0,
+};
+static uint8_t g_sntp_server_ip[4] = {216, 239, 35, 0}; // time.google.com
 /* Local-scope defines -----------------------------------------------------*/
 static void BSP_GPIO_Config(void);
 static void BSP_UART_Config(void);
@@ -100,7 +106,7 @@ void assert_failed(char const * const module, int const label) {
 /* repurpose regular IRQs for SST Tasks */
 /* prototypes */
 /**
- * @brief  This function handles RTC Handler for SST Task Server.
+ * @brief  This function handles RTC Handler for SST Task WebServer.
  * @param  None
  * @retval None
  */
@@ -117,8 +123,7 @@ void PWM7_Handler(void);
 
 void PWM7_Handler(void)	{ 
     SST_Task_activate(AO_Blinky);  
-} 
-
+}
 /**
  * @brief  This function handles PWM6 for Led Matrix Task
  * @param  None
@@ -129,7 +134,16 @@ void PWM6_Handler(void);
 void PWM6_Handler(void)	{ 
     SST_Task_activate(AO_Matrix);  
 } 
+/**
+ * @brief  This function handles PWM7 for Blinky Task
+ * @param  None
+ * @retval None
+ */
+void PWM5_Handler(void);
 
+void PWM5_Handler(void)	{ 
+    SST_Task_activate(AO_Sntp);  
+} 
 
 #else /* use reserved IRQs for SST Tasks */
 /* prototypes */
@@ -158,9 +172,10 @@ void BSP_init(void) {
     /* assign IRQs to tasks. NOTE: critical for SST... */
 #ifdef REGULAR_IRQS
     /* repurpose regular IRQs for SST Tasks */
+    SST_Task_setIRQ(AO_Sntp,    PWM5_IRQn);
+    SST_Task_setIRQ(AO_Matrix,  PWM6_IRQn);
     SST_Task_setIRQ(AO_Blinky,  PWM7_IRQn);
     SST_Task_setIRQ(AO_Server,  RTC_IRQn);
-    SST_Task_setIRQ(AO_Matrix,  PWM6_IRQn);
 #else
     /* use reserved IRQs for SST Tasks */
     SST_Task_setIRQ(AO_Blinky,  14U);
@@ -219,6 +234,11 @@ static void BSP_GPIO_Config(void)
     GPIO_InitStructure.GPIO_Direction = GPIO_Direction_OUT;
     GPIO_InitStructure.GPIO_AF = PAD_AF0;
     GPIO_Init(GPIOA, &GPIO_InitStructure);
+    /* Init a GPIO for SNTP Task Debug Monitoring using Logic Analyser*/
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
+    GPIO_InitStructure.GPIO_Direction = GPIO_Direction_OUT;
+    GPIO_InitStructure.GPIO_AF = PAD_AF1;
+    GPIO_Init(GPIOC, &GPIO_InitStructure);    
 }
 
 /* SURF5 LED2 */
@@ -230,6 +250,9 @@ void BSP_a0off(void) { GPIO_ResetBits(GPIOA, GPIO_Pin_0); }
 /* SURF5 GPIOA 1 */
 void BSP_a1on(void) { GPIO_SetBits(GPIOA, GPIO_Pin_1); }
 void BSP_a1off(void) { GPIO_ResetBits(GPIOA, GPIO_Pin_1); }
+/* SURF5 GPIOC 0 */
+void BSP_c0on(void) { GPIO_SetBits(GPIOC, GPIO_Pin_0); }
+void BSP_c0off(void) { GPIO_ResetBits(GPIOC, GPIO_Pin_0); }
 
 void BSP_cs_assert(void) { GPIO_ResetBits(GPIOA, GPIO_Pin_5); }
 void BSP_cs_deassert(void) { GPIO_SetBits(GPIOA, GPIO_Pin_5); }
@@ -356,17 +379,22 @@ void SST_onStart(void) {
     printf("SystemClock : %d\r\n", (int) GetSystemClock());
 
     /* set priorities of ISRs used in the system */
-    NVIC_InitStructure.NVIC_IRQChannel = PWM7_IRQn;
+    /* PWM5 ISR for Blinky */
+    NVIC_InitStructure.NVIC_IRQChannel = PWM5_IRQn;
     NVIC_InitStructure.NVIC_IRQChannelPriority = 0x1;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
-
-    /* set priorities of ISRs used in the system */
+    /* PWM7 ISR for Blinky */
+    NVIC_InitStructure.NVIC_IRQChannel = PWM7_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPriority = 0x3;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
+    /* PWM6 ISR for LED Matrix Task */
     NVIC_InitStructure.NVIC_IRQChannel = PWM6_IRQn;
     NVIC_InitStructure.NVIC_IRQChannelPriority = 0x2;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
-
+    /* RTC ISR for Web Server Task */
     NVIC_InitStructure.NVIC_IRQChannel = SysTick_IRQn;
     NVIC_InitStructure.NVIC_IRQChannelPriority = 0x0;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
@@ -389,7 +417,7 @@ void SST_onStart(void) {
     Network_Config();
 
     /* DHCP Process */
-    DHCP_init(0, test_buf);
+    DHCP_init(0, srv_buf);
     reg_dhcp_cbfunc(dhcp_assign, dhcp_update, dhcp_conflict);
     if (gWIZNETINFO.dhcp == NETINFO_DHCP) {       // DHCP
         printf("Start DHCP\r\n");
@@ -414,7 +442,18 @@ void SST_onStart(void) {
     /* Network information setting after DHCP operation.    
      * Displays the network information allocated by DHCP. */
     Network_Config();
-    Webserver_set_phyready();
+    /* Init SNTP Stack */
+    SNTP_init(SOCKET_SNTP, g_sntp_server_ip, TIMEZONE, g_sntp_buf);
+    /* signal our webserver task the PHY is ready */
+    // Webserver_set_phyready();
+
+    /* Send event to SNTP task */
+    static SntpWorkEvt const PhyInitDoneEvt = {
+        .super.sig = SNTP_RUN,
+        // .super.sig = GET_SN_SR_SIG,
+        
+    };
+    SST_Task_post(AO_Sntp, &PhyInitDoneEvt.super);
 
     /* Initialize the dot-matrix library
 	 * num controllers, BCD mode, SPI channel, GPIO pin number for CS*/ 
@@ -436,10 +475,16 @@ void SST_onStart(void) {
     /* Send event to led matrix max7219 controller */
     static MatrixWorkEvt const fInitDoneEvt = {
         .super.sig = USER_ONE_SHOT,
-        .text = "max7219 sst scroll task!",
-        .scroll_iter = 2        // 0 here for one shot image send.
+        .text = "Surf5 Design Contest 2024.",
+        .scroll_iter = 1        // 0 here for one shot image send.
     };
     SST_Task_post(AO_Matrix, &fInitDoneEvt.super);
+    static MatrixWorkEvt const fInitDoneEvt2 = {
+        .super.sig = USER_ONE_SHOT,
+        .text = "CLOCK",
+        .scroll_iter = 0        // 0 here for one shot image send.
+    };
+    SST_Task_post(AO_Matrix, &fInitDoneEvt2.super);
 #endif
     
 }

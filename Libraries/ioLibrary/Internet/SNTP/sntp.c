@@ -250,6 +250,7 @@ void SNTP_init(uint8_t s, uint8_t *ntp_server, uint8_t tz, uint8_t *buf)
 
 int8_t SNTP_run(datetime *time)
 {
+	int8_t   res=0;
 	uint16_t RSR_len;
 	uint32_t destip = 0;
 	uint16_t destport;
@@ -273,11 +274,10 @@ int8_t SNTP_run(datetime *time)
 
 			ntp_retry_cnt=0;
 			close(NTP_SOCKET);
-
-			return 1;
+			res = 1;
 		}
 
-		if(ntp_retry_cnt<0xFFFF)
+		if(ntp_retry_cnt<SNTP_TIMEOUT)
 		{
 			if(ntp_retry_cnt==0)//first send request, no need to wait
 			{
@@ -286,7 +286,7 @@ int8_t SNTP_run(datetime *time)
 			}
 			else // send request again? it should wait for a while
 			{
-				if((ntp_retry_cnt % 0xFFF) == 0) //wait time
+				if((ntp_retry_cnt % SNTP_RETRY_DLY) == 0) //wait time
 				{
 					sendto(NTP_SOCKET,ntpmessage,sizeof(ntpmessage),NTPformat.dstaddr,ntp_port);
 #ifdef _SNTP_DEBUG_
@@ -298,6 +298,7 @@ int8_t SNTP_run(datetime *time)
 		}
 		else //ntp retry fail
 		{
+			res = -1;
 			ntp_retry_cnt=0;
 #ifdef _SNTP_DEBUG_
 			printf("ntp retry failed!\r\n");
@@ -310,8 +311,10 @@ int8_t SNTP_run(datetime *time)
 		break;
 	}
 	// Return value
-	// 0 - failed / 1 - success
-	return 0;
+	// -1: failed - expired timeout 
+	//  0 - wait-socket open
+	//  1 - success
+	return res;
 }
 
 void calcdatetime(tstamp seconds)
@@ -320,7 +323,9 @@ void calcdatetime(tstamp seconds)
 	tstamp n=0,d=0,total_d=0,rz=0;
 	uint16_t y=0,r=0,yr=0;
 	signed long long yd=0;
+	tstamp tmpseconds;
 
+	tmpseconds = seconds;
 	n = seconds;
 	total_d = seconds/(SECS_PERDAY);
 	d=0;
@@ -393,10 +398,10 @@ void calcdatetime(tstamp seconds)
 	Nowdatetime.dd=yr;
 
 	//calculation for time
-	seconds = seconds%SECS_PERDAY;
-	Nowdatetime.hh = seconds/3600;
-	Nowdatetime.mm = (seconds%3600)/60;
-	Nowdatetime.ss = (seconds%3600)%60;
+	tmpseconds = seconds%SECS_PERDAY;
+	Nowdatetime.hh = tmpseconds/3600;
+	Nowdatetime.mm = (tmpseconds%3600)/60;
+	Nowdatetime.ss = (tmpseconds%3600)%60;
 
 }
 
@@ -442,7 +447,7 @@ tstamp changedatetime_to_seconds(void)
 		}
 	}
 
-	seconds = (total_day+Nowdatetime.dd-1)*24*3600;
+	seconds = (total_day+Nowdatetime.dd)*24*3600;
 	seconds += Nowdatetime.ss;//seconds
 	seconds += Nowdatetime.mm*60;//minute
 	seconds += Nowdatetime.hh*3600;//hour

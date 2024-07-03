@@ -10,6 +10,7 @@ add_executable(${TARGET_NAME}
   ${CMAKE_SOURCE_DIR}/src/bsp_surf5_w7500.c
   ${CMAKE_SOURCE_DIR}/src/blinky.c
   ${CMAKE_SOURCE_DIR}/src/webserver.c
+  ${CMAKE_SOURCE_DIR}/src/sntp_client.c
   ${CMAKE_SOURCE_DIR}/src/max7219.c
   ${CMAKE_SOURCE_DIR}/src/led_matrix.c
   ${CMAKE_SOURCE_DIR}/Libraries/sst_c/src/sst.c
@@ -42,6 +43,7 @@ target_link_libraries(${TARGET_NAME} PRIVATE
     WDT_FILES
     DNS_FILES
     DHCP_FILES
+    SNTP_FILES
     SOCKET_FILES
     LOOPBACK_FILES
     WIZCHIP_CONF_FILES

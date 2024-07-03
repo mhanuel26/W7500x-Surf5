@@ -63,6 +63,9 @@ typedef struct _datetime
 #define UTC_ADJ_HRS		9              	        // SEOUL : GMT+9
 #define EPOCH			    1900                    // NTP start year
 
+#define SNTP_TIMEOUT	1000 //0xFFFF	// original library timeout
+#define SNTP_RETRY_DLY	200 //0xFFF		// original library retry delay	
+
 void get_seconds_from_ntp_server(uint8_t *buf, uint16_t idx);
 void SNTP_init(uint8_t s, uint8_t *ntp_server, uint8_t tz, uint8_t *buf);
 int8_t SNTP_run(datetime *time);

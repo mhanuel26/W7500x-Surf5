@@ -257,9 +257,9 @@ void PWM4_Handler(void)
  * @param  None
  * @retval None
  */
-void PWM5_Handler(void)
-{
-}
+// void PWM5_Handler(void)
+// {
+// }
 
 /**
  * @brief  This function handles PWM6 Handler.

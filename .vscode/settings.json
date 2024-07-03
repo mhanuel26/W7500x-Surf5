@@ -15,7 +15,10 @@
         "dhcp.h": "c",
         "bsp.h": "c",
         "led_matrix.h": "c",
-        "dbc_assert.h": "c"
+        "dbc_assert.h": "c",
+        "sntp_srv.h": "c",
+        "server.h": "c",
+        "sntp.h": "c"
     },
     "cortex-debug.variableUseNaturalFormat": true
 }
