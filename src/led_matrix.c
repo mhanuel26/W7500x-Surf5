@@ -114,10 +114,10 @@ static void Matrix_dispatch(Matrix * const me, SST_Evt const * const e) {
                 maxDrawString((char*)tmp, bImg, iPitch, 1); // draw narrow digits
                 if(scroll_iter > 0){
                     SST_TimeEvt_arm(&me->te1, 1U, 0U);
+                    free = false;
                 }else{
                     maxSendImage(bImg, iPitch);
                 }
-                free = false;
             }
 #endif
             BSP_a1off();
