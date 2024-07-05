@@ -66,8 +66,11 @@ typedef struct _datetime
 #define SNTP_TIMEOUT	1000 //0xFFFF	// original library timeout
 #define SNTP_RETRY_DLY	200 //0xFFF		// original library retry delay	
 
+#define 	US	0
+#define 	EU	1
+
 void get_seconds_from_ntp_server(uint8_t *buf, uint16_t idx);
-void SNTP_init(uint8_t s, uint8_t *ntp_server, uint8_t tz, uint8_t *buf);
+void SNTP_init(uint8_t s, uint8_t *ntp_server, uint8_t tz, uint8_t dst_reg, uint8_t *buf);
 int8_t SNTP_run(datetime *time);
 tstamp changedatetime_to_seconds(void);
 void calcdatetime(tstamp seconds);

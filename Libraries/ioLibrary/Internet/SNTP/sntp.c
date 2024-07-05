@@ -19,6 +19,44 @@ uint8_t *data_buf;
 uint8_t NTP_SOCKET;
 uint8_t time_zone;
 uint16_t ntp_retry_cnt=0; //counting the ntp retry number
+uint8_t DST_region;
+
+
+int dstOffset (void)
+{
+  //Receives unix epoch time and returns seconds of offset for local DST
+  //Valid thru 2099 for US only, Calculations from "http://www.webexhibits.org/daylightsaving/i.html"
+  //Code idea from jm_wsb @ "http://forum.arduino.cc/index.php/topic,40286.0.html"
+  //Get epoch times @ "http://www.epochconverter.com/" for testing
+  //DST update wont be reflected until the next time sync
+  int beginDSTDay; 
+  int beginDSTMonth;
+  int endDSTDay;
+  int endDSTMonth;
+  if(DST_region == US){
+	beginDSTDay = (14 - (1 + Nowdatetime.yy * 5 / 4) % 7);  
+	beginDSTMonth=3;
+	endDSTDay = (7 - (1 + Nowdatetime.yy * 5 / 4) % 7);
+	endDSTMonth=11;
+  }
+  else if(DST_region == EU){
+	beginDSTDay = (31 - (4 + Nowdatetime.yy * 5 / 4) % 7);  
+	beginDSTMonth=3;
+	endDSTDay = (31 - (1 + Nowdatetime.yy * 5 / 4) % 7);
+	endDSTMonth=10;
+  }else{
+	return(0);		// no adjustment made
+  }
+
+  if (((Nowdatetime.mo > beginDSTMonth) && (Nowdatetime.mo < endDSTMonth))
+    || ((Nowdatetime.mo == beginDSTMonth) && (Nowdatetime.dd > beginDSTDay))
+    || ((Nowdatetime.mo == beginDSTMonth) && (Nowdatetime.dd == beginDSTDay) && (Nowdatetime.hh >= 2))
+    || ((Nowdatetime.mo == endDSTMonth) && (Nowdatetime.dd < endDSTDay))
+    || ((Nowdatetime.mo == endDSTMonth) && (Nowdatetime.dd == endDSTDay) && (Nowdatetime.hh < 1)))
+    return (3600);  //Add back in one hours worth of seconds - DST in effect
+  else
+    return (0);  //NonDST
+}
 
 /*
 00)UTC-12:00 Baker Island, Howland Island (both uninhabited)
@@ -214,9 +252,11 @@ void get_seconds_from_ntp_server(uint8_t *buf, uint16_t idx)
 
 	//calculation for date
 	calcdatetime(seconds);
+	seconds += dstOffset();
+	calcdatetime(seconds);
 }
 
-void SNTP_init(uint8_t s, uint8_t *ntp_server, uint8_t tz, uint8_t *buf)
+void SNTP_init(uint8_t s, uint8_t *ntp_server, uint8_t tz, uint8_t dst_reg, uint8_t *buf)
 {
 	NTP_SOCKET = s;
 
@@ -226,7 +266,7 @@ void SNTP_init(uint8_t s, uint8_t *ntp_server, uint8_t tz, uint8_t *buf)
 	NTPformat.dstaddr[3] = ntp_server[3];
 
 	time_zone = tz;
-
+	DST_region = dst_reg;
 	data_buf = buf;
 
 	uint8_t Flag;

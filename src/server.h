@@ -27,10 +27,12 @@
 #define WEB_SERVER_H_
 
 #include "dbc_assert.h" /* Design By Contract (DBC) assertions */
+#include "sntp.h"
 
 #define SNTP_REFRESH    60      /* Refresh Clock Rate in seconds using SNTP*/
 /* Timezone */
 #define TIMEZONE 21     // Ireland
+#define DST_REGION      EU
 
 #define SOCKET_SNTP     2
 #define SOCKET_WEB      1

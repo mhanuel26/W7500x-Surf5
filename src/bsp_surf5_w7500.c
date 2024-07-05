@@ -443,7 +443,7 @@ void SST_onStart(void) {
      * Displays the network information allocated by DHCP. */
     Network_Config();
     /* Init SNTP Stack */
-    SNTP_init(SOCKET_SNTP, g_sntp_server_ip, TIMEZONE, g_sntp_buf);
+    SNTP_init(SOCKET_SNTP, g_sntp_server_ip, TIMEZONE, DST_REGION, g_sntp_buf);
     /* signal our webserver task the PHY is ready */
     // Webserver_set_phyready();
 
