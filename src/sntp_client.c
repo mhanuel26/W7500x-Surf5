@@ -65,6 +65,14 @@ static MatrixWorkEvt fInitDoneEvt = {
     .text = "",
     .scroll_iter = 0        // 0 here for one shot image send.
 };
+static bool toogle_colon = TRUE;
+#ifdef FONT_SIZE_6X8
+static char const fmt_colon_on[] = {"%02d:%02d"};
+static char const fmt_colon_off[] = {"%02d %02d"};
+#else
+static char const fmt_colon_on[] = {"%02d:%02d:%02d"};
+static char const fmt_colon_off[] = {"%02d:%02d:%02d"};
+#endif
 /*..........................................................................*/
 static Client Sntpserver_inst; /* the Blinky instance */
 SST_Task * const AO_Sntp = &Sntpserver_inst.super; /* opaque AO pointer */
@@ -129,9 +137,16 @@ static void Sntpserver_dispatch(Client * const me, SST_Evt const * const e) {
                 tstamp tmp = changedatetime_to_seconds() + 1;
                 calcdatetime(tmp);
                 copy_datetime_object(&time);               
+#ifdef FONT_SIZE_6X8
                 memset(fInitDoneEvt.text, 0, sizeof(fInitDoneEvt.text));
-                sprintf(fInitDoneEvt.text, "%02d:%02d:%02d", time.hh, time.mm, time.ss);
+                if(toogle_colon){
+                    sprintf(fInitDoneEvt.text, fmt_colon_on, time.hh, time.mm);
+                }else{
+                    sprintf(fInitDoneEvt.text, fmt_colon_off, time.hh, time.mm);
+                }
+                toogle_colon ^= TRUE;
                 SST_Task_post(AO_Matrix, &fInitDoneEvt.super);
+#endif
                 printf("Software date-time:%d/%02d/%d-%02d:%02d:%02d\n\r", time.dd, time.mo, time.yy, time.hh, time.mm, time.ss);
                 SST_TimeEvt_arm(&me->te1, BSP_TICKS_PER_SEC * 1U, 0U);      /* update clock every second */
             }

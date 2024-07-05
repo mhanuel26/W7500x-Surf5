@@ -30,6 +30,8 @@
 
 #define BYTES_PER_LINE  24
 
+#define FONT_SIZE_6X8       
+
 typedef struct {
     SST_Evt super;    /* inherit SST_Evt */
     char text[40]; /* number of toggles of the signal */
