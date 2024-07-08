@@ -92,12 +92,16 @@ static void Webserver_init(Server * const me, SST_Evt const * const ie) {
 static void Webserver_dispatch(Server * const me, SST_Evt const * const e) {
     switch (e->sig) {
         case GET_SN_SR_SIG: {
+#if WEB_DBG_BLIP
             BSP_a0on();
+#endif
             if(Webserver_get_phyready()) {
                 WebServer(SOCKET_WEB, srv_buf, 80);
             }
             SST_TimeEvt_arm(&me->te1, BSP_TICKS_PER_SEC * 1U/1000U, 0U);
+#if WEB_DBG_BLIP
             BSP_a0off();
+#endif
             break;
         }
         default: {

@@ -45,7 +45,7 @@ static void Blinky_dispatch(Blinky * const me, SST_Evt const * const e);
 /*..........................................................................*/
 static Blinky Blinky_inst; /* the Blinky instance */
 SST_Task * const AO_Blinky = &Blinky_inst.super; /* opaque AO pointer */
-
+static bool toogle_blink = false;
 /*..........................................................................*/
 void Blinky_instantiate(void) {
     Blinky_ctor(&Blinky_inst);
@@ -76,13 +76,13 @@ static void Blinky_init(Blinky * const me, SST_Evt const * const ie) {
 static void Blinky_dispatch(Blinky * const me, SST_Evt const * const e) {
     switch (e->sig) {
         case TIMEOUT1_SIG: {
-            BSP_ledOn();
-            SST_TimeEvt_arm(&me->te2, BSP_TICKS_PER_SEC / 4U, 0U);
+            BSP_ledOn();    
+            SST_TimeEvt_arm(&me->te2, BSP_TICKS_PER_SEC / 20U, 0U);
             break;
         }
         case TIMEOUT2_SIG: {
             BSP_ledOff();
-            SST_TimeEvt_arm(&me->te1, BSP_TICKS_PER_SEC * 3U/4U, 0U);
+            SST_TimeEvt_arm(&me->te1, BSP_TICKS_PER_SEC / 20U, 0U);
             break;
         }
         default: {
@@ -98,6 +98,7 @@ static void Blinky_dispatch(Blinky * const me, SST_Evt const * const e) {
 
 static void Blinky_init(Blinky * const me, SST_Evt const * const ie) {
     (void)ie; /* unused parameter */
+    // SST_TimeEvt_arm(&me->te1, 1U/10U, 0U);
     SST_TimeEvt_arm(&me->te1, 1U,                          BSP_TICKS_PER_SEC);
     SST_TimeEvt_arm(&me->te2, 1U + (BSP_TICKS_PER_SEC/4U), BSP_TICKS_PER_SEC);
 }
@@ -106,12 +107,10 @@ static void Blinky_dispatch(Blinky * const me, SST_Evt const * const e) {
     switch (e->sig) {
         case TIMEOUT1_SIG: {
             BSP_ledOn();
-            // printf("LED ON!\r\n");
             break;
         }
         case TIMEOUT2_SIG: {
             BSP_ledOff();
-            // printf("LED OFF!\r\n");
             break;
         }
         default: {

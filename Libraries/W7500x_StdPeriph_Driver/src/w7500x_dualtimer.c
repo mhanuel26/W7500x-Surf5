@@ -323,6 +323,27 @@ void DUALTIMER_ClearIT(DUALTIMER_TypeDef* DUALTIMERn)
     DUALTIMERn->INTCLR = DUALTIMER_INTCLR_TIC;
 }
 
+
+/**
+ * @brief  Get the Timer Value value.
+ * @note   The Timer Value register contains the current value of the decrementing counter.
+ * @param  DUALTIMERn: where n can be 0_0, 0_1, 1_0 and 1_1 to select the Timer peripheral.
+ *          This parameter can be one of the following values:
+ *            @arg DUALTIMER0_0
+ *            @arg DUALTIMER0_1
+ *            @arg DUALTIMER1_0
+ *            @arg DUALTIMER1_1
+ * @retval The Timer Value value of which format is 32bit.
+ */
+uint32_t DUALTIMER_GetValue(DUALTIMER_TypeDef* DUALTIMERn)
+{
+    /* Check the parameters */
+    assert_param(IS_DUALTIMER_PERIH(DUALTIMERn));
+
+    /* Get the Timer Load Register value */
+    return DUALTIMERn->VALUE;
+}
+
 /**
  * @}
  */

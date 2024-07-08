@@ -36,6 +36,8 @@
 #define SOCKET_SNTP     0
 
 void BSP_init(void);
+uint32_t micros(void);
+
 
 void BSP_ledOn(void);
 void BSP_ledOff(void);

@@ -29,7 +29,7 @@
 #include "blinky.h"        /* application shared interface */
 #include "server.h"        /* application shared interface for web server and sntp */
 #include "led_matrix.h"    /* application shared interface for led matrix using max7219 */
-
+#include "ir_ctrl_task.h"  /* application shared interface for IR control task */
 
 /*..........................................................................*/
 int main() {
@@ -44,6 +44,15 @@ int main() {
         3U,            /* SST-priority */ 
         blinkyQSto,    /* storage for the AO's queue */
         ARRAY_NELEM(blinkyQSto),   /* queue length */
+        (void *)0);    /* initialization event (not used) */
+
+    IrCtrl_instantiate();
+    static SST_Evt const *ircontrolQSto[10]; /* Event queue storage */
+    SST_Task_start(
+        AO_IrCtrl,     /* AO pointer to start */
+        3U,            /* SST-priority */ 
+        ircontrolQSto,    /* storage for the AO's queue */
+        ARRAY_NELEM(ircontrolQSto),   /* queue length */
         (void *)0);    /* initialization event (not used) */
 
     Matrix_instantiate();

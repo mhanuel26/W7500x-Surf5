@@ -37,6 +37,7 @@
 #include "w7500x.h"  /* CMSIS-compliant header file for the MCU used */
 /* add other drivers if necessary... */
 #include "wizchip_conf.h"
+#include "ir_ctrl_task.h"
 #include "dhcp.h"
 #include "sntp.h"
 DBC_MODULE_NAME("bsp_surf5_w7500") /* for DBC assertions in this module */
@@ -50,6 +51,9 @@ static uint8_t g_sntp_buf[DATA_BUF_SIZE] = {
     0,
 };
 static uint8_t g_sntp_server_ip[4] = {216, 239, 35, 0}; // time.google.com
+
+static uint32_t micros_last;
+static uint32_t micros_acc = 0;
 /* Local-scope defines -----------------------------------------------------*/
 static void BSP_GPIO_Config(void);
 static void BSP_UART_Config(void);
@@ -104,6 +108,16 @@ void assert_failed(char const * const module, int const label) {
 
 #ifdef REGULAR_IRQS
 /* repurpose regular IRQs for SST Tasks */
+
+/**
+ * @brief  This function handles PWM4 Handler for SSR Task IR Remote Control.
+ * @param  None
+ * @retval None
+ */
+void PWM4_Handler(void)
+{
+    SST_Task_activate(AO_IrCtrl);  
+}
 /* prototypes */
 /**
  * @brief  This function handles RTC Handler for SST Task WebServer.
@@ -154,24 +168,15 @@ void Reserved14_IRQHandler(void) { SST_Task_activate(AO_Blinky);  }
 
 /* BSP functions ===========================================================*/
 void BSP_init(void) {
-    /* Configure the MPU to prevent NULL-pointer dereferencing
-    * see: www.state-machine.com/null-pointer-protection-with-arm-cortex-m-mpu
-    */
-//    MPU->RBAR = 0x0U                          /* base address (NULL) */
-//                | MPU_RBAR_VALID_Msk          /* valid region */
-//                | (MPU_RBAR_REGION_Msk & 7U); /* region #7 */
-//    MPU->RASR = (7U << MPU_RASR_SIZE_Pos)     /* 2^(7+1) region */
-//                | (0x0U << MPU_RASR_AP_Pos)   /* no-access region */
-//                | MPU_RASR_ENABLE_Msk;        /* region enable */
+    /* Configure the MPU is not possible on ARM-Cortex M0 */
 
-//    MPU->CTRL = MPU_CTRL_PRIVDEFENA_Msk       /* enable background region */
-//                | MPU_CTRL_ENABLE_Msk;        /* enable the MPU */
     __ISB();
     __DSB();
 
     /* assign IRQs to tasks. NOTE: critical for SST... */
 #ifdef REGULAR_IRQS
     /* repurpose regular IRQs for SST Tasks */
+    SST_Task_setIRQ(AO_IrCtrl,  PWM4_IRQn);
     SST_Task_setIRQ(AO_Sntp,    PWM5_IRQn);
     SST_Task_setIRQ(AO_Matrix,  PWM6_IRQn);
     SST_Task_setIRQ(AO_Blinky,  PWM7_IRQn);
@@ -218,8 +223,12 @@ static void BSP_UART_Config(void)
  */
 static void BSP_GPIO_Config(void)
 {
-    /* Surf5 USER LED GPIO */
+    /* Surf5 GPIO init routine*/
     GPIO_InitTypeDef GPIO_InitStructure;
+    GPIO_ITInitTypeDef GPIO_ITInitStructure;
+    NVIC_InitTypeDef NVIC_InitStructure;
+
+    /* Init LED GPIO of Surf5 board */
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;
     GPIO_InitStructure.GPIO_Direction = GPIO_Direction_OUT;
     GPIO_InitStructure.GPIO_AF = PAD_AF1;
@@ -239,6 +248,24 @@ static void BSP_GPIO_Config(void)
     GPIO_InitStructure.GPIO_Direction = GPIO_Direction_OUT;
     GPIO_InitStructure.GPIO_AF = PAD_AF1;
     GPIO_Init(GPIOC, &GPIO_InitStructure);    
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;
+    GPIO_InitStructure.GPIO_Direction = GPIO_Direction_IN;
+    GPIO_InitStructure.GPIO_Pad = GPIO_InputBufferEnable | GPIO_CMOS | GPIO_PuPd_UP;
+    GPIO_InitStructure.GPIO_AF = PAD_AF1;
+    GPIO_Init(GPIOC, &GPIO_InitStructure);
+
+    GPIO_ITInitStructure.GPIO_IT_Pin = GPIO_Pin_4;
+    GPIO_ITInitStructure.GPIO_IT_Polarity = GPIO_IT_LowFalling; //GPIO_IT_HighRising;
+    GPIO_ITInitStructure.GPIO_IT_Type = GPIO_IT_Edge;
+    GPIO_IT_Init(GPIOC, &GPIO_ITInitStructure);
+    GPIO_ITConfig(GPIOC, GPIO_Pin_4, ENABLE);
+
+    NVIC_InitStructure.NVIC_IRQChannel = PORT2_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPriority = 0x0;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
+
 }
 
 /* SURF5 LED2 */
@@ -256,6 +283,7 @@ void BSP_c0off(void) { GPIO_ResetBits(GPIOC, GPIO_Pin_0); }
 
 void BSP_cs_assert(void) { GPIO_ResetBits(GPIOA, GPIO_Pin_5); }
 void BSP_cs_deassert(void) { GPIO_SetBits(GPIOA, GPIO_Pin_5); }
+
 
 /**
  * @brief  Configures the Network Information.
@@ -343,6 +371,34 @@ static void DUALTIMER_Config(void)
     NVIC_Init(&NVIC_InitStructure);
 
     DUALTIMER_Cmd(DUALTIMER0_0, ENABLE);
+
+    /* Free Running Timer for IR Remote micros() function */
+    DUALTIMER_InitStructure.Timer_Load = GetSystemClock() / 1;
+    DUALTIMER_InitStructure.Timer_Prescaler = DUALTIMER_Prescaler_16;
+    DUALTIMER_InitStructure.Timer_Wrapping = DUALTIMER_Free_Running; //DUALTIMER_Periodic;
+    DUALTIMER_InitStructure.Timer_Repetition = DUALTIMER_Wrapping;
+    DUALTIMER_InitStructure.Timer_Size = DUALTIMER_Size_32;
+    DUALTIMER_Init(DUALTIMER1_0, &DUALTIMER_InitStructure);
+
+
+    DUALTIMER_Cmd(DUALTIMER1_0, ENABLE);
+
+    micros_last = DUALTIMER_GetValue(DUALTIMER1_0);
+
+}
+
+uint32_t micros(void){
+    uint32_t micros;
+    uint32_t tmp =  DUALTIMER_GetValue(DUALTIMER1_0);
+    if(tmp > micros_last){
+        uint32_t roll_over_count = 0xFFFFFFFF - tmp;
+        micros = micros_last + roll_over_count;
+    }else{
+        micros = micros_last - tmp;
+    }
+    micros_last = tmp;
+    micros_acc += micros;
+    return micros_acc;
 }
 
 
@@ -379,6 +435,12 @@ void SST_onStart(void) {
     printf("SystemClock : %d\r\n", (int) GetSystemClock());
 
     /* set priorities of ISRs used in the system */
+
+    /* PWM4 ISR for IR Remote Control Task */
+    NVIC_InitStructure.NVIC_IRQChannel = PWM4_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPriority = 0x1;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
     /* PWM5 ISR for Blinky */
     NVIC_InitStructure.NVIC_IRQChannel = PWM5_IRQn;
     NVIC_InitStructure.NVIC_IRQChannelPriority = 0x1;
@@ -475,12 +537,11 @@ void SST_onStart(void) {
     /* Send event to led matrix max7219 controller */
     static MatrixWorkEvt const fInitDoneEvt = {
         .super.sig = USER_ONE_SHOT,
-        .text = "Surf5 Demo using SST.",
+        .text = "Surf5 Demo using SST RTOS.",
         .scroll_iter = 1        // 0 here for one shot image send or a number for times text will scroll
     };
     SST_Task_post(AO_Matrix, &fInitDoneEvt.super);
 #endif
-    
 }
 /*..........................................................................*/
 void SST_onIdle(void) {

@@ -29,6 +29,13 @@
 #include <stdio.h>
 #include "w7500x_it.h"
 
+#include "nec_decoder.h"
+#include "dhcp.h"
+#include "bsp.h"
+
+bool toggle_led = 1;
+
+uint32_t tmp_dif = 0;
 /** @addtogroup W7500x_StdPeriph_Examples
  * @{
  */
@@ -151,12 +158,17 @@ void PORT0_Handler(void)
 /**
  * @brief  This function handles PORT1 Handler.
  * @param  None
- * @retval None
+ * @retval None 
  */
 void PORT1_Handler(void)
 {
 }
-
+/*
+        // uint32_t tmp = micros();
+        // uint32_t tmp2 =  tmp - tmp_dif;
+        // tmp_dif = tmp;
+        // printf("micros diff = %lu\r\n", tmp2);
+*/
 /**
  * @brief  This function handles PORT2 Handler.
  * @param  None
@@ -164,6 +176,16 @@ void PORT1_Handler(void)
  */
 void PORT2_Handler(void)
 {
+    if (GPIO_GetITStatus(GPIOC, GPIO_Pin_4) == SET) {
+        nec_decoder_tick();
+        if(toggle_led){
+            BSP_c0on();
+        }else{
+            BSP_c0off();
+        }
+        toggle_led ^= true;
+        GPIO_ClearITPendingPin(GPIOC, GPIO_Pin_4);
+    }
 }
 
 /**
@@ -248,9 +270,9 @@ void PWM3_Handler(void)
  * @param  None
  * @retval None
  */
-void PWM4_Handler(void)
-{
-}
+// void PWM4_Handler(void)
+// {
+// }
 
 /**
  * @brief  This function handles PWM5 Handler.

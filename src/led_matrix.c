@@ -82,15 +82,16 @@ static void Matrix_dispatch(Matrix * const me, SST_Evt const * const e) {
 #ifndef SEVEN_SEGMENT
             maxSendImage(bImg, iPitch);
 			maxScrollBitmap(bImg, iPitch, 1);
-            pixel_scroll--;
             if(pixel_scroll > 0U){
+                pixel_scroll--;
                 SST_TimeEvt_arm(&me->te1, 40U, 0U);
             }else{
-                scroll_iter --;
                 if(scroll_iter > 0U){
+                    scroll_iter --;
                     pixel_scroll = iPitch*8;
                     SST_TimeEvt_arm(&me->te1, 40U, 0U);
                 }else{
+                    scroll_iter  = 0;
                     pixel_scroll = 0;
                     free = true;
                 }
@@ -101,7 +102,6 @@ static void Matrix_dispatch(Matrix * const me, SST_Evt const * const e) {
         }
         case USER_ONE_SHOT: {
             BSP_a1on();
-            
             const char * tmp = SST_EVT_DOWNCAST(MatrixWorkEvt, e)->text;
 #ifdef SEVEN_SEGMENT
             maxSegmentString((char*)tmp);
@@ -114,6 +114,7 @@ static void Matrix_dispatch(Matrix * const me, SST_Evt const * const e) {
                 maxDrawString((char*)tmp, bImg, iPitch, 1); // draw narrow digits
                 if(scroll_iter > 0){
                     SST_TimeEvt_arm(&me->te1, 1U, 0U);
+                    scroll_iter--;
                     free = false;
                 }else{
                     maxSendImage(bImg, iPitch);
@@ -125,6 +126,7 @@ static void Matrix_dispatch(Matrix * const me, SST_Evt const * const e) {
         }
         case USER_SIG1: {
             BSP_a1on();
+            
             BSP_a1off();
             break;
         }

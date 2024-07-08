@@ -162,6 +162,8 @@ void DUALTIMER_ITConfig(DUALTIMER_TypeDef* DUALTIMERn, FunctionalState NewState)
 ITStatus DUALTIMER_GetITStatus(DUALTIMER_TypeDef* DUALTIMERn);
 void DUALTIMER_ClearIT(DUALTIMER_TypeDef* DUALTIMERn);
 
+uint32_t DUALTIMER_GetValue(DUALTIMER_TypeDef* DUALTIMERn);
+
 #ifdef __cplusplus
 }
 #endif

@@ -66,6 +66,7 @@ static MatrixWorkEvt fInitDoneEvt = {
     .scroll_iter = 0        // 0 here for one shot image send.
 };
 static bool toogle_colon = TRUE;
+static bool volatile sec_upd_pause = true;
 #ifdef FONT_SIZE_6X8
 static char const fmt_colon_on[] = {"%02d:%02d"};
 static char const fmt_colon_off[] = {"%02d %02d"};
@@ -124,7 +125,9 @@ static void Sntpserver_init(Client * const me, SST_Evt const * const ie) {
 static void Sntpserver_dispatch(Client * const me, SST_Evt const * const e) {
     switch (e->sig) {
         case GET_SN_SR_SIG: {
+#if SNTP_DBG_BLIP
             BSP_c0on();
+#endif
             if(inc_sec_ticks()) {
                 /* Setup for Run SNTP request task */
                 static SntpWorkEvt const PhyInitDoneEvt = {
@@ -138,23 +141,29 @@ static void Sntpserver_dispatch(Client * const me, SST_Evt const * const e) {
                 calcdatetime(tmp);
                 copy_datetime_object(&time);               
 #ifdef FONT_SIZE_6X8
-                memset(fInitDoneEvt.text, 0, sizeof(fInitDoneEvt.text));
-                if(toogle_colon){
-                    sprintf(fInitDoneEvt.text, fmt_colon_on, time.hh, time.mm);
-                }else{
-                    sprintf(fInitDoneEvt.text, fmt_colon_off, time.hh, time.mm);
+                if(sec_upd_pause){
+                    memset(fInitDoneEvt.text, 0, sizeof(fInitDoneEvt.text));
+                    if(toogle_colon){
+                        sprintf(fInitDoneEvt.text, fmt_colon_on, time.hh, time.mm);
+                    }else{
+                        sprintf(fInitDoneEvt.text, fmt_colon_off, time.hh, time.mm);
+                    }
+                    toogle_colon ^= TRUE;
+                    SST_Task_post(AO_Matrix, &fInitDoneEvt.super);
                 }
-                toogle_colon ^= TRUE;
-                SST_Task_post(AO_Matrix, &fInitDoneEvt.super);
 #endif
-                printf("Software date-time:%d/%02d/%d-%02d:%02d:%02d\n\r", time.dd, time.mo, time.yy, time.hh, time.mm, time.ss);
+                // printf("Software date-time:%d/%02d/%d-%02d:%02d:%02d\n\r", time.dd, time.mo, time.yy, time.hh, time.mm, time.ss);
                 SST_TimeEvt_arm(&me->te1, BSP_TICKS_PER_SEC * 1U, 0U);      /* update clock every second */
             }
+#if SNTP_DBG_BLIP
             BSP_c0off();
+#endif
             break;
         }
         case SNTP_RUN: {
+#if SNTP_DBG_BLIP
             BSP_c0on();
+#endif
             int8_t retval = 0;
             retval = SNTP_run(&time);
             if (retval == 1)
@@ -166,7 +175,13 @@ static void Sntpserver_dispatch(Client * const me, SST_Evt const * const e) {
             }else if(retval == -1){
                 printf("SNTP failed to get request response.\n\r");
             }
+#if SNTP_DBG_BLIP
             BSP_c0off();
+#endif
+            break;
+        }
+        case SNTP_PAUSE: {
+            sec_upd_pause ^= true;
             break;
         }
         default: {
