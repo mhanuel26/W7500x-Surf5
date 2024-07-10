@@ -256,7 +256,7 @@ static void BSP_GPIO_Config(void)
     GPIO_Init(GPIOC, &GPIO_InitStructure);
 
     GPIO_ITInitStructure.GPIO_IT_Pin = GPIO_Pin_4;
-    GPIO_ITInitStructure.GPIO_IT_Polarity = GPIO_IT_LowFalling; //GPIO_IT_HighRising;
+    GPIO_ITInitStructure.GPIO_IT_Polarity = GPIO_IT_LowFalling; 
     GPIO_ITInitStructure.GPIO_IT_Type = GPIO_IT_Edge;
     GPIO_IT_Init(GPIOC, &GPIO_ITInitStructure);
     GPIO_ITConfig(GPIOC, GPIO_Pin_4, ENABLE);
@@ -387,6 +387,12 @@ static void DUALTIMER_Config(void)
 
 }
 
+/**
+ * @brief  Calculates micros elapsed since start of execution.
+ * @note
+ * @param  None
+ * @retval None
+ */
 uint32_t micros(void){
     uint32_t micros;
     uint32_t tmp =  DUALTIMER_GetValue(DUALTIMER1_0);

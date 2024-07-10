@@ -252,7 +252,9 @@ void get_seconds_from_ntp_server(uint8_t *buf, uint16_t idx)
 
 	//calculation for date
 	calcdatetime(seconds);
+	/* calculation for DST savings */
 	seconds += dstOffset();
+	/* Re-calculate the datetime object once more*/
 	calcdatetime(seconds);
 }
 
