@@ -40,6 +40,8 @@
 #include "ir_ctrl_task.h"
 #include "dhcp.h"
 #include "sntp.h"
+#include "lfs.h"
+
 DBC_MODULE_NAME("bsp_surf5_w7500") /* for DBC assertions in this module */
 
 uint8_t srv_buf[DATA_BUF_SIZE];
@@ -54,6 +56,12 @@ static uint8_t g_sntp_server_ip[4] = {216, 239, 35, 0}; // time.google.com
 
 static uint32_t micros_last;
 static uint32_t micros_acc = 0;
+
+// variables used by the filesystem
+extern lfs_t lfs;
+extern lfs_file_t file;
+extern const struct lfs_config cfg;
+
 /* Local-scope defines -----------------------------------------------------*/
 static void BSP_GPIO_Config(void);
 static void BSP_UART_Config(void);
@@ -439,6 +447,29 @@ void SST_onStart(void) {
 
     printf("SourceClock : %d\r\n", (int) GetSourceClock());
     printf("SystemClock : %d\r\n", (int) GetSystemClock());
+
+    // /* initialize the litle file system */
+    // int err = lfs_mount(&lfs, &cfg);
+    // // reformat if we can't mount the filesystem
+    // // this should only happen on the first boot
+    // if (err) {
+    //     lfs_format(&lfs, &cfg);
+    //     lfs_mount(&lfs, &cfg);
+    // }
+    // // read current count
+    // uint32_t boot_count = 0;
+    // lfs_file_open(&lfs, &file, "boot_count", LFS_O_RDWR | LFS_O_CREAT);
+    // lfs_file_read(&lfs, &file, &boot_count, sizeof(boot_count));
+    // // update boot count
+    // boot_count += 1;
+    // lfs_file_rewind(&lfs, &file);
+    // lfs_file_write(&lfs, &file, &boot_count, sizeof(boot_count));
+    // // remember the storage is not updated until the file is closed successfully
+    // lfs_file_close(&lfs, &file);
+    // // release any resources we were using
+    // lfs_unmount(&lfs);
+    // // print the boot count
+    // printf("boot_count: %lu\n", boot_count);
 
     /* set priorities of ISRs used in the system */
 

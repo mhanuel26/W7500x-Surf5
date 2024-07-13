@@ -29,6 +29,8 @@
 #include <stdio.h>
 #include "w7500x_it.h"
 
+static uint8_t burst_on_off = 0;
+
 /** @addtogroup W7500x_StdPeriph_Examples
  * @{
  */
@@ -87,6 +89,12 @@ void PendSV_Handler(void)
  */
 void SysTick_Handler(void)
 {
+    if(burst_on_off){
+        PWM_Cmd(PWM0, ENABLE);
+    }else{
+        PWM_Cmd(PWM0, DISABLE);
+    }
+    burst_on_off ^= 1;
 }
 
 /******************************************************************************/

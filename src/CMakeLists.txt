@@ -15,13 +15,19 @@ add_executable(${TARGET_NAME}
   ${CMAKE_SOURCE_DIR}/src/led_matrix.c
   ${CMAKE_SOURCE_DIR}/src/nec_decoder.c
   ${CMAKE_SOURCE_DIR}/src/ir_ctrl_task.c
+  ${CMAKE_SOURCE_DIR}/src/surf5LittleFs.c
+  ${CMAKE_SOURCE_DIR}/src/surf5LittleFS_block_device.c
+  ${CMAKE_SOURCE_DIR}/src/surf5Flash.c
   ${CMAKE_SOURCE_DIR}/Libraries/sst_c/src/sst.c
   ${CMAKE_SOURCE_DIR}/Libraries/sst_c/ports/arm-cm/sst_port.c
+  ${CMAKE_SOURCE_DIR}/Libraries/littlefs/lfs.c
+  ${CMAKE_SOURCE_DIR}/Libraries/littlefs/lfs_util.c
   ${CMAKE_SOURCE_DIR}/Libraries/CMSIS/Device/WIZnet/W7500/Source/GCC/startup_w7500.s
   )
 
 target_include_directories(${TARGET_NAME} PUBLIC
   ${CMAKE_SOURCE_DIR}/src
+  ${CMAKE_SOURCE_DIR}/Libraries/littlefs
   ${CMAKE_SOURCE_DIR}/Libraries/sst_c/ports/arm-cm
   ${CMAKE_SOURCE_DIR}/Libraries/sst_c/include
   )

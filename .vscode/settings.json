@@ -21,7 +21,9 @@
         "sntp.h": "c",
         "stdint.h": "c",
         "w7500x_dualtimer.h": "c",
-        "sst.h": "c"
+        "sst.h": "c",
+        "surf5littlefs_block_device.h": "c",
+        "surf5littlefs.h": "c"
     },
     "cortex-debug.variableUseNaturalFormat": true
 }

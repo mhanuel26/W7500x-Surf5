@@ -29,6 +29,7 @@
 #include "dbc_assert.h" /* Design By Contract (DBC) assertions */
 #include "sntp.h"
 
+
 #define SNTP_REFRESH    3600        /* Refresh Clock Rate in seconds using SNTP*/
 #define SNTP_DBG_BLIP   false       /* SNTP uses a Blip signal on DIO C0 of SURF5 */
 #define WEB_DBG_BLIP    false       /* SNTP uses a Blip signal on DIO C0 of SURF5 */

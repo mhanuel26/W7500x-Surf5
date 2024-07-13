@@ -53,6 +53,8 @@ int main(void)
 {
     SystemInit();
 
+    SysTick_Config((GetSystemClock() / 1000U) + 1U);
+
     UART_Config();
     PWM_Config();
 
@@ -106,12 +108,11 @@ static void PWM_Config(void)
     PWM_StructInit(&PWM_InitStructure);
 
     PWM_InitStructure.PWM_Output = PWM_Output_OutEnable_InDisable;
-    // 1/8,000,000Hz = 0.000000125s
-    // 0.000000125 * 8 = 0.000001s
-    PWM_InitStructure.PWM_Prescale_Counter = 8 - 1;
-    // 0.000001 * 100000 = 0.1s = 10Hz
-    PWM_InitStructure.PWM_Duty = 50000 - 1;
-    PWM_InitStructure.PWM_Period = 100000 - 1;
+    // 1/16,000,000Hz = 0.0000000625s
+    // 0.0000000625 * 420 = 26.25us = 38.1 kHz
+    PWM_InitStructure.PWM_Duty = 210 - 1;
+    PWM_InitStructure.PWM_Period = 420 - 1;
+
     PWM_Init(PWM0, &PWM_InitStructure);
     PWM_Cmd(PWM0, ENABLE);
 }
