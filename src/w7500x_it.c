@@ -33,10 +33,7 @@
 #include "dhcp.h"
 #include "bsp.h"
 
-// bool toggle_led = 1;
-static uint8_t burst_on_off = 0;
 uint32_t tmp_dif = 0;
-static uint32_t tm_cur, tm_start;
 static Ir_tx_state state = IDLE;
 static uint8_t ir_addr, ir_cmd, ir_addr_inv, ir_cmd_inv;
 static uint8_t ir_cnt = 0;
@@ -53,15 +50,17 @@ static bool ir_pulse_dly = true;
 /* Private functions ---------------------------------------------------------*/
 
 void send_ir(uint8_t addr, uint8_t cmd){
-    ir_addr = addr;
-    ir_addr_inv = ~addr;
-    ir_cmd = cmd;
-    ir_cmd_inv = ~cmd;
-    ir_pulse_dly = true;
-    change_ir_tx_state(DELAY_4500);
-    PWM_Cmd(PWM0, ENABLE);
-    DUALTIMER_SetLoad(DUALTIMER1_0, 9000U);
-    DUALTIMER_Cmd(DUALTIMER1_0, ENABLE);
+    if(state == IDLE){
+        ir_addr = addr;
+        ir_addr_inv = ~addr;
+        ir_cmd = cmd;
+        ir_cmd_inv = ~cmd;
+        ir_pulse_dly = true;
+        change_ir_tx_state(DELAY_4500);
+        PWM_Cmd(PWM2, ENABLE);
+        DUALTIMER_SetLoad(DUALTIMER1_0, 9000U);
+        DUALTIMER_Cmd(DUALTIMER1_0, ENABLE);
+    }
 }
 
 void change_ir_tx_state(Ir_tx_state new){
@@ -71,10 +70,10 @@ void change_ir_tx_state(Ir_tx_state new){
 
 void send_ir_data(uint8_t* data, Ir_tx_state next_state){
     if(ir_pulse_dly){
-        PWM_Cmd(PWM0, ENABLE);  /* activate the pulse */
+        PWM_Cmd(PWM2, ENABLE);  /* activate the pulse */
         DUALTIMER_SetLoad(DUALTIMER1_0, 562U - EXP_COMPENSATION);
     }else{
-        PWM_Cmd(PWM0, DISABLE);
+        PWM_Cmd(PWM2, DISABLE);
         if (*data & (1 << 7)) DUALTIMER_SetLoad(DUALTIMER1_0, 1687U - EXP_COMPENSATION);
         else DUALTIMER_SetLoad(DUALTIMER1_0, 562U);
         *data <<= 1;
@@ -220,12 +219,6 @@ void PORT2_Handler(void)
 {
     if (GPIO_GetITStatus(GPIOC, GPIO_Pin_4) == SET) {
         nec_decoder_tick();
-        // if(toggle_led){
-        //     BSP_c0on();
-        // }else{
-        //     BSP_c0off();
-        // }
-        // toggle_led ^= true;
         GPIO_ClearITPendingPin(GPIOC, GPIO_Pin_4);
     }
 }
@@ -274,10 +267,10 @@ void DUALTIMER1_Handler(void)
         switch(state){
             case IDLE:
                 DUALTIMER_Cmd(DUALTIMER1_0, DISABLE);
-                PWM_Cmd(PWM0, DISABLE);
+                PWM_Cmd(PWM2, DISABLE);
             break;
             case DELAY_4500:
-                PWM_Cmd(PWM0, DISABLE);
+                PWM_Cmd(PWM2, DISABLE);
                 DUALTIMER_SetLoad(DUALTIMER1_0, 4500U);
                 state = SEND_ADDR;
                 ir_cnt = 0;
@@ -295,7 +288,7 @@ void DUALTIMER1_Handler(void)
                 send_ir_data(&ir_cmd_inv, PULSE_562);
             break;
             case PULSE_562:
-                PWM_Cmd(PWM0, ENABLE);
+                PWM_Cmd(PWM2, ENABLE);
                 DUALTIMER_SetLoad(DUALTIMER1_0, 562U);
                 state = IDLE;
             break;

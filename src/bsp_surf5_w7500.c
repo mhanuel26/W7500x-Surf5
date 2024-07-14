@@ -302,7 +302,7 @@ static void PWM_Config(void)
 {
     PWM_InitTypeDef PWM_InitStructure;
 
-    GPIO_PinAFConfig(GPIOC, GPIO_PinSource0, PAD_AF2);
+    GPIO_PinAFConfig(GPIOC, GPIO_PinSource2, PAD_AF2);
 
     PWM_StructInit(&PWM_InitStructure);
 
@@ -312,16 +312,16 @@ static void PWM_Config(void)
     PWM_InitStructure.PWM_Duty = 210 - 1;
     PWM_InitStructure.PWM_Period = 420 - 1;
 
-    PWM_Init(PWM0, &PWM_InitStructure);
-    PWM_Cmd(PWM0, DISABLE);
+    PWM_Init(PWM2, &PWM_InitStructure);
+    PWM_Cmd(PWM2, DISABLE);
 }
 
 void BSP_enable_PWM(void){
-    PWM_Cmd(PWM0, ENABLE);
+    PWM_Cmd(PWM2, ENABLE);
 }
 
 void BSP_disable_PWM(void){
-    PWM_Cmd(PWM0, DISABLE);
+    PWM_Cmd(PWM2, DISABLE);
 }
 
 
@@ -441,7 +441,7 @@ static void DUALTIMER_Config(void)
     NVIC_Init(&NVIC_InitStructure);
 
     DUALTIMER_Cmd(DUALTIMER1_0, DISABLE);
-    // send_ir(0x55, 0x1);                /* example usage for sending IR NEC command */
+    send_ir(0x55, 0x1);                /* example usage for sending IR NEC command */
 
 }
 
