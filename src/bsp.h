@@ -50,4 +50,7 @@ void BSP_c0off(void);
 void BSP_cs_assert(void);
 void BSP_cs_deassert(void);
 
+void BSP_disable_PWM(void);
+void BSP_enable_PWM(void);
+
 #endif /* BSP_H_ */

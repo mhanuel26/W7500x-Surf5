@@ -292,6 +292,38 @@ void BSP_c0off(void) { GPIO_ResetBits(GPIOC, GPIO_Pin_0); }
 void BSP_cs_assert(void) { GPIO_ResetBits(GPIOA, GPIO_Pin_5); }
 void BSP_cs_deassert(void) { GPIO_SetBits(GPIOA, GPIO_Pin_5); }
 
+/**
+ * @brief  Configures the PWM Peripheral.
+ * @note
+ * @param  None
+ * @retval None
+ */
+static void PWM_Config(void)
+{
+    PWM_InitTypeDef PWM_InitStructure;
+
+    GPIO_PinAFConfig(GPIOC, GPIO_PinSource0, PAD_AF2);
+
+    PWM_StructInit(&PWM_InitStructure);
+
+    PWM_InitStructure.PWM_Output = PWM_Output_OutEnable_InDisable;
+    // 1/16,000,000Hz = 0.0000000625s
+    // 0.0000000625 * 420 = 26.25us = 38.1 kHz
+    PWM_InitStructure.PWM_Duty = 210 - 1;
+    PWM_InitStructure.PWM_Period = 420 - 1;
+
+    PWM_Init(PWM0, &PWM_InitStructure);
+    PWM_Cmd(PWM0, DISABLE);
+}
+
+void BSP_enable_PWM(void){
+    PWM_Cmd(PWM0, ENABLE);
+}
+
+void BSP_disable_PWM(void){
+    PWM_Cmd(PWM0, DISABLE);
+}
+
 
 /**
  * @brief  Configures the Network Information.
@@ -381,17 +413,25 @@ static void DUALTIMER_Config(void)
     DUALTIMER_Cmd(DUALTIMER0_0, ENABLE);
 
     /* Free Running Timer for IR Remote micros() function */
-    DUALTIMER_InitStructure.Timer_Load = GetSystemClock() / 1;
+    /* No ISR required for this dual timer. */
+    DUALTIMER_InitStructure.Timer_Load = 0xFFFFFFFF;  /* we don't care as it is free running */
     DUALTIMER_InitStructure.Timer_Prescaler = DUALTIMER_Prescaler_16;
-    DUALTIMER_InitStructure.Timer_Wrapping = DUALTIMER_Free_Running; //DUALTIMER_Periodic;
+    DUALTIMER_InitStructure.Timer_Wrapping = DUALTIMER_Free_Running;
     DUALTIMER_InitStructure.Timer_Repetition = DUALTIMER_Wrapping;
     DUALTIMER_InitStructure.Timer_Size = DUALTIMER_Size_32;
-    DUALTIMER_Init(DUALTIMER1_0, &DUALTIMER_InitStructure);
+    DUALTIMER_Init(DUALTIMER0_1, &DUALTIMER_InitStructure);
 
-
-    DUALTIMER_Cmd(DUALTIMER1_0, ENABLE);
+    DUALTIMER_Cmd(DUALTIMER0_1, ENABLE);
 
     micros_last = DUALTIMER_GetValue(DUALTIMER1_0);
+
+    /* Dual Timer used for IR Tx. */
+    DUALTIMER_InitStructure.Timer_Load = 0x10;
+    DUALTIMER_InitStructure.Timer_Prescaler = DUALTIMER_Prescaler_1;
+    DUALTIMER_InitStructure.Timer_Wrapping = DUALTIMER_Periodic;
+    DUALTIMER_InitStructure.Timer_Repetition = DUALTIMER_Wrapping;
+    DUALTIMER_InitStructure.Timer_Size = DUALTIMER_Size_16;
+    DUALTIMER_Init(DUALTIMER0_1, &DUALTIMER_InitStructure);
 
 }
 
