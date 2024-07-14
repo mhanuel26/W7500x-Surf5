@@ -276,11 +276,6 @@ void DUALTIMER1_Handler(void)
                 DUALTIMER_Cmd(DUALTIMER1_0, DISABLE);
                 PWM_Cmd(PWM0, DISABLE);
             break;
-            // case PULSE_9000:
-            //     PWM_Cmd(PWM0, ENABLE);
-            //     DUALTIMER_SetLoad(DUALTIMER1_0, 9000U);
-            //     state = DELAY_4500;
-            // break;
             case DELAY_4500:
                 PWM_Cmd(PWM0, DISABLE);
                 DUALTIMER_SetLoad(DUALTIMER1_0, 4500U);
@@ -307,16 +302,6 @@ void DUALTIMER1_Handler(void)
             default:
             break;
         }
-
-        
-        // if(burst_on_off){
-        //     // PWM_Cmd(PWM0, ENABLE);
-        //     BSP_c0on();
-        // }else{
-        //     BSP_c0off();
-        //     // PWM_Cmd(PWM0, DISABLE);
-        // }
-        // burst_on_off ^= 1;
     }
 }
 

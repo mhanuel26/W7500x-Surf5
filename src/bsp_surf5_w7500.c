@@ -481,7 +481,6 @@ void SST_onStart(void) {
 #endif
     NVIC_InitTypeDef NVIC_InitStructure;
     SystemInit();
-    // SystemCoreClockUpdate();
 
     /* set up the SysTick timer to fire at BSP_TICKS_PER_SEC rate */
     SysTick_Config((GetSystemClock() / BSP_TICKS_PER_SEC) + 1U);
