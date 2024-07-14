@@ -33,9 +33,14 @@
 #include "dhcp.h"
 #include "bsp.h"
 
-bool toggle_led = 1;
-
+// bool toggle_led = 1;
+static uint8_t burst_on_off = 0;
 uint32_t tmp_dif = 0;
+static uint32_t tm_cur, tm_start;
+static Ir_tx_state state = IDLE;
+static uint8_t ir_addr, ir_cmd, ir_addr_inv, ir_cmd_inv;
+static uint8_t ir_cnt = 0;
+static bool ir_pulse_dly = true;
 /** @addtogroup W7500x_StdPeriph_Examples
  * @{
  */
@@ -46,6 +51,43 @@ uint32_t tmp_dif = 0;
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
+
+void send_ir(uint8_t addr, uint8_t cmd){
+    ir_addr = addr;
+    ir_addr_inv = ~addr;
+    ir_cmd = cmd;
+    ir_cmd_inv = ~cmd;
+    ir_pulse_dly = true;
+    change_ir_tx_state(DELAY_4500);
+    PWM_Cmd(PWM0, ENABLE);
+    DUALTIMER_SetLoad(DUALTIMER1_0, 9000U);
+    DUALTIMER_Cmd(DUALTIMER1_0, ENABLE);
+}
+
+void change_ir_tx_state(Ir_tx_state new){
+    state = new;
+}
+
+
+void send_ir_data(uint8_t* data, Ir_tx_state next_state){
+    if(ir_pulse_dly){
+        PWM_Cmd(PWM0, ENABLE);  /* activate the pulse */
+        DUALTIMER_SetLoad(DUALTIMER1_0, 562U - EXP_COMPENSATION);
+    }else{
+        PWM_Cmd(PWM0, DISABLE);
+        if (*data & (1 << 7)) DUALTIMER_SetLoad(DUALTIMER1_0, 1687U - EXP_COMPENSATION);
+        else DUALTIMER_SetLoad(DUALTIMER1_0, 562U);
+        *data <<= 1;
+        if(ir_cnt >= 7){
+            state = next_state;
+            ir_cnt = 0;
+        }else{
+            ir_cnt++;        /* here we ack one less bit to send */
+        }
+    }
+    ir_pulse_dly ^= true;
+}
+
 
 /******************************************************************************/
 /*            Cortex-M0 Processor Exceptions Handlers                         */
@@ -178,12 +220,12 @@ void PORT2_Handler(void)
 {
     if (GPIO_GetITStatus(GPIOC, GPIO_Pin_4) == SET) {
         nec_decoder_tick();
-        if(toggle_led){
-            BSP_c0on();
-        }else{
-            BSP_c0off();
-        }
-        toggle_led ^= true;
+        // if(toggle_led){
+        //     BSP_c0on();
+        // }else{
+        //     BSP_c0off();
+        // }
+        // toggle_led ^= true;
         GPIO_ClearITPendingPin(GPIOC, GPIO_Pin_4);
     }
 }
@@ -216,9 +258,9 @@ void DUALTIMER0_Handler(void)
     if (DUALTIMER_GetITStatus(DUALTIMER0_0)) {
         DUALTIMER_ClearIT(DUALTIMER0_0);
         DHCP_time_handler();
-        // printf("dual timer isr\r\n");
     }
 }
+
 
 /**
  * @brief  This function handles DUALTIMER1 Handler.
@@ -227,6 +269,55 @@ void DUALTIMER0_Handler(void)
  */
 void DUALTIMER1_Handler(void)
 {
+    if (DUALTIMER_GetITStatus(DUALTIMER1_0)) {
+        DUALTIMER_ClearIT(DUALTIMER1_0);
+        switch(state){
+            case IDLE:
+                DUALTIMER_Cmd(DUALTIMER1_0, DISABLE);
+                PWM_Cmd(PWM0, DISABLE);
+            break;
+            // case PULSE_9000:
+            //     PWM_Cmd(PWM0, ENABLE);
+            //     DUALTIMER_SetLoad(DUALTIMER1_0, 9000U);
+            //     state = DELAY_4500;
+            // break;
+            case DELAY_4500:
+                PWM_Cmd(PWM0, DISABLE);
+                DUALTIMER_SetLoad(DUALTIMER1_0, 4500U);
+                state = SEND_ADDR;
+                ir_cnt = 0;
+            break;
+            case SEND_ADDR:
+                send_ir_data(&ir_addr, SEND_ADDR_INV);
+            break;
+            case SEND_ADDR_INV:
+                send_ir_data(&ir_addr_inv, SEND_CMD);
+            break;
+            case SEND_CMD:
+                send_ir_data(&ir_cmd, SEND_CMD_INV);
+            break;
+            case SEND_CMD_INV:
+                send_ir_data(&ir_cmd_inv, PULSE_562);
+            break;
+            case PULSE_562:
+                PWM_Cmd(PWM0, ENABLE);
+                DUALTIMER_SetLoad(DUALTIMER1_0, 562U);
+                state = IDLE;
+            break;
+            default:
+            break;
+        }
+
+        
+        // if(burst_on_off){
+        //     // PWM_Cmd(PWM0, ENABLE);
+        //     BSP_c0on();
+        // }else{
+        //     BSP_c0off();
+        //     // PWM_Cmd(PWM0, DISABLE);
+        // }
+        // burst_on_off ^= 1;
+    }
 }
 
 /**

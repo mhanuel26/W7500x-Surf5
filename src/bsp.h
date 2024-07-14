@@ -53,4 +53,21 @@ void BSP_cs_deassert(void);
 void BSP_disable_PWM(void);
 void BSP_enable_PWM(void);
 
+
+typedef enum {
+    // PULSE_9000=0,
+    DELAY_4500=0,
+    SEND_ADDR,
+    SEND_ADDR_INV,
+    SEND_CMD, 
+    SEND_CMD_INV,
+    PULSE_562, 
+    IDLE
+
+}Ir_tx_state; 
+#define EXP_COMPENSATION    20U     /* adjustment experimental observation on timing */
+
+void send_ir(uint8_t addr, uint8_t cmd);
+void change_ir_tx_state(Ir_tx_state new);
+
 #endif /* BSP_H_ */

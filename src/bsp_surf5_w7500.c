@@ -423,15 +423,25 @@ static void DUALTIMER_Config(void)
 
     DUALTIMER_Cmd(DUALTIMER0_1, ENABLE);
 
-    micros_last = DUALTIMER_GetValue(DUALTIMER1_0);
+    micros_last = DUALTIMER_GetValue(DUALTIMER0_1);
 
     /* Dual Timer used for IR Tx. */
-    DUALTIMER_InitStructure.Timer_Load = 0x10;
-    DUALTIMER_InitStructure.Timer_Prescaler = DUALTIMER_Prescaler_1;
+    DUALTIMER_InitStructure.Timer_Load = 100U;
+    DUALTIMER_InitStructure.Timer_Prescaler = DUALTIMER_Prescaler_16;
     DUALTIMER_InitStructure.Timer_Wrapping = DUALTIMER_Periodic;
     DUALTIMER_InitStructure.Timer_Repetition = DUALTIMER_Wrapping;
     DUALTIMER_InitStructure.Timer_Size = DUALTIMER_Size_16;
-    DUALTIMER_Init(DUALTIMER0_1, &DUALTIMER_InitStructure);
+    DUALTIMER_Init(DUALTIMER1_0, &DUALTIMER_InitStructure);
+
+    DUALTIMER_ITConfig(DUALTIMER1_0, ENABLE);
+
+    NVIC_InitStructure.NVIC_IRQChannel = DUALTIMER1_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPriority = 0x1;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
+
+    DUALTIMER_Cmd(DUALTIMER1_0, DISABLE);
+    // send_ir(0x55, 0x1);                /* example usage for sending IR NEC command */
 
 }
 
@@ -443,7 +453,7 @@ static void DUALTIMER_Config(void)
  */
 uint32_t micros(void){
     uint32_t micros;
-    uint32_t tmp =  DUALTIMER_GetValue(DUALTIMER1_0);
+    uint32_t tmp =  DUALTIMER_GetValue(DUALTIMER0_1);
     if(tmp > micros_last){
         uint32_t roll_over_count = 0xFFFFFFFF - tmp;
         micros = micros_last + roll_over_count;
@@ -481,6 +491,7 @@ void SST_onStart(void) {
 
     /* setup uart for debug console output using printf*/
     BSP_UART_Config();
+    PWM_Config();
     DUALTIMER_Config();
 
     printf("W7500x Standard Peripheral Library version : %d.%d.%d\r\n", __W7500X_STDPERIPH_VERSION_MAIN, __W7500X_STDPERIPH_VERSION_SUB1, __W7500X_STDPERIPH_VERSION_SUB2);

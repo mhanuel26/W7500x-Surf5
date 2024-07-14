@@ -6,9 +6,9 @@
   "configurations": [
     {
       "cwd": "${workspaceFolder}",
-      "executable": "build/Projects/W7500x_StdPeriph_Examples/PWM/PWM_PWMOutput/PWM_PWMOutput.elf",
+      // "executable": "build/Projects/W7500x_StdPeriph_Examples/PWM/PWM_PWMOutput/PWM_PWMOutput.elf",
       // "executable": "build/Projects/W7500x_StdPeriph_Examples/GPIO/GPIO_Interrupt/GPIO_Interrupt.elf",
-      // "executable": "build/src/src.elf",
+      "executable": "build/src/src.elf",
       // "executable": "build/Projects/W7500x_StdPeriph_Examples/WZTOE/WZTOE_WebServer/WZTOE_WebServer.elf",
       // "executable": "build/Projects/W7500x_StdPeriph_Examples/WZTOE/WZTOE_MessagePack/WZTOE_MessagePack.elf",
       // "executable": "build/Projects/W7500x_StdPeriph_Examples/WZTOE/WZTOE_Loopback/WZTOE_Loopback.elf",
